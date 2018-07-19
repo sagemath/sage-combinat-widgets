@@ -17,7 +17,6 @@ from ipywidgets import Layout, VBox, HBox, Text, Label, HTML
 import traitlets
 
 cell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
-box_layout = Layout()
 css = HTML("<style>\n.blbutton { background-color: white; }\n.dwbutton {\n    border-collapse: collapse;\n    color: red;\n    border: 1px solid #666;\n}\n.left { border-right: 1px dotted #999; }\n.right { border-left: 1px dotted #999; }\n.bottom { border-top: 1px dotted #999; }\n.top { border-bottom: 1px dotted #999; }\n.green { background-color: lightgreen; }\n.blue { background-color: lightblue; }\n.pink { background-color: lightpink; }\n.yellow { background-color: lightyellow; }\n</style>")
 try:
     display(css)
@@ -40,7 +39,7 @@ class TCell(Text):
 
         TESTS::
 
-        sage: from sage_combinat_widgets import TCell
+        sage: from sage_combinat_widgets.tableau_widget import TCell
         sage: c = TCell(None, (0,0), 5)
         sage: assert c.value == '5'
         """
@@ -56,7 +55,7 @@ class TCell(Text):
         r"""
         TESTS::
 
-        sage: from sage_combinat_widgets import TCell
+        sage: from sage_combinat_widgets.tableau_widget import TCell
         sage: c = TCell(None, (0,0), 5)
         sage: from traitlets import Bunch
         sage: b = Bunch({'owner': c, 'new': u'10', 'old': u'5', 'name': 'value', 'type': 'change'})
@@ -195,15 +194,12 @@ class PartitionWidget(TableauWidget):
         TESTS::
 
         sage: from sage_combinat_widgets import *
-        sage: from sage.combinat.tableau import Tableau
+        sage: from sage.combinat.partition import Partitions
         sage: p = Partitions(7)[5]
         sage: w = PartitionWidget(p)
         sage: assert w.valid == True
-        sage: t = Tableau(list([p]))
-        sage: w = TableauWidget(t)
-        sage: assert w.valid == False
         """
         from sage.combinat.tableau import Tableau
-        tbl = Tableau(list([partition]))
-        super(TableauWidget, self).__init__(tbl)
+        tbl = Tableau([[1]*partition[i] for i in range(len(partition))])
+        super(PartitionWidget, self).__init__(tbl)
         self.validate('generic')

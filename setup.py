@@ -20,13 +20,13 @@ class SageTest(TestCommand):
 
 setup(
     name = "sage-combinat-widgets",
-    version = readfile("VERSION"), # the VERSION file is shared with the documentation
+    version = readfile("VERSION"),
     description='Jupyter widgets for SAGE Combinat',
-    long_description = readfile("README.rst"), # get the long description from the README
-    url='https://github.com/nthiery/odile/sage-combinat-widgets',
+    long_description = readfile("README.rst"),
+    url='https://github.com/sagemath/sage-combinat-widgets',
     author='Odile Bénassy, Nicolas M. Thiéry',
-    author_email='odile.benassy@u-psud.fr', # choose a main contact email
-    license='GPLv3+', # This should be consistent with the LICENCE file
+    author_email='odile.benassy@u-psud.fr',
+    license='GPLv3+',
     classifiers=[
       # How mature is this project? Common values are
       #   3 - Alpha
@@ -41,5 +41,5 @@ setup(
     keywords = "SageMath widget combinatorics",
     packages = ['sage_combinat_widgets'],
     cmdclass = {'test': SageTest}, # adding a special setup command for tests
-    install_requires = ['ipywidgets', 'sage-package']
+    install_requires = ['ipywidgets']
 )
