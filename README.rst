@@ -2,7 +2,7 @@
 Sage Combinat Widgets
 =====================
 
-A few widgets for Sage Combinat:
+Jupyter widgets for Sage Combinat:
 - Standard/Semi-standard/Generic Tableau
 - Partition
 
@@ -60,3 +60,16 @@ This is just calling ``sage -t`` with appropriate flags.
 Shorthand::
 
     $ make test
+
+Documentation
+-------------
+
+The documentation of the package can be generated using Sage's
+``Sphinx`` installation::
+
+    $ cd docs
+    $ sage -sh -c "make html"
+
+Shorthand::
+
+    $ make doc
