@@ -13,6 +13,7 @@ AUTHORS:
 
 """
 from __future__ import print_function, absolute_import
+from sage.combinat.tableau import *
 from ipywidgets import Layout, VBox, HBox, Text, Label, HTML
 import traitlets
 
@@ -80,8 +81,8 @@ class TableauWidget(VBox):
             sage: S = StandardTableaux(15)
             sage: t = S.random_element()
             sage: w = TableauWidget(t)
-            sage: w.compute_label()
-            sage: assert w.label == 'standard'
+            sage: w.compute_status()
+            sage: assert w.status == 'standard'
         """
         super(TableauWidget, self).__init__()
         self.tbl = tbl
@@ -115,20 +116,20 @@ class TableauWidget(VBox):
         else:
             self.valid = True
 
-    def compute_label(self):
+    def compute_status(self):
         if self.tbl.is_standard():
-            self.label = 'standard'
+            self.status = 'standard'
         elif self.tbl.is_semistandard():
-            self.label = 'semistandard'
+            self.status = 'semistandard'
         else:
-            self.label = 'generic'
+            self.status = 'generic'
 
     def get_object(self):
         return self.tbl
 
     def set_object(self, tbl):
         self.tbl = tbl
-        self.compute_label()
+        self.compute_status()
 
     @traitlets.observe(traitlets.All)
     def update_tableau(self, change):
@@ -143,8 +144,8 @@ class TableauWidget(VBox):
             self.label.value = "Initial Tableau"
             return
         self.tbl = Tableau(lvalue)
-        self.compute_label()
-        self.label.value = self.label.capitalize()
+        self.compute_status()
+        self.label.value = self.status.capitalize()
 
 
 class SemistandardTableauWidget(TableauWidget):
