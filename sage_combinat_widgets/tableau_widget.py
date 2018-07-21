@@ -88,7 +88,7 @@ class TableauWidget(VBox):
         self.tbl = tbl
         self.size = tbl.size()
         self.initial_lvalue = [[c for c in r] for r in self.tbl]
-        self.label = Label("Tableau ready")
+        self.label = Label()
         self.cells = {}
         for r in self.tbl:
             for i in r:
