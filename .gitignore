@@ -1,0 +1,3 @@
+.ipynb_checkpoints/
+*.pyc
+sage_explorer.egg-info/
