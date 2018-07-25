@@ -13,6 +13,7 @@ AUTHORS:
 
 """
 from __future__ import print_function, absolute_import
+from sage.misc.bindable_class import BindableClass
 from sage.combinat.tableau import *
 from ipywidgets import Layout, VBox, HBox, Text, Label, HTML
 import traitlets
@@ -69,8 +70,13 @@ class TCell(Text):
         self.value = change.new
         self.content = int(self.value)
 
+import sage.misc.classcall_metaclass
+class MetaHasTraitsClasscallMetaclass (traitlets.traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
+    pass
+class BindableWidgetClass(BindableClass):
+    __metaclass__ = MetaHasTraitsClasscallMetaclass
 
-class TableauWidget(VBox):
+class TableauWidget(VBox, BindableWidgetClass):
     """Jupyter Widget for exploring a Young Tableau"""
 
     def __init__(self, tbl, display='en'):
