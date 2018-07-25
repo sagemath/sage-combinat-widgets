@@ -15,6 +15,7 @@ AUTHORS:
 from __future__ import print_function, absolute_import
 from sage.misc.bindable_class import BindableClass
 from sage.combinat.tableau import *
+from sage.all import SageObject
 from ipywidgets import Layout, VBox, HBox, Text, Label, HTML
 import traitlets
 
@@ -76,7 +77,30 @@ class MetaHasTraitsClasscallMetaclass (traitlets.traitlets.MetaHasTraits, sage.m
 class BindableWidgetClass(BindableClass):
     __metaclass__ = MetaHasTraitsClasscallMetaclass
 
-class TableauWidget(VBox, BindableWidgetClass):
+class GridWidget(VBox, BindableWidgetClass):
+    r"""Base Jupyter Interactive Widget for Sage Grid Objects
+
+    Composed of TCells.
+    """
+    value = traitlets.Instance(SageObject)
+
+    def __init__(self, obj):
+        r"""
+        TESTS::
+
+            sage: from sage_combinat_widgets import GridWidget
+            sage: import matrix, graphs
+            sage: from sage.graphs.generic_graph import GenericGraph
+            sage: m = matrix.identity(2)
+            sage: g = graphs.GridGraph(3)
+            sage: wm = GridWidget(m)
+            sage: wg = GridWidget(g)
+        """
+        super(GridWidget, self).__init__()
+        self.value = obj
+        self.cells = {}
+
+class TableauWidget(GridWidget):
     """Jupyter Widget for exploring a Young Tableau"""
 
     def __init__(self, tbl, display='en'):
@@ -90,51 +114,50 @@ class TableauWidget(VBox, BindableWidgetClass):
             sage: w.compute_status()
             sage: assert w.status == 'standard'
         """
-        super(TableauWidget, self).__init__()
-        self.tbl = tbl
+        super(TableauWidget, self).__init__(tbl)
         self.size = tbl.size()
-        self.initial_lvalue = [[c for c in r] for r in self.tbl]
+        self.initial_lvalue = [[c for c in r] for r in self.value]
         self.label = Label()
         self.cells = {}
-        for r in self.tbl:
+        for r in self.value:
             for i in r:
-                coord = (self.tbl.index(r), r.index(i))
+                coord = (self.value.index(r), r.index(i))
                 self.cells[coord] = TCell(self, coord, i)
                 self.add_traits(**{'cell_%d_%d' % (coord) : traitlets.Unicode()})
                 traitlets.link((self, 'cell_%d_%d' % (coord)), (self.cells[coord], 'value'))
         self.display_convention = display
         if self.display_convention == 'fr':
-            rows = list(self.tbl)
+            rows = list(self.value)
             rows.reverse()
             self.children = [ self.label ] + [HBox(
-                [self.cells[(self.tbl.index(r), r.index(i))] for i in r]
+                [self.cells[(self.value.index(r), r.index(i))] for i in r]
             ) for r in rows]
         else:
             self.children = [ self.label ] + [HBox(
-                [self.cells[(self.tbl.index(r), r.index(i))] for i in r]
-            ) for r in self.tbl]
+                [self.cells[(self.value.index(r), r.index(i))] for i in r]
+            ) for r in self.value]
 
     def validate(self, label='standard'):
         if label == 'semistandard':
-            self.valid = self.tbl.is_semistandard()
+            self.valid = self.value.is_semistandard()
         elif label == 'standard':
-            self.valid = self.tbl.is_standard()
+            self.valid = self.value.is_standard()
         else:
             self.valid = True
 
     def compute_status(self):
-        if self.tbl.is_standard():
+        if self.value.is_standard():
             self.status = 'standard'
-        elif self.tbl.is_semistandard():
+        elif self.value.is_semistandard():
             self.status = 'semistandard'
         else:
             self.status = 'generic'
 
     def get_object(self):
-        return self.tbl
+        return self.value
 
     def set_object(self, tbl):
-        self.tbl = tbl
+        self.value = tbl
         self.compute_status()
 
     @traitlets.observe(traitlets.All)
@@ -144,12 +167,12 @@ class TableauWidget(VBox, BindableWidgetClass):
         assert(change.name.startswith('cell_') and '_' in change.name[5:])
         vpos = int(change.name.split('_')[1])
         hpos = int(change.name.split('_')[2])
-        lvalue = [[c for c in r] for r in self.tbl]
+        lvalue = [[c for c in r] for r in self.value]
         lvalue[vpos][hpos] = int(change.new)
         if lvalue == self.initial_lvalue:
             self.label.value = "Initial Tableau"
             return
-        self.tbl = Tableau(lvalue)
+        self.value = Tableau(lvalue)
         self.compute_status()
         self.label.value = self.status.capitalize()
 
