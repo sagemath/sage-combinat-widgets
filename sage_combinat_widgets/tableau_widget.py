@@ -20,7 +20,28 @@ from ipywidgets import Layout, VBox, HBox, Text, Label, HTML
 import traitlets
 
 cell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
-css = HTML("<style>\n.blbutton { background-color: white; }\n.dwbutton {\n    border-collapse: collapse;\n    color: red;\n    border: 1px solid #666;\n}\n.left { border-right: 1px dotted #999; }\n.right { border-left: 1px dotted #999; }\n.bottom { border-top: 1px dotted #999; }\n.top { border-bottom: 1px dotted #999; }\n.green { background-color: lightgreen; }\n.blue { background-color: lightblue; }\n.pink { background-color: lightpink; }\n.yellow { background-color: lightyellow; }\n</style>")
+css_lines = []
+css_lines.append(".invisible {display: none; width: 0; height: 0;}")
+css_lines.append(".visible {display: table}")
+css_lines.append(".blbutton { background-color: white; }")
+css_lines.append(".dwbutton { border-collapse: collapse; color: red; border: 1px solid #666;}")
+css_lines.append(".left { border-right: 1px dotted #999; }")
+css_lines.append(".right { border-left: 1px dotted #999; }")
+css_lines.append(".bottom { border-top: 1px dotted #999; }")
+css_lines.append(".top { border-bottom: 1px dotted #999; }")
+css_lines.append(".green { background-color: lightgreen; }")
+css_lines.append(".blue { background-color: lightblue; }")
+css_lines.append(".pink { background-color: lightpink; }")
+css_lines.append(".yellow { background-color: lightyellow; }")
+css = HTML("<style>%s</style>" % '\n'.join(css_lines))
+
+ip = get_ipython()
+for base in ip.__class__.__mro__:
+    """If we are in a notebook, we will find 'notebook' in those names"""
+    if 'otebook' in base.__name__:
+        ip.display_formatter.format(css)
+        break
+
 try:
     display(css)
 except:
@@ -117,7 +138,8 @@ class TableauWidget(GridWidget):
         super(TableauWidget, self).__init__(tbl)
         self.size = tbl.size()
         self.initial_lvalue = [[c for c in r] for r in self.value]
-        self.label = Label()
+        self.output = Label()
+        self.output.add_class('invisible')
         self.cells = {}
         for r in self.value:
             for i in r:
@@ -129,11 +151,11 @@ class TableauWidget(GridWidget):
         if self.display_convention == 'fr':
             rows = list(self.value)
             rows.reverse()
-            self.children = [ self.label ] + [HBox(
+            self.children = [ self.output ] + [HBox(
                 [self.cells[(self.value.index(r), r.index(i))] for i in r]
             ) for r in rows]
         else:
-            self.children = [ self.label ] + [HBox(
+            self.children = [ self.output ] + [HBox(
                 [self.cells[(self.value.index(r), r.index(i))] for i in r]
             ) for r in self.value]
 
@@ -170,11 +192,17 @@ class TableauWidget(GridWidget):
         lvalue = [[c for c in r] for r in self.value]
         lvalue[vpos][hpos] = int(change.new)
         if lvalue == self.initial_lvalue:
-            self.label.value = "Initial Tableau"
+            self.output.value = "Initial Tableau"
             return
         self.value = Tableau(lvalue)
         self.compute_status()
-        self.label.value = self.status.capitalize()
+        self.output.value = self.status.capitalize()
+        if self.output.value:
+            self.output.remove_class('invisible')
+            self.output.add_class('visible')
+        else:
+            self.output.remove_class('visible')
+            self.output.add_class('invisible')
 
 
 class SemistandardTableauWidget(TableauWidget):
