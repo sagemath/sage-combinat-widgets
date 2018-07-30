@@ -5,7 +5,6 @@ An editable GridWidget for Sage Jupyter Notebook
 EXAMPLES ::
     sage: from sage_combinat_widgets import GridWidget
     sage: from sage.all import matrix, graphs
-    sage: from sage.graphs.generic_graph import GenericGraph
     sage: m = matrix([[1,2], [3,4]])
     sage: w = GridWidget(m)
     sage: g = graphs.GridGraph((3,3))
@@ -63,7 +62,7 @@ class GridWidget(Box, BindableWidgetClass):
     """
     value = traitlets.Instance(SageObject)
 
-    def __init__(self, obj=None, cell_class=Text):
+    def __init__(self, obj=None, cell_class=Text, trait_class=traitlets.Unicode, **kwargs):
         r"""
         TESTS::
 
@@ -80,9 +79,9 @@ class GridWidget(Box, BindableWidgetClass):
         super(GridWidget, self).__init__()
         if obj:
             self.value = obj
-            self.compute(cell_class)
+            self.compute(cell_class, trait_class)
 
-    def compute(self, cell_class=Text):
+    def compute(self, cell_class=Text, trait_class=traitlets.Unicode):
         self.cells = {}
         children = []
         obj = self.value
@@ -99,7 +98,7 @@ class GridWidget(Box, BindableWidgetClass):
         for c in cells:
             traitname = 'cell_%d_%d' % c
             new_cell = cell_class('', layout=cell_layout, placeholder=str(c)[1:-1])
-            self.add_traits(**{traitname : traitlets.Unicode()})
+            self.add_traits(**{traitname : trait_class()})
             traitlets.link((self, traitname), (new_cell, 'value'))
             self.cells[c] = new_cell
             children.append(new_cell)

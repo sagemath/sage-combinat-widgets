@@ -54,19 +54,17 @@ class TCell(Text):
 
         INPUT:
 
-        - ``parent`` -- a TableauWidget
-        - ``coord`` -- a tuple of coordinates (vertical, horizontal)
-        - ``content`` -- an Integer value for the cell
+        - ``content`` -- an Integer value for the tableau cell
 
         TESTS::
 
-        sage: from sage_combinat_widgets.tableau_widget import TCell
-        sage: c = TCell(5)
-        sage: assert c.value == '5'
+            sage: from sage_combinat_widgets.tableau_widget import TCell
+            sage: c = TCell(5)
+            sage: assert c.value == '5'
         """
         super(TCell, self).__init__('', layout=cell_layout, continuous_update = False)
         self.content = content
-        self.value = str(self.content)
+        self.value = str(content)
         self.placeholder = str(content)
 
     @traitlets.observe('value')
