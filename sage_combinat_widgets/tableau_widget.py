@@ -68,7 +68,7 @@ class TCell(Text):
         self.placeholder = str(content)
 
     @traitlets.observe('value')
-    def update_cell(self, change):
+    def update_cell(self, event):
         r"""
         TESTS::
 
@@ -80,9 +80,9 @@ class TCell(Text):
         sage: c.update_cell(Bunch({'owner': c, 'new': u'10', 'old': u'5', 'name': 'value', 'type': 'change'}))
         sage: assert c.content == 10
         """
-        if not change.new:
+        if not event.new:
             return
-        self.value = change.new
+        self.value = event.new
         self.content = int(self.value)
 
 class TableauWidget(GridWidget):
@@ -140,14 +140,14 @@ class TableauWidget(GridWidget):
         self.compute_status()
 
     @traitlets.observe(traitlets.All)
-    def update_tableau(self, change):
-        if not change.new or not change.name.startswith('cell_'):
+    def update_tableau(self, event):
+        if not event.new or not event.name.startswith('cell_'):
             return
-        assert(change.name.startswith('cell_') and '_' in change.name[5:])
-        vpos = int(change.name.split('_')[1])
-        hpos = int(change.name.split('_')[2])
+        assert(event.name.startswith('cell_') and '_' in event.name[5:])
+        vpos = int(event.name.split('_')[1])
+        hpos = int(event.name.split('_')[2])
         lvalue = [[c for c in r] for r in self.value]
-        lvalue[vpos][hpos] = int(change.new)
+        lvalue[vpos][hpos] = int(event.new)
         if lvalue == self.initial_lvalue:
             self.output.value = "Initial Tableau"
             return
