@@ -37,7 +37,7 @@ Once the package is installed, you can use it in Sage Jupyter Notebook.
     w = TableauWidget(t)
     display(w)
 
-See the `demo notebook <demo_tableau_widget.ipynb>`_.
+See the `demo notebook <demo_Grid.ipynb>`_.
 
 
 Source code
