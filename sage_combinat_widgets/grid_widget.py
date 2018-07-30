@@ -4,14 +4,12 @@ An editable GridWidget for Sage Jupyter Notebook
 
 EXAMPLES ::
     sage: from sage_combinat_widgets import GridWidget
-    sage: import matrix, graphs
+    sage: from sage.all import matrix, graphs
     sage: from sage.graphs.generic_graph import GenericGraph
-    sage: m = matrix.identity(2)
+    sage: m = matrix([[1,2], [3,4]])
     sage: w = GridWidget(m)
-    sage: display(w)
     sage: g = graphs.GridGraph((3,3))
     sage: w = GridWidget(g)
-    sage: display(w)
 
 AUTHORS:
 - Odile Bénassy, Nicolas Thiéry
@@ -40,19 +38,15 @@ css_lines.append(".pink { background-color: lightpink; }")
 css_lines.append(".yellow { background-color: lightyellow; }")
 css = HTML("<style>%s</style>" % '\n'.join(css_lines))
 
-ip = get_ipython()
-for base in ip.__class__.__mro__:
-    """If we are in a notebook, we will find 'notebook' in those names"""
-    if 'otebook' in base.__name__:
-        ip.display_formatter.format(css)
-        break
-
-ip = get_ipython()
-for base in ip.__class__.__mro__:
-    """If we are in a notebook, we will find 'notebook' in those names"""
-    if 'otebook' in base.__name__:
-        ip.display_formatter.format(css)
-        break
+try:
+    ip = get_ipython()
+    for base in ip.__class__.__mro__:
+        """If we are in a notebook, we will find 'notebook' in those names"""
+        if 'otebook' in base.__name__:
+            ip.display_formatter.format(css)
+            break
+except:
+    pass # We are in the test environment
 
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass (traitlets.traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
@@ -74,12 +68,14 @@ class GridWidget(Box, BindableWidgetClass):
         TESTS::
 
             sage: from sage_combinat_widgets import GridWidget
-            sage: import matrix, graphs
+            sage: from sage.all import matrix, graphs
             sage: from sage.graphs.generic_graph import GenericGraph
-            sage: m = matrix.identity(2)
-            sage: g = graphs.GridGraph((3,3))
-            sage: wm = GridWidget(m)
-            sage: wg = GridWidget(g)
+            sage: v = vector((1,2,3))
+            sage: w = GridWidget(v)
+            sage: g = graphs.AztecDiamondGraph(3)
+            sage: w = GridWidget(g)
+            sage: t = StandardTableaux(5).random_element()
+            sage: w = GridWidget(t)
         """
         super(GridWidget, self).__init__()
         if obj:
