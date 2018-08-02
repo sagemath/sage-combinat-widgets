@@ -281,7 +281,7 @@ class Domino (HasTraits):
         other.compute()
 
 
-class DominosWidget(VBox, GridWidget):
+class DominosWidget(GridWidget):
     r"""A widget for flipping dominos in a graph
 
     TESTS:

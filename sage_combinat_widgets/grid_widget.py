@@ -18,7 +18,7 @@ from __future__ import print_function, absolute_import
 from sage.misc.bindable_class import BindableClass
 from sage.combinat.tableau import *
 from sage.all import SageObject, matrix
-from ipywidgets import Layout, Box, Text, HTML
+from ipywidgets import Layout, VBox, HBox, Text, HTML
 import traitlets
 
 cell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
@@ -47,13 +47,26 @@ try:
 except:
     pass # We are in the test environment
 
+class Blank(Text):
+    r"""A disabled placeholder input
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_widget import Blank
+        sage: b = Blank()
+    """
+
+    def __init__(self):
+        super(Blank, self).__init__('', disabled=True)
+        self.layout = cell_layout
+        self.add_class('bltext')
+
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass (traitlets.traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
     pass
 class BindableWidgetClass(BindableClass):
     __metaclass__ = MetaHasTraitsClasscallMetaclass
 
-class GridWidget(Box, BindableWidgetClass):
+class GridWidget(VBox, BindableWidgetClass):
     r"""Base Jupyter Interactive Widget for Sage Grid Objects
 
     Composed of cells. Various Cell Classes are possible.
@@ -83,7 +96,6 @@ class GridWidget(Box, BindableWidgetClass):
 
     def compute(self, cell_class=Text, trait_class=traitlets.Unicode):
         self.cells = {}
-        children = []
         obj = self.value
         if hasattr(obj, 'vertices'): # Graph
             cells = getattr(obj, 'vertices')()
@@ -95,11 +107,19 @@ class GridWidget(Box, BindableWidgetClass):
             cells = [(i, j) for i in range(matrix(obj).nrows()) for j in range(matrix(obj).ncols())]
         else:
             cells = []
+        rows = []
+        columns = []
         for c in cells:
+            if c[1] == 0:
+                if columns:
+                    rows.append(HBox(columns))
+                columns = []
             traitname = 'cell_%d_%d' % c
             new_cell = cell_class('', layout=cell_layout, placeholder=str(c)[1:-1])
             self.add_traits(**{traitname : trait_class()})
             traitlets.link((self, traitname), (new_cell, 'value'))
             self.cells[c] = new_cell
-            children.append(new_cell)
-        self.children = children
+            columns.append(new_cell)
+        if columns:
+            rows.append(HBox(columns))
+        self.children = rows
