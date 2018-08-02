@@ -2,7 +2,7 @@
 Sage Combinat Widgets
 =====================
 
-A few widgets for Sage Combinat:
+Jupyter widgets for Sage Combinat:
 - Standard/Semi-standard/Generic Tableau
 - Partition
 
@@ -37,7 +37,7 @@ Once the package is installed, you can use it in Sage Jupyter Notebook.
     w = TableauWidget(t)
     display(w)
 
-See the `demo notebook <demo_tableau_widget.ipynb>`_.
+See the `demo notebook <demo_Grid.ipynb>`_.
 
 
 Source code
@@ -60,3 +60,16 @@ This is just calling ``sage -t`` with appropriate flags.
 Shorthand::
 
     $ make test
+
+Documentation
+-------------
+
+The documentation of the package can be generated using Sage's
+``Sphinx`` installation::
+
+    $ cd docs
+    $ sage -sh -c "make html"
+
+Shorthand::
+
+    $ make doc
