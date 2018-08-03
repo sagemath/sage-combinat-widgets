@@ -109,11 +109,16 @@ class GridWidget(VBox, BindableWidgetClass):
             cells = []
         rows = []
         columns = []
+        rnum = 0
         for pos, val in cells:
-            if pos[1] == 0:
+            if pos[0] > rnum: # new row
+                rnum = pos[0]
                 if columns:
                     rows.append(HBox(columns))
                 columns = []
+                if pos[1] > 0: # we have to make blank cells at the beginning of this row
+                    for i in range(pos[1]):
+                        columns.append(BlankCell())
             traitname = 'cell_%d_%d' % pos
             new_cell = cell_class('', layout=cell_layout, placeholder=str(val))
             self.add_traits(**{traitname : trait_class()})
