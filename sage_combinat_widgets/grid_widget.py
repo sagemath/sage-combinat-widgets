@@ -109,7 +109,7 @@ class GridWidget(VBox, BindableWidgetClass):
             cells = []
         rows = []
         columns = []
-        rnum = 0
+        rnum = -1
         for pos, val in cells:
             if pos[0] > rnum: # new row
                 rnum = pos[0]
