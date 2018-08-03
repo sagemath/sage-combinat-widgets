@@ -98,27 +98,27 @@ class GridWidget(VBox, BindableWidgetClass):
         self.cells = {}
         obj = self.value
         if hasattr(obj, 'vertices'): # Graph
-            cells = getattr(obj, 'vertices')()
+            cells = [(c, str(c)[1:-1]) for c in getattr(obj, 'vertices')()]
         elif hasattr(obj, 'cells'): # Tableau
-            cells = getattr(obj, 'cells')()
+            cells = [(c, obj.entry(c)) for c in getattr(obj, 'cells')()]
         elif hasattr(obj, 'nrows'): # Matrix
-            cells = [(i, j) for i in range(obj.nrows()) for j in range(obj.ncols())]
+            cells = [((i, j), obj[(i, j)]) for i in range(obj.nrows()) for j in range(obj.ncols())]
         elif hasattr(obj, 'row'): # Vector
-            cells = [(i, j) for i in range(matrix(obj).nrows()) for j in range(matrix(obj).ncols())]
+            cells = [((i, j), obj[i+j]) for i in range(matrix(obj).nrows()) for j in range(matrix(obj).ncols())]
         else:
             cells = []
         rows = []
         columns = []
-        for c in cells:
-            if c[1] == 0:
+        for pos, val in cells:
+            if pos[1] == 0:
                 if columns:
                     rows.append(HBox(columns))
                 columns = []
-            traitname = 'cell_%d_%d' % c
-            new_cell = cell_class('', layout=cell_layout, placeholder=str(c)[1:-1])
+            traitname = 'cell_%d_%d' % pos
+            new_cell = cell_class('', layout=cell_layout, placeholder=str(val))
             self.add_traits(**{traitname : trait_class()})
             traitlets.link((self, traitname), (new_cell, 'value'))
-            self.cells[c] = new_cell
+            self.cells[pos] = new_cell
             columns.append(new_cell)
         if columns:
             rows.append(HBox(columns))
