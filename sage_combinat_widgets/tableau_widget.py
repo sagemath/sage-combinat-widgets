@@ -62,10 +62,8 @@ class TCell(Text):
             sage: c = TCell(5)
             sage: assert c.value == '5'
         """
-        super(TCell, self).__init__('', layout=cell_layout, continuous_update = False)
+        super(TCell, self).__init__(str(content), layout=cell_layout, placeholder=str(content), continuous_update = False)
         self.content = content
-        self.value = str(content)
-        self.placeholder = str(content)
 
     @traitlets.observe('value')
     def update_cell(self, event):
@@ -106,15 +104,9 @@ class TableauWidget(GridWidget):
         self.output.add_class('invisible')
         self.display_convention = display
         if self.display_convention == 'fr':
-            rows = list(self.value)
+            rows = list(self.children)
             rows.reverse()
-            self.children = [ self.output ] + [HBox(
-                [self.cells[(self.value.index(r), r.index(i))] for i in r]
-            ) for r in rows]
-        else:
-            self.children = [ self.output ] + [HBox(
-                [self.cells[(self.value.index(r), r.index(i))] for i in r]
-            ) for r in self.value]
+            self.children = rows
 
     def validate(self, label='standard'):
         if label == 'semistandard':

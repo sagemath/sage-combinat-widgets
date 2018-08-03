@@ -120,7 +120,13 @@ class GridWidget(VBox, BindableWidgetClass):
                     for i in range(pos[1]):
                         columns.append(BlankCell())
             traitname = 'cell_%d_%d' % pos
-            new_cell = cell_class('', layout=cell_layout, placeholder=str(val))
+            for v in [val, str(val), False, '', None]:
+                try:
+                    new_cell = cell_class(v, layout=cell_layout, placeholder=str(val))
+                except:
+                    pass
+                else:
+                    break
             self.add_traits(**{traitname : trait_class()})
             traitlets.link((self, traitname), (new_cell, 'value'))
             self.cells[pos] = new_cell
