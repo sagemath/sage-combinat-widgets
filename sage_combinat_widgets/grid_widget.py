@@ -18,7 +18,7 @@ from __future__ import print_function, absolute_import
 from sage.misc.bindable_class import BindableClass
 from sage.combinat.tableau import *
 from sage.all import SageObject, matrix
-from ipywidgets import Layout, VBox, HBox, Text, HTML
+from ipywidgets import Layout, HTML, Text, VBox, HBox
 import traitlets
 
 cell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
@@ -47,18 +47,18 @@ try:
 except:
     pass # We are in the test environment
 
-class Blank(Text):
+class BlankCell(Text):
     r"""A disabled placeholder input
 
     TESTS::
-        sage: from sage_combinat_widgets.grid_widget import Blank
-        sage: b = Blank()
+        sage: from sage_combinat_widgets.grid_widget import BlankCell
+        sage: c = BlankCell()
     """
 
-    def __init__(self):
-        super(Blank, self).__init__('', disabled=True)
-        self.layout = cell_layout
-        self.add_class('bltext')
+    def __init__(self, layout=cell_layout):
+        super(BlankCell, self).__init__(disabled=True)
+        self.layout = layout
+        self.add_class('blankcell')
 
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass (traitlets.traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
