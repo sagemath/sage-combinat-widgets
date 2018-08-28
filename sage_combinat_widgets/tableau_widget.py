@@ -73,8 +73,11 @@ class TCell(Text):
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass (traitlets.traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
     pass
-class BindableWidgetClass(BindableClass):
-    __metaclass__ = MetaHasTraitsClasscallMetaclass
+@add_metaclass(MetaHasTraitsClasscallMetaclass)
+class BindableClassWithMeta(BindableClass):
+    pass
+class BindableWidgetClass(traitlets.HasTraits, BindableClassWithMeta):
+     pass
 
 class TableauWidget(VBox, BindableWidgetClass):
     """Jupyter Widget for exploring a Young Tableau"""
