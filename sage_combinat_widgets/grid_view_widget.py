@@ -39,7 +39,9 @@ import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass(traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
     pass
 @add_metaclass(MetaHasTraitsClasscallMetaclass)
-class BindableWidgetClass(traitlets.HasTraits):#, BindableClass):
+class BindableClassWithMeta(BindableClass):
+    pass
+class BindableWidgetClass(traitlets.HasTraits, BindableClassWithMeta):
     pass
 
 class GridViewWidget(BindableWidgetClass):
