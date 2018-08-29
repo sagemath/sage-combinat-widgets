@@ -6,18 +6,18 @@ import traitlets
 cell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
 blank_layout = Layout(width='3em',height='2em', margin='0', border='0')
 css_lines = []
-css_lines.append(".invisible {display: none; width: 0; height: 0;}")
-css_lines.append(".visible {display: table}")
+#css_lines.append(".invisible {display: none; width: 0; height: 0;}")
+#css_lines.append(".visible {display: table}")
 css_lines.append(".blankcell { background-color: white; }")
-css_lines.append(".dwbutton { border-collapse: collapse; color: red; border: 1px solid #666;}")
-css_lines.append(".left { border-right: 1px dotted #999; }")
-css_lines.append(".right { border-left: 1px dotted #999; }")
-css_lines.append(".bottom { border-top: 1px dotted #999; }")
-css_lines.append(".top { border-bottom: 1px dotted #999; }")
-css_lines.append(".green { background-color: lightgreen; }")
-css_lines.append(".blue { background-color: lightblue; }")
-css_lines.append(".pink { background-color: lightpink; }")
-css_lines.append(".yellow { background-color: lightyellow; }")
+#css_lines.append(".dwbutton { border-collapse: collapse; color: red; border: 1px solid #666;}")
+#css_lines.append(".left { border-right: 1px dotted #999; }")
+#css_lines.append(".right { border-left: 1px dotted #999; }")
+#css_lines.append(".bottom { border-top: 1px dotted #999; }")
+#css_lines.append(".top { border-bottom: 1px dotted #999; }")
+#css_lines.append(".green { background-color: lightgreen; }")
+#css_lines.append(".blue { background-color: lightblue; }")
+#css_lines.append(".pink { background-color: lightpink; }")
+#css_lines.append(".yellow { background-color: lightyellow; }")
 css = HTML("<style>%s</style>" % '\n'.join(css_lines))
 
 try:
@@ -83,7 +83,7 @@ class GridViewWidget(GridViewEditor, VBox):
                         cell_string = ''
                     else:
                         cell_string = str(cell_content)
-                    cell = cell_class(cell_string, placeholder=cell_string, tooltip=compute_tooltip((i,j)))
+                    cell = cell_class(cell_string, placeholder=cell_string, tooltip=compute_tooltip((i,j)), layout=cell_layout)
                     # TODO write some typecasting (possibly a subclass for cell_class or traitlets.link)
                     # traitlets.link((self, 'cell_%d_%d' % (i,j)), (cell, 'value'))
                     hbox_children.append(cell)
