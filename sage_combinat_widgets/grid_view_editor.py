@@ -117,8 +117,8 @@ class GridViewEditor(BindableEditorClass):
         for pos, val in cells:
             self.cells[pos] = val
             traitname = 'cell_%d_%d' % pos
-            if not self.has_trait(traitname):
-                self.add_traits(**{traitname : trait_class()})
+            #if not self.has_trait(traitname):
+            #    self.add_traits(**{traitname : trait_class()})
 
     def get_value(self):
         return self.value
