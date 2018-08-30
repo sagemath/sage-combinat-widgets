@@ -21,6 +21,8 @@ from sage.combinat.tableau import *
 from sage.all import SageObject, matrix, Integer
 from sage.rings.real_mpfr import RealLiteral
 from sage.graphs.generic_graph import GenericGraph
+from sage.combinat.partition import Partition
+from sage.structure.list_clone import ClonableList
 import traitlets
 
 SAGETYPE_TO_TRAITTYPE = {
@@ -89,13 +91,18 @@ class GridViewEditor(BindableEditorClass):
         """
         if not obj:
             obj = self.value
+        self.cells = {}
         if not obj:
             return
         cells = []
-        if issubclass(obj.__class__, GenericGraph): # i.e. a graph
+        obj_class = obj.__class__
+        if issubclass(obj_class, GenericGraph): # i.e. a graph
             cells = [((i,j), None) for (i,j) in obj.vertices()]
-            trait_class = traitlets.Instance
-        elif hasattr(obj, 'cells'): # e.g. a tableau or a partition
+            trait_class = traitlets.Unicode
+        elif issubclass(obj_class, Partition): # a Partition
+            cells = [((i,j), None) for (i,j) in obj.cells()]
+            trait_class = traitlets.Unicode
+        elif issubclass(obj_class, ClonableList): # e.g. a tableau
             cells = [((i,j), obj[i][j]) for (i,j) in obj.cells()]
             trait_class = traitlets.Integer
         elif hasattr(obj, 'nrows'): # e.g. a matrix
@@ -113,7 +120,6 @@ class GridViewEditor(BindableEditorClass):
         else:
             cells = []
             trait_class = traitlets.Instance
-        self.cells = {}
         for pos, val in cells:
             self.cells[pos] = val
             traitname = 'cell_%d_%d' % pos
@@ -150,8 +156,7 @@ class GridViewEditor(BindableEditorClass):
             g.add_vertices(list(cells.keys()))
             self.value = g
         elif hasattr(obj_class, 'cells') or hasattr(obj_class, 'rows'): # e.g. a tableau / matrix / vector
-            positions = list(cells.keys())
-            positions.sort()
+            positions = sorted(list(cells.keys()))
             for cl in obj_class.__mro__:
                 try:
                     self.value = cl([[cells[pos] for pos in positions if pos[0]==i] for i in uniq([t[0] for t in positions])])

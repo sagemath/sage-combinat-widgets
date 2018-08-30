@@ -61,8 +61,8 @@ class GridViewWidget(GridViewEditor, VBox):
         GridViewEditor.__init__(self, obj)
         VBox.__init__(self)
         self._model_id = list(self.get_manager_state()['state'].keys())[-1] # For some reason, it lost its _model_id
-        positions = list(self.cells.keys())
-        positions.sort()
+        self.compute_cells()
+        positions = sorted(list(self.cells.keys()))
         rows = [[(pos, self.cells[pos]) for pos in positions if pos[0]==i] for i in uniq([t[0] for t in positions])]
         vbox_children = []
         for i in range(len(rows)):
