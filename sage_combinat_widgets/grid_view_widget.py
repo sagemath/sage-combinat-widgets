@@ -46,7 +46,7 @@ class GridViewWidget(GridViewEditor, VBox):
     r"""A widget for all grid-representable Sage objects
     """
 
-    def __init__(self, obj, cell_class=Text, blank_class=BlankCell):
+    def __init__(self, obj, cell_classes=[Text], blank_class=BlankCell):
         r"""
         TESTS::
 
@@ -65,18 +65,22 @@ class GridViewWidget(GridViewEditor, VBox):
         positions = sorted(list(self.cells.keys()))
         rows = [[(pos, self.cells[pos]) for pos in positions if pos[0]==i] for i in uniq([t[0] for t in positions])]
         vbox_children = []
+        def cell_class_index(pos):
+            # Such function can enable for example various shapes or colors
+            return 0
         for i in range(len(rows)):
             j = 0
             hbox_children = []
             while j<=max([t[0][1] for t in rows[i]]):
                 if (i,j) in positions:
                     cell_content = self.cells[(i,j)]
+                    cell_class = cell_classes[cell_class_index((i,j))]
                     if cell_content is None:
                         cell_string = ''
                     else:
                         cell_string = str(cell_content)
                     cell = cell_class(cell_string, placeholder=cell_string, tooltip=compute_tooltip((i,j)), layout=cell_layout)
-                    # TODO write some typecasting (possibly a subclass for cell_class or traitlets.link)
+                    # TODO write some typecasting (possibly requires subclassing cell_class or traitlets.link)
                     # traitlets.link((self, 'cell_%d_%d' % (i,j)), (cell, 'value'))
                     cell.add_class('gridcell')
                     hbox_children.append(cell)
