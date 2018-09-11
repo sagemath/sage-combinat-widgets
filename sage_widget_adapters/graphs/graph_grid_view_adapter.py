@@ -54,8 +54,8 @@ class GraphGridViewAdapter(Graph):
             cells[v] = None
         return cells
 
-    @staticmethod
-    def from_cells(cells={}):
+    @classmethod
+    def from_cells(cls, cells={}):
         r"""
         From a dictionary { coordinates pair : None }
         return a graph with one vertex for every coordinates pair
@@ -68,7 +68,7 @@ class GraphGridViewAdapter(Graph):
         """
         g = Graph()
         g.add_vertices(list(cells.keys()))
-        return g
+        return cls(g)
 
     def addable_cells(self):
         r"""

@@ -25,9 +25,12 @@ Grid View Adapter for matrices
     :meth:`~MatrixGridViewAdapter.remove_column` | Remove a column at given index
 """
 
-from sage.structure.element import Matrix
+from sage.matrix.matrix2 import Matrix
 
 class MatrixGridViewAdapter(Matrix):
+    def __init__(self, parent):
+        super(MatrixGridViewAdapter, self).__init__(parent)
+
     def compute_cells(self):
         cells = {}
         for i in self.numrows():
@@ -58,7 +61,7 @@ class MatrixGridViewAdapter(Matrix):
         r"""
         Edit matrix cell
         TESTS::
-        sage: from sage_combinat_widgets.adapter.matrix import matrix_grid_view_adapter
+        sage: from sage_widget_adapters import MatrixGridViewAdapter
         sage: A = MatrixGridViewAdapter((QQ, 3, 3, range(9))/2)
         sage: A.edit_cell((0,1), 2/3)
         sage: A
@@ -151,8 +154,10 @@ class MatrixGridViewAdapter(Matrix):
     def remove_row(self, index=None):
         r"""
         TESTS::
-        sage: from sage_combinat_widgets.adapter.matrix import matrix_grid_view_adapter
-        sage: A = Matrix(4,3,range(12))
+        sage: from sage.matrix.matrix_space import MatrixSpace
+        sage: S = MatrixSpace(ZZ, 4,3)
+        sage: from sage_widget_adapters import MatrixGridViewAdapter
+        sage: A = MatrixGridViewAdapter(S,range(12))
         sage: A.remove_row(2)
         [ 0  1  2]
         [ 3  4  5]
@@ -200,9 +205,9 @@ class MatrixGridViewAdapter(Matrix):
     def remove_column(self, index):
         r"""
         TESTS::
-        sage: from sage_combinat_widgets.adapter.matrix import matrix_grid_view_adapter
-        sage: A = Matrix(4,3,range(12))
-        sage: A.remove_column(1)
+        sage: from sage_widget_adapters import MatrixGridViewAdapter
+        sage: m = MatrixGridViewAdapter([[0,1,2],[3,4,5],[6,7,8],[9,10,11]])
+        sage: m.remove_column(1)
         [ 0  2]
         [ 3  5]
         [ 6  8]

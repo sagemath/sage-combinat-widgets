@@ -39,7 +39,7 @@ setup(
       'Programming Language :: Python :: 2.7',
     ], # classifiers list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
     keywords = "SageMath widget combinatorics",
-    packages = ['sage_combinat_widgets'],
+    packages = ['sage_combinat_widgets', 'sage_widget_adapters', 'sage_widget_adapters.combinat', 'sage_widget_adapters.graphs', 'sage_widget_adapters.matrix'],
     cmdclass = {'test': SageTest}, # adding a special setup command for tests
     install_requires = ['ipywidgets']
 )
