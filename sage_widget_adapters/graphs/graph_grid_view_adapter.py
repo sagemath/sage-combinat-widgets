@@ -25,8 +25,13 @@ Grid View Adapter for grid-representable graphs
 
 
 from sage.all import Graph
+from traitlets import Unicode
 
 class GraphGridViewAdapter(Graph):
+    def __init__(self):
+        super(GraphGridViewAdapter, self).__init__()
+        self.traitclass = Unicode
+
     def compute_cells(self):
         r"""
         From the graph vertices,
@@ -135,6 +140,8 @@ class GraphGridViewAdapter(Graph):
         sage: ga
         Grid Graph for [3, 2]: Graph on 7 vertices
         """
+        if pos in self.cells:
+            raise ValueError("This cell (position=%s) is already in the graph." % str(pos))
         self.add_vertex(pos)
 
     def remove_cell(self, pos):

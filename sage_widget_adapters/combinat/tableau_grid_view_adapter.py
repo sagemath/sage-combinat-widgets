@@ -20,8 +20,13 @@ Grid View Adapter for tableaux
 """
 
 from sage.combinat.tableau import *
+from traitlets import Integer
 
 class TableauGridViewAdapter(Tableau):
+    def __init__(self, parent, t):
+        super(GraphGridViewAdapter, self).__init__(parent, t)
+        self.traitclass = Integer
+
     def compute_cells(self):
         r"""
         From a tableau,

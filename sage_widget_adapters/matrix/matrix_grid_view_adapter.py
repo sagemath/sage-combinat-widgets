@@ -102,7 +102,7 @@ class MatrixGridViewAdapter(Matrix):
         except for vectors
         """
         if not pos in self.addable_cells():
-            return self
+            raise ValueError("Position '%s' is not addable." % str(pos))
         if pos[0] == 0:
             return self.augment(vector([val]))
         if pos[1] == 0:
