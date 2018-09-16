@@ -50,18 +50,19 @@ class GridViewWidget(GridViewEditor, VBox):
         r"""
         TESTS::
 
-            sage: from sage_combinat_widgets import GridViewWidget
+            sage: from sage_combinat_widgets import *
             sage: t = StandardTableaux(15).random_element()
-            sage: w = GridViewWidget(t)
-            sage: st = SkewTableaux([[None,1], [2,3],[None, None, 4]])
-            sage: w = GridViewWidget(st)
-            sage: az = graphs.AztecDiamondGraph(4)
-            sage: w = GridViewWidget(az)
+            sage: ta = TableauGridViewAdapter(t.parent(), t)
+            sage: w = GridViewWidget(ta)
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: az = AztecDiamondGraph(4)
+            sage: aza = GraphGridViewAdapter(az)
+            sage: w = GridViewWidget(aza)
         """
         GridViewEditor.__init__(self, obj)
         VBox.__init__(self)
         self._model_id = list(self.get_manager_state()['state'].keys())[-1] # For some reason, it lost its _model_id
-        self.compute_cells()
+        self.compute()
         positions = sorted(list(self.cells.keys()))
         rows = [[(pos, self.cells[pos]) for pos in positions if pos[0]==i] for i in uniq([t[0] for t in positions])]
         vbox_children = []

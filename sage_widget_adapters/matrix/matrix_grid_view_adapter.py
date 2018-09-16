@@ -28,9 +28,6 @@ Grid View Adapter for matrices
 from sage.matrix.matrix2 import Matrix
 
 class MatrixGridViewAdapter(Matrix):
-    def __init__(self, parent):
-        super(MatrixGridViewAdapter, self).__init__(parent)
-
     def compute_cells(self):
         cells = {}
         for i in self.numrows():

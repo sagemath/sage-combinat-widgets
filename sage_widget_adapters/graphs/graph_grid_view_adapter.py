@@ -25,13 +25,8 @@ Grid View Adapter for grid-representable graphs
 
 
 from sage.all import Graph
-from traitlets import Unicode
 
 class GraphGridViewAdapter(Graph):
-    def __init__(self):
-        super(GraphGridViewAdapter, self).__init__()
-        self.traitclass = Unicode
-
     def compute_cells(self):
         r"""
         From the graph vertices,

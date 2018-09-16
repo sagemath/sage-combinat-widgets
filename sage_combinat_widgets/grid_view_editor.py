@@ -30,13 +30,13 @@ from sage_widget_adapters import *
 
 SAGETYPE_TO_TRAITTYPE = {
     bool: traitlets.Bool,
-    int: traitlets.Integer,
-    float: traitlets.Float,
+    int: traitlets.Unicode,
+    float: traitlets.Unicode,
     list: traitlets.List,
     set: traitlets.Set,
     dict: traitlets.Dict,
-    Integer: traitlets.Integer,
-    RealLiteral: traitlets.Float
+    Integer: traitlets.Unicode,
+    RealLiteral: traitlets.Unicode
     }
 
 import sage.misc.classcall_metaclass
@@ -80,8 +80,7 @@ class GridViewEditor(BindableEditorClass):
         except:
             raise TypeError("Is this object really grid-representable?")
         super(GridViewEditor, self).__init__()
-        self.value = obj # FIXME try to find the relevant Adapter
-        self.compute()
+        self.set_value(obj)
 
     def validate(self, obj, value=None, obj_class=None):
         r"""
@@ -99,7 +98,7 @@ class GridViewEditor(BindableEditorClass):
         r"""We have an object value
         but we want to compute cells
         as a dictionary (row_number, cell_number_in_row) -> trait
-        The cell_traitclass will depend on the object
+        The cell traitclass will depend on the object
         """
         if not obj:
             obj = self.value
@@ -119,7 +118,7 @@ class GridViewEditor(BindableEditorClass):
             elif issubclass(obj_class, Partition): # a Partition
                 traitclass = traitlets.Unicode
             elif issubclass(obj_class, ClonableList): # e.g. a tableau
-                traitclass = traitlets.Integer
+                traitclass = traitlets.Unicode
             elif hasattr(obj, 'nrows'): # e.g. a matrix
                 if type(obj[0][0]) in SAGETYPE_TO_TRAITTYPE:
                     traitclass = SAGETYPE_TO_TRAITTYPE[type(obj[0][0])]
@@ -133,14 +132,17 @@ class GridViewEditor(BindableEditorClass):
                 if type(obj[0]) in SAGETYPE_TO_TRAITTYPE:
                     traitclass = SAGETYPE_TO_TRAITTYPE[type(obj[0])]
             else:
-                traitclass = traitlets.Instance
+                traitclass = traitlets.Unicode # Because we might be able to represent everything as strings
         for pos, val in self.cells.items():
             traitname = 'cell_%d_%d' % pos
-            traitvalue = val
+            traitvalue = str(val) # FIXME case not Unicode
             if not self.has_trait(traitname):
                 trait = traitclass(traitvalue)
-                trait.instance_init(self)
-                self._trait_values[self.name] = trait.value # Can be val, or can be trait's default value
+                trait.class_init(self.__class__, traitname)
+                trait.value = traitvalue
+                trait.name = traitname
+                #trait.instance_init(self) # Not useful at this point
+                self._trait_values[traitname] = str(traitvalue) # Can be val, or can be trait's default value
         self.traitclass = traitclass
 
     def get_value(self):
@@ -149,7 +151,7 @@ class GridViewEditor(BindableEditorClass):
     def set_value(self, obj):
         if not self.validate(obj):
             raise ValueError("Object %s is not compatible." % str(obj))
-        self.value = obj
+        self.value = obj # FIXME here try to find the relevant Adapter
         self.compute()
 
     def get_cells(self):
