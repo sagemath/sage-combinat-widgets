@@ -20,8 +20,19 @@ Grid View Adapter for tableaux
 """
 
 from sage.combinat.tableau import *
+from traitlets import Integer
 
 class TableauGridViewAdapter(Tableau):
+    traitclass = Integer
+
+    @staticmethod
+    def cell_to_unicode(cell_content):
+        return str(cell_content)
+
+    @staticmethod
+    def unicode_to_cell(s):
+        return int(s)
+
     def compute_cells(self):
         r"""
         From a tableau,
@@ -87,7 +98,7 @@ class TableauGridViewAdapter(Tableau):
         sage: gt = TableauGridViewAdapter(t.parent(), t)
         sage: gt.set_cell((1,1), 8)
         sage: gt.get_cell((1,1))
-        8      
+        8
         """
         tl = self.to_list()
         nl = []
