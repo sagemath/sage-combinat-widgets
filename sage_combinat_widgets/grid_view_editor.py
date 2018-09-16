@@ -30,13 +30,13 @@ from sage_widget_adapters import *
 
 SAGETYPE_TO_TRAITTYPE = {
     bool: traitlets.Bool,
-    int: traitlets.Unicode,
-    float: traitlets.Unicode,
+    int: traitlets.Integer,
+    float: traitlets.Float,
     list: traitlets.List,
     set: traitlets.Set,
     dict: traitlets.Dict,
-    Integer: traitlets.Unicode,
-    RealLiteral: traitlets.Unicode
+    Integer: traitlets.Integer,
+    RealLiteral: traitlets.Float
     }
 
 import sage.misc.classcall_metaclass
@@ -118,7 +118,7 @@ class GridViewEditor(BindableEditorClass):
             elif issubclass(obj_class, Partition): # a Partition
                 traitclass = traitlets.Unicode
             elif issubclass(obj_class, ClonableList): # e.g. a tableau
-                traitclass = traitlets.Unicode
+                traitclass = traitlets.Integer
             elif hasattr(obj, 'nrows'): # e.g. a matrix
                 if type(obj[0][0]) in SAGETYPE_TO_TRAITTYPE:
                     traitclass = SAGETYPE_TO_TRAITTYPE[type(obj[0][0])]
@@ -132,17 +132,19 @@ class GridViewEditor(BindableEditorClass):
                 if type(obj[0]) in SAGETYPE_TO_TRAITTYPE:
                     traitclass = SAGETYPE_TO_TRAITTYPE[type(obj[0])]
             else:
-                traitclass = traitlets.Unicode # Because we might be able to represent everything as strings
+                traitclass = traitlets.Instance
         for pos, val in self.cells.items():
             traitname = 'cell_%d_%d' % pos
-            traitvalue = str(val) # FIXME case not Unicode
-            if not self.has_trait(traitname):
+            traitvalue = val
+            if traitname in self._trait_values:
+                self._trait_values[traitname] = traitvalue
+            else:
                 trait = traitclass(traitvalue)
                 trait.class_init(self.__class__, traitname)
-                trait.value = traitvalue
                 trait.name = traitname
-                #trait.instance_init(self) # Not useful at this point
-                self._trait_values[traitname] = str(traitvalue) # Can be val, or can be trait's default value
+                trait.instance_init(self)
+                trait.value = traitvalue
+                #self._trait_values[traitname] = traitvalue # Is set by instance_init()
         self.traitclass = traitclass
 
     def get_value(self):
