@@ -135,7 +135,7 @@ class GraphGridViewAdapter(Graph):
         sage: ga
         Grid Graph for [3, 2]: Graph on 7 vertices
         """
-        if pos in self.cells:
+        if pos in self.vertices():
             raise ValueError("This cell (position=%s) is already in the graph." % str(pos))
         self.add_vertex(pos)
 
