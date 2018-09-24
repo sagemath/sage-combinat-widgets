@@ -1,11 +1,10 @@
 from .grid_view_editor import GridViewEditor
-from ipywidgets import Layout, VBox, HBox, Text, Label, HTML
+from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, Button
 from sage.misc.misc import uniq
 import traitlets
 
 cell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
-blank_layout = Layout(width='3em',height='2em', margin='0', border='0')
-addable_layout = Layout(width='3em',height='2em', margin='0', border='0')
+button_layout = Layout(width='5em',height='4em', margin='0')
 css_lines = []
 css_lines.append(".widget-text INPUT { border-collapse: collapse !important }")
 css_lines.append(".blankcell INPUT {border:0px !important}")
@@ -23,6 +22,34 @@ except:
     pass # We are in the test environment
 
 
+class TextCell(Text):
+    r"""A regular text grid cell
+
+    TESTS::
+        sage: from sage_combinat_widgets import TextCell
+        sage: b = TextCell()
+    """
+
+    def __init__(self, content, position, **kws):
+        super(TextCell, self).__init__(content, **kws)
+        self.position = position
+        self.layout = cell_layout
+        self.add_class('gridcell')
+
+class ButtonCell(Button):
+    r"""A button grid cell
+
+    TESTS::
+        sage: from sage_combinat_widgets import ButtonCell
+        sage: b = ButtonCell()
+    """
+
+    def __init__(self, content, position, **kws):
+        super(ButtonCell, self).__init__(**kws)
+        self.position = position
+        self.layout = button_layout
+        self.add_class('gridcell')
+
 class BlankCell(Text):
     r"""A blank placeholder cell
 
@@ -33,7 +60,7 @@ class BlankCell(Text):
 
     def __init__(self):
         super(BlankCell, self).__init__('', disabled=True)
-        self.layout = blank_layout
+        self.layout = cell_layout
         self.add_class('blankcell')
 
 class AddableCell(Text):
@@ -46,7 +73,7 @@ class AddableCell(Text):
 
     def __init__(self, position):
         super(AddableCell, self).__init__('')
-        self.layout = addable_layout
+        self.layout = cell_layout
         self.add_class('addablecell')
         self.position = position
 
@@ -60,7 +87,7 @@ class GridViewWidget(GridViewEditor, VBox):
     r"""A widget for all grid-representable Sage objects
     """
 
-    def __init__(self, obj, cell_widget_classes=[Text], blank_widget_class=BlankCell, addable_widget_class=AddableCell):
+    def __init__(self, obj, cell_widget_classes=[TextCell], blank_widget_class=BlankCell, addable_widget_class=AddableCell):
         r"""
         TESTS::
 
@@ -113,13 +140,12 @@ class GridViewWidget(GridViewEditor, VBox):
                     else:
                         cell_string = self.value.cell_to_unicode(cell_content)
                     cell = cell_widget_class(cell_string,
+                                             (i,j),
                                              placeholder=cell_string,
                                              tooltip=compute_tooltip((i,j)), # For buttons, menus ..
                                              layout=cell_layout)
-                    cell.position = (i,j)
                     # TODO write some typecasting (possibly requires subclassing traitlets.link)
                     # traitlets.mylink((self, 'cell_%d_%d' % (i,j)), (cell, 'value'))
-                    cell.add_class('gridcell')
                     hbox_children.append(cell)
                 elif (i,j) in addable_positions:
                     hbox_children.append(self.addable_widget_class((i,j)))
