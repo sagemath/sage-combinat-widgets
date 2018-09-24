@@ -2,7 +2,7 @@ from .grid_view_editor import GridViewEditor
 from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, Button
 from sage.misc.misc import uniq
-import traitlets
+from traitlets import HasTraits, observe, link
 
 textcell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
 buttoncell_layout = Layout(width='5em',height='4em', margin='0')
@@ -22,6 +22,20 @@ try:
 except:
     pass # We are in the test environment
 
+
+class cdlink(link):
+    r"""
+    A directional link (for a start) with type casting
+    """
+    def __init__(self, source, target, cast):
+        super(cdlink, self).__init__(source, target)
+        setattr(self, 'to_cell', cast)
+
+    def _update_target(self, change):
+        if self.updating:
+            return
+        with self._busy_updating():
+            setattr(self.target[0], self.to_cell(self.target[1]), change.new)
 
 class TextCell(Text):
     r"""A regular text grid cell
@@ -103,14 +117,31 @@ class GridViewWidget(GridViewEditor, VBox):
         if not cell_layout:
             if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
                 cell_layout = buttoncell_layout
+                cast = self.value.bool_to_cell
             else:
                 cell_layout = textcell_layout
+                cast = self.value.unicode_to_cell
         self.cell_layout = cell_layout
         self.cell_widget_classes = cell_widget_classes
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
         self.compute()
         self.draw()
+        self.add_links(cast)
+
+    def add_links(self, cast):
+        r"""
+        Link each individual widget cell
+        to its corresponding trait in the editor
+        """
+        for pos in self.cells.keys():
+            traitname = 'cell_%d_%d' % (pos)
+            try:
+                child = self.children[pos[0]].children[pos[1]]
+            except:
+                child = None
+            if child and traitname in self.traits().keys():
+                cdlink((child, 'value'), (self, traitname), cast)
 
     def draw(self):
         r"""
