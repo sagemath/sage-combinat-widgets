@@ -1,10 +1,11 @@
 from .grid_view_editor import GridViewEditor
+from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, Button
 from sage.misc.misc import uniq
 import traitlets
 
-cell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
-button_layout = Layout(width='5em',height='4em', margin='0')
+textcell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
+buttoncell_layout = Layout(width='5em',height='4em', margin='0')
 css_lines = []
 css_lines.append(".widget-text INPUT { border-collapse: collapse !important }")
 css_lines.append(".blankcell INPUT {border:0px !important}")
@@ -30,10 +31,9 @@ class TextCell(Text):
         sage: b = TextCell()
     """
 
-    def __init__(self, content, position, **kws):
-        super(TextCell, self).__init__(content, **kws)
+    def __init__(self, content, position, layout=textcell_layout, **kws):
+        super(TextCell, self).__init__(content, layout=layout, **kws)
         self.position = position
-        self.layout = cell_layout
         self.add_class('gridcell')
 
 class ButtonCell(Button):
@@ -44,10 +44,9 @@ class ButtonCell(Button):
         sage: b = ButtonCell()
     """
 
-    def __init__(self, content, position, **kws):
-        super(ButtonCell, self).__init__(**kws)
+    def __init__(self, content, position, layout=buttoncell_layout, **kws):
+        super(ButtonCell, self).__init__(layout=layout, **kws)
         self.position = position
-        self.layout = button_layout
         self.add_class('gridcell')
 
 class BlankCell(Text):
@@ -58,9 +57,8 @@ class BlankCell(Text):
         sage: b = BlankCell()
     """
 
-    def __init__(self):
-        super(BlankCell, self).__init__('', disabled=True)
-        self.layout = cell_layout
+    def __init__(self, layout=textcell_layout):
+        super(BlankCell, self).__init__('', layout=layout, disabled=True)
         self.add_class('blankcell')
 
 class AddableCell(Text):
@@ -71,11 +69,10 @@ class AddableCell(Text):
         sage: a = AddableCell()
     """
 
-    def __init__(self, position):
-        super(AddableCell, self).__init__('')
-        self.layout = cell_layout
-        self.add_class('addablecell')
+    def __init__(self, position, layout=textcell_layout):
+        super(AddableCell, self).__init__('', layout=layout)
         self.position = position
+        self.add_class('addablecell')
 
 def compute_tooltip(t):
     r"""From a tuple (i,j),
@@ -87,7 +84,7 @@ class GridViewWidget(GridViewEditor, VBox):
     r"""A widget for all grid-representable Sage objects
     """
 
-    def __init__(self, obj, cell_widget_classes=[TextCell], blank_widget_class=BlankCell, addable_widget_class=AddableCell):
+    def __init__(self, obj, cell_layout=None, cell_widget_classes=[TextCell], blank_widget_class=BlankCell, addable_widget_class=AddableCell):
         r"""
         TESTS::
 
@@ -103,6 +100,12 @@ class GridViewWidget(GridViewEditor, VBox):
         GridViewEditor.__init__(self, obj)
         VBox.__init__(self)
         self._model_id = list(self.get_manager_state()['state'].keys())[-1] # For some reason, it lost its _model_id
+        if not cell_layout:
+            if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
+                cell_layout = buttoncell_layout
+            else:
+                cell_layout = textcell_layout
+        self.cell_layout = cell_layout
         self.cell_widget_classes = cell_widget_classes
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
@@ -141,21 +144,22 @@ class GridViewWidget(GridViewEditor, VBox):
                         cell_string = self.value.cell_to_unicode(cell_content)
                     cell = cell_widget_class(cell_string,
                                              (i,j),
+                                             self.cell_layout,
                                              placeholder=cell_string,
-                                             tooltip=compute_tooltip((i,j)), # For buttons, menus ..
-                                             layout=cell_layout)
+                                             tooltip=compute_tooltip((i,j)) # For buttons, menus ..
+                    )
                     # TODO write some typecasting (possibly requires subclassing traitlets.link)
                     # traitlets.mylink((self, 'cell_%d_%d' % (i,j)), (cell, 'value'))
                     hbox_children.append(cell)
                 elif (i,j) in addable_positions:
-                    hbox_children.append(self.addable_widget_class((i,j)))
+                    hbox_children.append(self.addable_widget_class((i,j), self.cell_layout))
                 else:
-                    hbox_children.append(self.blank_widget_class())
+                    hbox_children.append(self.blank_widget_class(self.cell_layout))
                 j+=1
                 if (i,j) in addable_positions:
-                    hbox_children.append(self.addable_widget_class((i,j)))
+                    hbox_children.append(self.addable_widget_class((i,j), self.cell_layout))
             vbox_children.append(HBox(hbox_children))
         for row in addable_rows:
             if row[0] > i:
-                vbox_children.append(HBox([self.addable_widget_class((i,j)) for c in row[1]]))
+                vbox_children.append(HBox([self.addable_widget_class((i,j), self.cell_layout) for c in row[1]]))
         self.children = vbox_children
