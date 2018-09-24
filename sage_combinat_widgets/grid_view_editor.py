@@ -133,6 +133,7 @@ class GridViewEditor(BindableEditorClass):
                     traitclass = SAGETYPE_TO_TRAITTYPE[type(obj[0])]
             else:
                 traitclass = traitlets.Instance
+        traits_to_add = {}
         for pos, val in self.cells.items():
             traitname = 'cell_%d_%d' % pos
             traitvalue = val or ''
@@ -140,12 +141,10 @@ class GridViewEditor(BindableEditorClass):
                 self._trait_values[traitname] = traitvalue
             else:
                 trait = traitclass(traitvalue)
-                trait.class_init(self.__class__, traitname)
                 trait.name = traitname
-                trait.instance_init(self)
-                trait.value = traitvalue
-                #self._trait_values[traitname] = traitvalue # Is set by instance_init()
+                traits_to_add[traitname] = trait
         self.traitclass = traitclass
+        self.add_traits(**traits_to_add)
 
     def get_value(self):
         return self.value
