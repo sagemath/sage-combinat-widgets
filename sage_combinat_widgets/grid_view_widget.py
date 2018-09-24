@@ -7,6 +7,9 @@ cell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
 blank_layout = Layout(width='3em',height='2em', margin='0', border='0')
 addable_layout = Layout(width='3em',height='2em', margin='0', border='0')
 css_lines = []
+css_lines.append(".widget-text INPUT { border-collapse: collapse !important }")
+css_lines.append(".blankcell INPUT {border:0px !important}")
+css_lines.append(".addablecell INPUT {border:1px dashed #999 !important}")
 css = HTML("<style>%s</style>" % '\n'.join(css_lines))
 
 try:
@@ -33,10 +36,6 @@ class BlankCell(Text):
         self.layout = blank_layout
         self.add_class('blankcell')
 
-    def reset(self):
-        pass
-
-
 class AddableCell(Text):
     r"""An addable placeholder for adding a cell to the widget
 
@@ -45,13 +44,11 @@ class AddableCell(Text):
         sage: a = AddableCell()
     """
 
-    def __init__(self):
+    def __init__(self, position):
         super(AddableCell, self).__init__('')
         self.layout = addable_layout
         self.add_class('addablecell')
-
-    def reset(self):
-        pass
+        self.position = position
 
 def compute_tooltip(t):
     r"""From a tuple (i,j),
@@ -117,21 +114,22 @@ class GridViewWidget(GridViewEditor, VBox):
                         cell_string = str(cell_content)
                     cell = cell_widget_class(cell_string,
                                              placeholder=cell_string,
-                                             tooltip=compute_tooltip((i,j)),
+                                             tooltip=compute_tooltip((i,j)), # For buttons, menus ..
                                              layout=cell_layout)
+                    cell.position = (i,j)
                     # TODO write some typecasting (possibly requires subclassing traitlets.link)
                     # traitlets.mylink((self, 'cell_%d_%d' % (i,j)), (cell, 'value'))
                     cell.add_class('gridcell')
                     hbox_children.append(cell)
                 elif (i,j) in addable_positions:
-                    hbox_children.append(self.addable_widget_class())
+                    hbox_children.append(self.addable_widget_class((i,j)))
                 else:
                     hbox_children.append(self.blank_widget_class())
                 j+=1
                 if (i,j) in addable_positions:
-                    hbox_children.append(self.addable_widget_class())
+                    hbox_children.append(self.addable_widget_class((i,j)))
             vbox_children.append(HBox(hbox_children))
         for row in addable_rows:
             if row[0] > i:
-                vbox_children.append(HBox([self.addable_widget_class() for c in row[1]]))
+                vbox_children.append(HBox([self.addable_widget_class((i,j)) for c in row[1]]))
         self.children = vbox_children
