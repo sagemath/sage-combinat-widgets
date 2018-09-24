@@ -28,14 +28,18 @@ class cdlink(link):
     A directional link (for a start) with type casting
     """
     def __init__(self, source, target, cast):
-        super(cdlink, self).__init__(source, target)
-        setattr(self, 'to_cell', cast)
+        self.source, self.target, self.to_cell = source, target, cast
+        try:
+            setattr(target[0], target[1], cast(getattr(source[0], source[1])))
+        finally:
+            source[0].observe(self._update_target, names=source[1])
+            target[0].observe(self._update_source, names=target[1])
 
     def _update_target(self, change):
         if self.updating:
             return
         with self._busy_updating():
-            setattr(self.target[0], self.to_cell(self.target[1]), change.new)
+            setattr(self.target[0], self.target[1], self.to_cell(change.new))
 
 class TextCell(Text):
     r"""A regular text grid cell
@@ -140,7 +144,7 @@ class GridViewWidget(GridViewEditor, VBox):
                 child = self.children[pos[0]].children[pos[1]]
             except:
                 child = None
-            if child and traitname in self.traits().keys():
+            if child and traitname in self.traits():
                 cdlink((child, 'value'), (self, traitname), cast)
 
     def draw(self):
