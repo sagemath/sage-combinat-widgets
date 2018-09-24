@@ -135,7 +135,7 @@ class GridViewEditor(BindableEditorClass):
                 traitclass = traitlets.Instance
         for pos, val in self.cells.items():
             traitname = 'cell_%d_%d' % pos
-            traitvalue = val
+            traitvalue = val or ''
             if traitname in self._trait_values:
                 self._trait_values[traitname] = traitvalue
             else:

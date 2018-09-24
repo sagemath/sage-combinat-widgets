@@ -9,6 +9,10 @@ Grid View Adapter for grid-representable graphs
     :widths: 30, 70
     :delim: |
 
+    :meth:`~TableauGridViewAdapter.cell_to_unicode` | Static method for typecasting cell content to unicode
+    :meth:`~TableauGridViewAdapter.unicode_to_cell` | Static method for typecasting unicode to cell content
+    :meth:`~TableauGridViewAdapter.cell_to_bool` | Static method for typecasting cell content to boolean
+    :meth:`~TableauGridViewAdapter.bool_to_cell` | Static method for typecasting boolean to cell content
     :meth:`~GraphGridViewAdapter.compute_cells` | Compute graph cells as a dictionary { coordinate pair : label }
     :meth:`~GraphGridViewAdapter.from_cells` | Create a new graph from a cells dictionary
     :meth:`~GraphGridViewAdapter.addable_cells` | List addable cells
@@ -27,6 +31,23 @@ Grid View Adapter for grid-representable graphs
 from sage.all import Graph
 
 class GraphGridViewAdapter(Graph):
+
+    @staticmethod
+    def cell_to_unicode(cell_content):
+        return ''
+
+    @staticmethod
+    def unicode_to_cell(s):
+        return None
+
+    @staticmethod
+    def cell_to_bool(cell_content):
+        return False
+
+    @staticmethod
+    def bool_to_cell(b):
+        return None
+
     def compute_cells(self):
         r"""
         From the graph vertices,

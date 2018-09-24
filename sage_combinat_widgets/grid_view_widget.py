@@ -111,7 +111,7 @@ class GridViewWidget(GridViewEditor, VBox):
                     if cell_content is None:
                         cell_string = ''
                     else:
-                        cell_string = str(cell_content)
+                        cell_string = self.value.cell_to_unicode(cell_content)
                     cell = cell_widget_class(cell_string,
                                              placeholder=cell_string,
                                              tooltip=compute_tooltip((i,j)), # For buttons, menus ..

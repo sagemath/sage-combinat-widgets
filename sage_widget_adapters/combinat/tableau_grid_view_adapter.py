@@ -9,7 +9,9 @@ Grid View Adapter for tableaux
     :widths: 30, 70
     :delim: |
 
-    :meth:`~TableauGridViewAdapter.compute_cells` | Compute tableau cells as a dictionary { coordinate pair : label }
+    :meth:`~TableauGridViewAdapter.cell_to_unicode` | Static method for typecasting cell content to unicode
+    :meth:`~TableauGridViewAdapter.unicode_to_cell` | Static method for typecasting unicode to cell content
+    :meth:`~TableauGridViewAdapter.compute_cells` | Compute tableau cells as a dictionary { coordinate pair : integer }
     :meth:`~TableauGridViewAdapter.from_cells` | Create a new tableau from a cells dictionary
     :meth:`~TableauGridViewAdapter.get_cell` | Get the tableau cell content
     :meth:`~TableauGridViewAdapter.set_cell` | Set the tableau cell content
