@@ -4,10 +4,12 @@ from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, Button
 from sage.misc.misc import uniq
 from traitlets import observe, link
 
-textcell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
-buttoncell_layout = Layout(width='5em',height='4em', margin='0')
+textcell_layout = Layout(width='3em',height='2em', margin='0', padding='0')
+buttoncell_layout = Layout(width='5em',height='4em', margin='0', padding='0')
 css_lines = []
 css_lines.append(".widget-text INPUT { border-collapse: collapse !important}")
+css_lines.append(".gridbutton {border:1px solid #999}")
+css_lines.append(".blankbutton {border:0px !important; background-color: white}")
 css_lines.append(".blankcell INPUT {border:0px !important}")
 css_lines.append(".addablecell INPUT, .removablecell INPUT {background-position: right top; background-size: 1em; background-repeat: no-repeat}")
 css_lines.append(".addablecell INPUT {border:1px dashed #999 !important; background-image: url('Plus.png')}")
@@ -67,7 +69,7 @@ class ButtonCell(Button):
     def __init__(self, content, position, layout=buttoncell_layout, **kws):
         super(ButtonCell, self).__init__(layout=layout, **kws)
         self.position = position
-        self.add_class('gridcell')
+        self.add_class('gridbutton')
 
 class BlankCell(Text):
     r"""A blank placeholder cell
@@ -80,6 +82,18 @@ class BlankCell(Text):
     def __init__(self, layout=textcell_layout):
         super(BlankCell, self).__init__('', layout=layout, disabled=True)
         self.add_class('blankcell')
+
+class BlankButton(Button):
+    r"""A blank placeholder button
+
+    TESTS::
+        sage: from sage_combinat_widgets import BlankButton
+        sage: b = BlankButton()
+    """
+
+    def __init__(self, layout=buttoncell_layout):
+        super(BlankButton, self).__init__(layout=layout, disabled=True)
+        self.add_class('blankbutton')
 
 class AddableCell(Text):
     r"""An addable placeholder for adding a cell to the widget
