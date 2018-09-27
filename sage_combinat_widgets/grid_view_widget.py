@@ -49,8 +49,8 @@ class TextCell(Text):
     r"""A regular text grid cell
 
     TESTS::
-        sage: from sage_combinat_widgets import TextCell
-        sage: b = TextCell()
+        sage: from sage_combinat_widgets.grid_view_widget import TextCell
+        sage: b = TextCell('my text', (1,2))
     """
 
     def __init__(self, content, position, layout=textcell_layout, **kws):
@@ -62,8 +62,8 @@ class ButtonCell(Button):
     r"""A button grid cell
 
     TESTS::
-        sage: from sage_combinat_widgets import ButtonCell
-        sage: b = ButtonCell()
+        sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
+        sage: b = ButtonCell('None', (1,2))
     """
 
     def __init__(self, content, position, layout=buttoncell_layout, **kws):
@@ -75,7 +75,7 @@ class BlankCell(Text):
     r"""A blank placeholder cell
 
     TESTS::
-        sage: from sage_combinat_widgets import BlankCell
+        sage: from sage_combinat_widgets.grid_view_widget import BlankCell
         sage: b = BlankCell()
     """
 
@@ -87,7 +87,7 @@ class BlankButton(Button):
     r"""A blank placeholder button
 
     TESTS::
-        sage: from sage_combinat_widgets import BlankButton
+        sage: from sage_combinat_widgets.grid_view_widget import BlankButton
         sage: b = BlankButton()
     """
 
@@ -99,8 +99,8 @@ class AddableCell(Text):
     r"""An addable placeholder for adding a cell to the widget
 
     TESTS::
-        sage: from sage_combinat_widgets import AddableCell
-        sage: a = AddableCell()
+        sage: from sage_combinat_widgets.grid_view_widget import AddableCell
+        sage: a = AddableCell((3,4))
     """
 
     def __init__(self, position, layout=textcell_layout):
