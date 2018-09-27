@@ -134,9 +134,15 @@ class GridViewEditor(BindableEditorClass):
             else:
                 traitclass = traitlets.Instance
         traits_to_add = {}
+        if self.addable_cells():
+            # Setup a catch-all trait for addable cells
+            emptyvalue = traitclass.default_value
+            emptytrait = traitclass(emptyvalue)
+            emptytrait.name = 'new_cell'
+            traits_to_add['new_cell'] = emptytrait
         for pos, val in self.cells.items():
             traitname = 'cell_%d_%d' % pos
-            traitvalue = val or ''
+            traitvalue = val
             if traitname in self._trait_values:
                 self._trait_values[traitname] = traitvalue
             else:
@@ -193,10 +199,14 @@ class GridViewEditor(BindableEditorClass):
         self.set_value(obj)
 
     def addable_cells(self):
-        return self.value.addable_cells()
+        if hasattr(self.value, 'addable_cells'):
+            return self.value.addable_cells()
+        return []
 
     def removable_cells(self):
-        return self.value.removable_cells()
+        if hasattr(self.value, 'removable_cells'):
+            return self.value.removable_cells()
+        return []
 
     def add_cell(self, pos, val):
         if not hasattr(self.value, 'add_cell'):

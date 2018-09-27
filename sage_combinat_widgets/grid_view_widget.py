@@ -50,7 +50,7 @@ class TextCell(Text):
     """
 
     def __init__(self, content, position, layout=textcell_layout, **kws):
-        super(TextCell, self).__init__(content, layout=layout, **kws)
+        super(TextCell, self).__init__(content, layout=layout, continuous_update=False, **kws)
         self.position = position
         self.add_class('gridcell')
 
@@ -88,7 +88,7 @@ class AddableCell(Text):
     """
 
     def __init__(self, position, layout=textcell_layout):
-        super(AddableCell, self).__init__('', layout=layout)
+        super(AddableCell, self).__init__('', layout=layout, continuous_update=False)
         self.position = position
         self.add_class('addablecell')
 
@@ -146,6 +146,13 @@ class GridViewWidget(GridViewEditor, VBox):
                 child = None
             if child and traitname in self.traits():
                 cdlink((child, 'value'), (self, traitname), cast)
+        for pos in self.addable_cells():
+            # A directional link to the catch-all trait 'new_cell'
+            try:
+                child = self.children[pos[0]].children[pos[1]]
+                cdlink((child, 'value'), (self, 'new_cell'), cast)
+            except:
+                pass
 
     def draw(self):
         r"""
@@ -162,7 +169,7 @@ class GridViewWidget(GridViewEditor, VBox):
             # Such function can enable for example various shapes or colors
             return 0
         addable_positions = []
-        if self.addable_widget_class and hasattr(self, 'addable_cells'):
+        if self.addable_widget_class and self.addable_cells():
             addable_positions = sorted(list(self.addable_cells()))
             addable_rows = [(i,[pos for pos in addable_positions if pos[0]==i]) \
                             for i in uniq([t[0] for t in addable_positions])]
