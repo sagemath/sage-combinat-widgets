@@ -7,9 +7,11 @@ from traitlets import observe, link
 textcell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
 buttoncell_layout = Layout(width='5em',height='4em', margin='0')
 css_lines = []
-css_lines.append(".widget-text INPUT { border-collapse: collapse !important }")
+css_lines.append(".widget-text INPUT { border-collapse: collapse !important}")
 css_lines.append(".blankcell INPUT {border:0px !important}")
-css_lines.append(".addablecell INPUT {border:1px dashed #999 !important}")
+css_lines.append(".addablecell INPUT, .removablecell INPUT {background-position: right top; background-size: 1em; background-repeat: no-repeat}")
+css_lines.append(".addablecell INPUT {border:1px dashed #999 !important; background-image: url('Plus.png')}")
+css_lines.append(".removablecell INPUT {background-image: url('Minus.png')}")
 css = HTML("<style>%s</style>" % '\n'.join(css_lines))
 
 try:
@@ -172,6 +174,7 @@ class GridViewWidget(GridViewEditor, VBox):
             return 0
         addable_positions = []
         addable_rows = []
+        removable_positions = self.removable_cells()
         if self.addable_widget_class and self.addable_cells():
             addable_positions = sorted(list(self.addable_cells()))
             addable_rows = [(i,[pos for pos in addable_positions if pos[0]==i]) \
@@ -193,8 +196,8 @@ class GridViewWidget(GridViewEditor, VBox):
                                              placeholder=cell_string,
                                              tooltip=compute_tooltip((i,j)) # For buttons, menus ..
                     )
-                    # TODO write some typecasting (possibly requires subclassing traitlets.link)
-                    # traitlets.mylink((self, 'cell_%d_%d' % (i,j)), (cell, 'value'))
+                    if (i,j) in removable_positions:
+                        cell.add_class('removablecell')
                     hbox_children.append(cell)
                 elif (i,j) in addable_positions:
                     hbox_children.append(self.addable_widget_class((i,j), self.cell_layout))

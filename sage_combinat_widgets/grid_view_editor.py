@@ -257,8 +257,6 @@ class GridViewEditor(BindableEditorClass):
             traits_to_add[traitname] = trait
         addable_traitname = 'add_%d_%d' % pos
         if self.has_trait(addable_traitname):
-            #print(self.__dict__)
-            #print(self.traits())
             delattr(self.__class__, addable_traitname)
             del self._trait_values[addable_traitname]
         for pos in self.addable_cells():
@@ -267,7 +265,7 @@ class GridViewEditor(BindableEditorClass):
                 emptytrait = self.traitclass(self.traitclass.default_value)
                 emptytrait.name = emptytraitname
                 traits_to_add[emptytraitname] = emptytrait
-        print(traits_to_add)
+        #print(traits_to_add)
         self.add_traits(**traits_to_add)
         self.draw()
 
