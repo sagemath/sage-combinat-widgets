@@ -2,7 +2,7 @@ from .grid_view_editor import GridViewEditor
 from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, Button
 from sage.misc.misc import uniq
-from traitlets import HasTraits, observe, link
+from traitlets import observe, link
 
 textcell_layout = Layout(width='3em',height='2em', margin='0',padding='0')
 buttoncell_layout = Layout(width='5em',height='4em', margin='0')
@@ -147,10 +147,12 @@ class GridViewWidget(GridViewEditor, VBox):
             if child and hasattr(child, 'value') and traitname in self.traits():
                 cdlink((child, 'value'), (self, traitname), cast)
         for pos in self.addable_cells():
-            # A directional link to the catch-all trait 'new_cell'
+            # A directional link to trait 'add_i_j'
+            traitname = 'add_%d_%d' % (pos)
             try:
                 child = self.children[pos[0]].children[pos[1]]
-                cdlink((child, 'value'), (self, 'new_cell'), cast)
+                if child and hasattr(child, 'value') and traitname in self.traits():
+                    cdlink((child, 'value'), (self, traitname), cast)
             except:
                 pass
 

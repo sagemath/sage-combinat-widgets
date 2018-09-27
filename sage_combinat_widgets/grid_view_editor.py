@@ -16,8 +16,9 @@ AUTHORS:
 - Odile Bénassy, Nicolas Thiéry
 
 """
-from __future__ import print_function, absolute_import
+import re, traitlets
 from six import add_metaclass
+from copy import copy
 from sage.misc.bindable_class import BindableClass
 from sage.combinat.tableau import *
 from sage.all import SageObject, matrix, Integer
@@ -25,7 +26,6 @@ from sage.rings.real_mpfr import RealLiteral
 from sage.graphs.generic_graph import GenericGraph
 from sage.combinat.partition import Partition
 from sage.structure.list_clone import ClonableList
-import traitlets
 from sage_widget_adapters import *
 
 SAGETYPE_TO_TRAITTYPE = {
@@ -38,6 +38,17 @@ SAGETYPE_TO_TRAITTYPE = {
     Integer: traitlets.Integer,
     RealLiteral: traitlets.Float
     }
+
+def extract_coordinates(s):
+    r"""
+    sage: from sage_combinat_widgets.grid_view_editor import extract_coordinates
+    sage: extract_coordinates('add_0_4')
+    (0, 4)
+    """
+    patt = re.compile('_([0-9]+)_([0-9]+)')
+    m = patt.search(s)
+    if m:
+        return tuple(int(i) for i in m.groups())
 
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass(traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
@@ -134,11 +145,12 @@ class GridViewEditor(BindableEditorClass):
             else:
                 traitclass = traitlets.Instance
         traits_to_add = {}
-        if self.addable_cells():
-            # Setup a catch-all trait for addable cells
+        for pos in self.addable_cells():
+            # Empty traits for addable cells
+            emptytraitname = 'add_%d_%d' % pos
             emptytrait = traitclass(traitclass.default_value)
-            emptytrait.name = 'new_cell'
-            traits_to_add['new_cell'] = emptytrait
+            emptytrait.name = emptytraitname
+            traits_to_add[emptytraitname] = emptytrait
         for pos, val in self.cells.items():
             traitname = 'cell_%d_%d' % pos
             traitvalue = val
@@ -150,6 +162,9 @@ class GridViewEditor(BindableEditorClass):
                 traits_to_add[traitname] = trait
         self.traitclass = traitclass
         self.add_traits(**traits_to_add)
+
+    def draw(self):
+        pass
 
     def get_value(self):
         return self.value
@@ -192,7 +207,14 @@ class GridViewEditor(BindableEditorClass):
             raise ValueError("Could not make a compatible ('%s')  object from given cells" % str(obj_class))
         self.set_value(obj)
 
-    def set_cell(self, pos, val):
+    @traitlets.observe(traitlets.All)
+    def set_cell(self, change):
+        if not change.name.startswith('cell_'):
+            return
+        if change.new == change.old:
+            return
+        pos = extract_coordinates(change.name)
+        val = change.new
         obj = copy(self.value)
         obj.set_cell(pos, val)
         self.set_value(obj)
@@ -207,7 +229,12 @@ class GridViewEditor(BindableEditorClass):
             return self.value.removable_cells()
         return []
 
-    def add_cell(self, pos, val):
+    @traitlets.observe(traitlets.All)
+    def add_cell(self, change):
+        if not change.name.startswith('add_'):
+            return
+        pos = extract_coordinates(change.name)
+        val = change.new
         if not hasattr(self.value, 'add_cell'):
             raise TypeError("Cannot add cell to this object.")
         obj = copy(self.value)
@@ -217,17 +244,32 @@ class GridViewEditor(BindableEditorClass):
             raise ValueError("Unable to add cell (position=%s and value=%s)" % (str(pos), str(val)))
         if not self.validate(obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
+        self.value = obj
         self.cells[pos] = val
+        # Adding a new trait and more addable cell(s)
+        traits_to_add = {}
         traitname = 'cell_%d_%d' % pos
         traitvalue = val
         if self.has_trait(traitname):
-            trait = self.traits[traitname]
-            del(trait)
-            del(self.traits[traitname])
-        trait = traitclass(traitvalue)
-        trait.instance_init(self)
-        self._trait_values[self.name] = trait.value # Can be val, or can be trait's default value
-        self.value = obj
+            self.set_trait(traitname, traitvalue)
+        else:
+            trait = self.traitclass(traitvalue)
+            traits_to_add[traitname] = trait
+        addable_traitname = 'add_%d_%d' % pos
+        if self.has_trait(addable_traitname):
+            #print(self.__dict__)
+            #print(self.traits())
+            delattr(self.__class__, addable_traitname)
+            del self._trait_values[addable_traitname]
+        for pos in self.addable_cells():
+            emptytraitname = 'add_%d_%d' % pos
+            if not self.has_trait(emptytraitname):
+                emptytrait = self.traitclass(self.traitclass.default_value)
+                emptytrait.name = emptytraitname
+                traits_to_add[emptytraitname] = emptytrait
+        print(traits_to_add)
+        self.add_traits(**traits_to_add)
+        self.draw()
 
     def remove_cell(self, pos):
         if not hasattr(self.value, 'add_cell'):
