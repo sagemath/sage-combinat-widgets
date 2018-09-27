@@ -144,7 +144,7 @@ class GridViewWidget(GridViewEditor, VBox):
                 child = self.children[pos[0]].children[pos[1]]
             except:
                 child = None
-            if child and traitname in self.traits():
+            if child and hasattr(child, 'value') and traitname in self.traits():
                 cdlink((child, 'value'), (self, traitname), cast)
         for pos in self.addable_cells():
             # A directional link to the catch-all trait 'new_cell'
@@ -169,6 +169,7 @@ class GridViewWidget(GridViewEditor, VBox):
             # Such function can enable for example various shapes or colors
             return 0
         addable_positions = []
+        addable_rows = []
         if self.addable_widget_class and self.addable_cells():
             addable_positions = sorted(list(self.addable_cells()))
             addable_rows = [(i,[pos for pos in addable_positions if pos[0]==i]) \
