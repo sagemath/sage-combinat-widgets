@@ -114,7 +114,7 @@ class GridViewEditor(BindableEditorClass):
         else:
             obj_class = obj.__class__
             if issubclass(obj_class, GenericGraph): # i.e. a graph
-                traitclass = traitlets.Unicode
+                traitclass = traitlets.Any
             elif issubclass(obj_class, Partition): # a Partition
                 traitclass = traitlets.Unicode
             elif issubclass(obj_class, ClonableList): # e.g. a tableau
@@ -128,7 +128,7 @@ class GridViewEditor(BindableEditorClass):
                 if not self.cells:
                     cells = [((i, j), obj[i+j]) for i in range(matrix(obj).nrows()) for j in range(matrix(obj).ncols())]
                     for pos, val in cells:
-                        self.cells[pos] = val
+                        self.cells[pos] = val or traitclass.default_value
                 if type(obj[0]) in SAGETYPE_TO_TRAITTYPE:
                     traitclass = SAGETYPE_TO_TRAITTYPE[type(obj[0])]
             else:
@@ -136,8 +136,7 @@ class GridViewEditor(BindableEditorClass):
         traits_to_add = {}
         if self.addable_cells():
             # Setup a catch-all trait for addable cells
-            emptyvalue = traitclass.default_value
-            emptytrait = traitclass(emptyvalue)
+            emptytrait = traitclass(traitclass.default_value)
             emptytrait.name = 'new_cell'
             traits_to_add['new_cell'] = emptytrait
         for pos, val in self.cells.items():
