@@ -39,11 +39,27 @@ SAGETYPE_TO_TRAITTYPE = {
     RealLiteral: traitlets.Float
     }
 
+def simplecast(x):
+    r"""
+    From Sage math objects to ordinary python types.
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_editor import simplecast
+        sage: a = 1
+        sage: type(simplecast(a))
+        <class 'int'>
+    """
+    if type(x) == sage.rings.integer.Integer:
+        return int(x)
+    if type(x) == sage.rings.real_mpfr.RealLiteral:
+        return float(x)
+    return x
+
 def extract_coordinates(s):
     r"""
-    sage: from sage_combinat_widgets.grid_view_editor import extract_coordinates
-    sage: extract_coordinates('add_0_4')
-    (0, 4)
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_editor import extract_coordinates
+        sage: extract_coordinates('add_0_4')
+        (0, 4)
     """
     patt = re.compile('_([0-9]+)_([0-9]+)')
     m = patt.search(s)
@@ -153,7 +169,8 @@ class GridViewEditor(BindableEditorClass):
             traits_to_add[emptytraitname] = emptytrait
         for pos, val in self.cells.items():
             traitname = 'cell_%d_%d' % pos
-            traitvalue = val
+            # Simple type casting, e.g. sage.rings.integer.Integer -> int ...
+            traitvalue = simplecast(val)
             if traitname in self._trait_values:
                 self._trait_values[traitname] = traitvalue
             else:
