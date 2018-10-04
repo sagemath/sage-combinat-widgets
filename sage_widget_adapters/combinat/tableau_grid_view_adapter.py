@@ -9,7 +9,6 @@ Grid View Adapter for tableaux
     :widths: 30, 70
     :delim: |
 
-    :meth:`~TableauGridViewAdapter.cell_to_unicode` | Static method for typecasting cell content to unicode
     :meth:`~TableauGridViewAdapter.unicode_to_cell` | Static method for typecasting unicode to cell content
     :meth:`~TableauGridViewAdapter.compute_cells` | Compute tableau cells as a dictionary { coordinate pair : integer }
     :meth:`~TableauGridViewAdapter.from_cells` | Create a new tableau from a cells dictionary
@@ -20,38 +19,36 @@ Grid View Adapter for tableaux
     :meth:`~TableauGridViewAdapter.add_cell` | Add a cell
     :meth:`~TableauGridViewAdapter.remove_cell` | Remove a cell
 """
-
 from sage.combinat.tableau import *
-from traitlets import Integer
+from sage.rings.integer import Integer
+from traitlets import Int
+from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
-class TableauGridViewAdapter(Tableau):
-    traitclass = Integer
-
-    @staticmethod
-    def cell_to_unicode(cell_content):
-        return str(cell_content)
+class TableauGridViewAdapter(GridViewAdapter):
+    objclass = Tableau
+    traitclass = Int
 
     @staticmethod
     def unicode_to_cell(s):
         return int(s)
 
-    def compute_cells(self):
+    @staticmethod
+    def compute_cells(obj):
         r"""
         From a tableau,
         return a dictionary { coordinates pair : integer }
         TESTS:
-        sage: from sage.combinat.tableau import StandardTableau
-        sage: from sage_widget_adapters import TableauGridViewAdapter
-        sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
-        sage: gt = TableauGridViewAdapter(t.parent(), t)
-        sage: gt.compute_cells()
+        sage: from sage.combinat.tableau import Tableau
+        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
+        sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
+        sage: TableauGridViewAdapter.compute_cells(t)
         {(0, 0): 1, (0, 1): 2, (0, 2): 5, (0, 3): 6, (1, 0): 3, (2, 0): 4}
         """
         cells = {}
-        for i in range(len(self)):
-            r = self[i]
+        for i in range(len(obj)):
+            r = obj[i]
             for j in range(len(r)):
-                cells[(i,j)] = r[j]
+                cells[(i,j)] = int(r[j])
         return cells
 
     @classmethod
@@ -60,8 +57,8 @@ class TableauGridViewAdapter(Tableau):
         From a dictionary { coordinates pair : integer }
         return a corresponding tableau
         TESTS:
-        sage: from sage.combinat.tableau import StandardTableau
-        sage: from sage_widget_adapters import TableauGridViewAdapter
+        sage: from sage.combinat.tableau import Tableau
+        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
         sage: TableauGridViewAdapter.from_cells({(0, 0): 1, (0, 1): 2, (0, 2): 5, (0, 3): 6, (1, 0): 3, (2, 0): 4})
         [[1, 2, 5, 6], [3], [4]]
         """
@@ -72,37 +69,40 @@ class TableauGridViewAdapter(Tableau):
             row.sort()
             rows.append(row)
             i += 1
-        return cls.__classcall_private__(cls, rows)
+        try:
+            obj = cls.objclass(rows)
+        except:
+            raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
+        return obj
 
-    def get_cell(self, pos):
+    @staticmethod
+    def get_cell(obj, pos):
         r"""
         Get cell value
         TESTS::
-        sage: from sage.combinat.tableau import StandardTableau
-        sage: from sage_widget_adapters import TableauGridViewAdapter
-        sage: t = StandardTableau([[1, 2, 5, 6], [3, 7], [4]])
-        sage: gt = TableauGridViewAdapter(t.parent(), t)
-        sage: gt.get_cell((1,1))
+        sage: from sage.combinat.tableau import Tableau
+        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
+        sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
+        sage: TableauGridViewAdapter.get_cell(t, (1,1))
         7
         """
         try:
-            return self.__call__(pos)
+            return obj.__call__(pos)
         except:
             raise ValueError("Cell %s does not exist!" % str(pos))
 
-    def set_cell(self, pos, val):
+    @classmethod
+    def set_cell(cls, obj, pos, val):
         r"""
         Set cell value
         TESTS::
-        sage: from sage.combinat.tableau import StandardTableau
-        sage: from sage_widget_adapters import TableauGridViewAdapter
-        sage: t = StandardTableau([[1, 2, 5, 6], [3, 7], [4]])
-        sage: gt = TableauGridViewAdapter(t.parent(), t)
-        sage: gt.set_cell((1,1), 8)
-        sage: gt.get_cell((1,1))
-        8
+        sage: from sage.combinat.tableau import Tableau
+        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
+        sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
+        sage: TableauGridViewAdapter.set_cell(t, (1,1), 8)
+        [[1, 2, 5, 6], [3, 8], [4]]
         """
-        tl = self.to_list()
+        tl = obj.to_list()
         nl = []
         for i in range(len(tl)):
             l = tl[i]
@@ -110,88 +110,92 @@ class TableauGridViewAdapter(Tableau):
                 l[pos[1]] = val
             nl.append(l)
         try:
-            new_obj = self.__init__(self.parent(), tl)
+            new_obj = cls.objclass(nl)
         except:
             raise ValueError("Value '%s' is not compatible!" % val)
         else:
             return new_obj
 
-    def addable_cells(self):
+    @staticmethod
+    def addable_cells(obj):
         r"""
-        List addable cells
+        List object addable cells
         TESTS::
-        sage: from sage.combinat.tableau import StandardTableau
-        sage: from sage_widget_adapters import TableauGridViewAdapter
-        sage: t = StandardTableau([[1, 2, 5, 6], [3, 7], [4]])
-        sage: gt = TableauGridViewAdapter(t.parent(), t)
-        sage: gt.addable_cells()
+        sage: from sage.combinat.tableau import Tableau
+        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
+        sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
+        sage: TableauGridViewAdapter.addable_cells(t)
         [(0, 4), (1, 2), (2, 1), (3, 0)]
         """
-        return self.shape().outside_corners()
+        return obj.shape().outside_corners()
 
-    def removable_cells(self):
+    @staticmethod
+    def removable_cells(obj):
         r"""
-        List removable cells
+        List object removable cells
         TESTS::
-        sage: from sage.combinat.tableau import StandardTableau
-        sage: from sage_widget_adapters import TableauGridViewAdapter
-        sage: t = StandardTableau([[1, 2, 5, 6], [3, 7], [4]])
-        sage: gt = TableauGridViewAdapter(t.parent(), t)
-        sage: gt.removable_cells()
+        sage: from sage.combinat.tableau import Tableau
+        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
+        sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
+        sage: TableauGridViewAdapter.removable_cells(t)
         [(0, 3), (1, 1), (2, 0)]
         """
-        return self.corners()
+        return obj.corners()
 
-    def add_cell(self, pos, val):
+    @classmethod
+    def add_cell(cls, obj, pos, val):
         r"""
         Add cell
         TESTS::
-        sage: from sage.combinat.tableau import StandardTableau
-        sage: from sage_widget_adapters import TableauGridViewAdapter
-        sage: t = StandardTableau([[1, 2, 5, 6], [3, 7], [4]])
-        sage: gt = TableauGridViewAdapter(t.parent(), t)
-        sage: gt.add_cell((3, 0), 8)
-        sage: gt.add_cell((2, 0), 9) # doctest: +IGNORE_EXCEPTION_DETAIL
+        sage: from sage.combinat.tableau import Tableau
+        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
+        sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
+        sage: TableauGridViewAdapter.add_cell(t, (3, 0), 8)
+        [[1, 2, 5, 6], [3, 7], [4], [8]]
+        sage: TableauGridViewAdapter.add_cell(t, (1, 2), 8)
+        [[1, 2, 5, 6], [3, 7, 8], [4]]
+        sage: TableauGridViewAdapter.add_cell(t, (2, 0), 9) # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         ValueError: Cell position '(2, 0)' is not addable.
         """
-        if not pos in self.addable_cells():
+        if not pos in cls.addable_cells(obj):
             raise ValueError("Position '%s' is not addable." % str(pos))
-        tl = self.to_list()
+        tl = obj.to_list()
         if pos[0] >= len(tl):
-            nl = tl + [val]
+            nl = tl + [[Integer(val)]]
         else:
             nl = []
             for i in range(len(tl)):
                 l = tl[i]
                 if i == pos[0]:
-                    l.append(val)
+                    l.append(Integer(val))
                 nl.append(l)
         try:
-            new_obj = self.__init__(self.parent(), tl)
+            new_obj = cls.objclass(nl)
         except:
-            raise ValueError("Cannot create a %s with this list!" % self.parent())
+            raise ValueError("Cannot create a %s with this list!" % cls.objclass)
         else:
             return new_obj
 
-    def remove_cell(self, pos):
+    @classmethod
+    def remove_cell(cls, obj, pos):
         r"""
         Remove cell
         TESTS::
-        sage: from sage.combinat.tableau import StandardTableau
-        sage: from sage_widget_adapters import TableauGridViewAdapter
-        sage: t = StandardTableau([[1, 2, 5, 6], [3, 7], [4]])
-        sage: gt = TableauGridViewAdapter(t.parent(), t)
-        sage: gt.remove_cell((1, 1))
-        sage: gt.remove_cell((2, 1)) # doctest: +IGNORE_EXCEPTION_DETAIL
+        sage: from sage.combinat.tableau import Tableau
+        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
+        sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
+        sage: TableauGridViewAdapter.remove_cell(t, (1, 1))
+        [[1, 2, 5, 6], [3], [4]]
+        sage: TableauGridViewAdapter.remove_cell(t, (2, 1)) # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         ValueError: Cell position '(2, 1)' is not removable.
         """
-        if not pos in self.removable_cells():
-            raise ValueError("Position '%s' is not removable." % str(pos))
-        tl = self.to_list()
+        if not pos in cls.removable_cells(obj):
+            raise ValueError("Cell position '%s' is not removable." % str(pos))
+        tl = obj.to_list()
         nl = []
         for i in range(len(tl)):
             l = tl[i]
@@ -199,8 +203,8 @@ class TableauGridViewAdapter(Tableau):
                 l.pop()
             nl.append(l)
         try:
-            new_obj = self.__init__(self.parent(), tl)
+            new_obj = cls.objclass(nl)
         except:
-            raise ValueError("Cannot create a %s with this list!" % self.parent())
+            raise ValueError("Cannot create a %s with this list!" % cls.objclass)
         else:
             return new_obj

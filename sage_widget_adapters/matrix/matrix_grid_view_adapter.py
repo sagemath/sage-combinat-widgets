@@ -9,6 +9,8 @@ Grid View Adapter for matrices
     :widths: 30, 70
     :delim: |
 
+    :meth:`~TableauGridViewAdapter.cell_to_unicode` | Static method for typecasting cell content to unicode
+    :meth:`~TableauGridViewAdapter.unicode_to_cell` | Static method for typecasting unicode to cell content
     :meth:`~MatrixGridViewAdapter.compute_cells` | Compute matrix cells as a dictionary { coordinate pair : label }
     :meth:`~MatrixGridViewAdapter.from_cells` | Create a new matrix from a cells dictionary
     :meth:`~MatrixGridViewAdapter.get_cell` | Get the matrix cell value
@@ -24,20 +26,50 @@ Grid View Adapter for matrices
     :meth:`~MatrixGridViewAdapter.insert_column` | Insert a column at given index
     :meth:`~MatrixGridViewAdapter.remove_column` | Remove a column at given index
 """
+from sage.matrix.matrix2 import Matrix as MatrixClass
+from sage.matrix.constructor import Matrix
+from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
-from sage.matrix.matrix2 import Matrix
+class MatrixGridViewAdapter(GridViewAdapter):
+    objclass = MatrixClass
 
-class MatrixGridViewAdapter(Matrix):
-    def compute_cells(self):
+    @staticmethod
+    def cell_to_unicode(cell_content):
+        return str(cell_content)
+
+    @staticmethod
+    def unicode_to_cell(s):
+        if obj.base_ring().is_subring(ZZ):
+            return ZZ(s)
+        if obj.base_ring().is_subring(QQ):
+            return QQ(float(s))
+        if obj.base_ring().is_subring(RDF):
+            return RDF(s)
+        if obj.base_ring().is_subring(CDF):
+            return CDF(s)
+        try:
+            return obj.base_ring()(s)
+        except:
+            try:
+                return obj.base_ring()(float(s))
+            except:
+                raise TypeError("Unable to cast this value: %s" % s)
+
+    @staticmethod
+    def compute_cells(obj):
+        r"""
+        From a tableau,
+        return a dictionary { coordinates pair : integer }
+        """
         cells = {}
-        for i in self.numrows():
-            r = self[i]
-            for j in self.numcols():
+        for i in obj.numrows():
+            r = obj[i]
+            for j in obj.numcols():
                 cells[(i,j)] = r[j]
         return cells
 
     @classmethod
-    def from_cells(cells={}):
+    def from_cells(cls, cells={}):
         rows = []
         i = 0
         while i < max(pos[0] for pos in cells):
@@ -46,175 +78,194 @@ class MatrixGridViewAdapter(Matrix):
             i += 1
         return matrix(rows)
 
-    def get_cell(self, pos):
+    @staticmethod
+    def get_cell(obj, pos):
         r"""
         Get cell content
         """
-        if pos[0] >= self.nrows() or pos[1] >= self.ncols():
+        if pos[0] >= obj.nrows() or pos[1] >= obj.ncols():
             raise ValueError("Entry '%s' does not exist!" % pos)
-        return self[pos[0]][pos[1]]
+        return obj[pos[0]][pos[1]]
 
-    def set_cell(self, pos, val):
+    @classmethod
+    def set_cell(cls, obj, pos, val):
         r"""
         Edit matrix cell
         TESTS::
-        sage: from sage_widget_adapters import MatrixGridViewAdapter
-        sage: A = MatrixGridViewAdapter((QQ, 3, 3, range(9))/2)
-        sage: A.edit_cell((0,1), 2/3)
-        sage: A
-        sage: A.edit_cell((2,2), pi)
-        ---------------------------------------------------------------------------
-        TypeError
+        sage: from sage.matrix.constructor import Matrix
+        sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+        sage: A = Matrix(QQ, 3, 3, range(9))/2
+        sage: MatrixGridViewAdapter.set_cell(A, (0,1), 2/3)
+        [  0 2/3   1]
+        [3/2   2 5/2]
+        [  3 7/2   4]
+        sage: MatrixGridViewAdapter.set_cell(A, (2,2), pi) # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        TypeError: Value 'pi' is not compatible!
         """
-        if not val in self.base_ring():
+        if not val in obj.base_ring():
             raise TypeError("Value '%s' is not compatible!" % val)
-        B = matrix(self.base_ring(), 1, 1, val)
-        self.set_block(pos[0], pos[1], val)
+        B = Matrix(obj.base_ring(), 1, 1, val)
+        obj.set_block(pos[0], pos[1], B)
+        return obj
 
-    def addable_cells(self):
+    @staticmethod
+    def addable_cells(obj):
         r"""
         No cell should be added in isolation
         except for vectors
         """
-        if self.nrows() == 1:
-            return [(0, self.ncols())]
-        if self.ncols() == 1:
-            return [(self.nrows(), 0)]
+        if obj.nrows() == 1:
+            return [(0, obj.ncols())]
+        if obj.ncols() == 1:
+            return [(obj.nrows(), 0)]
         return []
 
-    def removable_cells(self):
+    @staticmethod
+    def removable_cells(obj):
         r"""
         No cell should be removed in isolation
         except for vectors
         """
-        if self.nrows() == 1:
-            return [(0, self.ncols()-1)]
-        if self.ncols() == 1:
-            return [(self.nrows()-1, 0)]
+        if obj.nrows() == 1:
+            return [(0, obj.ncols()-1)]
+        if obj.ncols() == 1:
+            return [(obj.nrows()-1, 0)]
         return []
 
-    def add_cell(self, pos, val):
+    @classmethod
+    def add_cell(cls, obj, pos, val):
         r"""
         No cell should be added in isolation
         except for vectors
         """
-        if not pos in self.addable_cells():
+        if not pos in obj.addable_cells():
             raise ValueError("Position '%s' is not addable." % str(pos))
         if pos[0] == 0:
-            return self.augment(vector([val]))
+            return obj.augment(vector([val]))
         if pos[1] == 0:
-            return self.stack(vector([val]))
+            return obj.stack(vector([val]))
 
-    def remove_cell(self, pos):
+    @classmethod
+    def remove_cell(cls, obj, pos):
         r"""
         No cell should be removed in isolation
         except for vectors
         """
-        if not pos in self.removable_cells():
-            return self
+        if not pos in obj.removable_cells():
+            return obj
         if pos[0] == 0:
-            return self.matrix_from_columns(range(self.ncols()-1))
+            return obj.matrix_from_columns(range(obj.ncols()-1))
         if pos[1] == 1:
-            return self.matrix_from_rows(range(self.nrows()-1))
+            return obj.matrix_from_rows(range(obj.nrows()-1))
 
-    def append_row(self, r=None):
+    @classmethod
+    def append_row(cls, obj, r=None):
         r"""
         """
         if not r:
-            return self.stack(vector([0] * self.ncols()))
+            return obj.stack(vector([0] * obj.ncols()))
         for x in r:
-            if not x in self.base_ring():
+            if not x in obj.base_ring():
                 raise TypeError("Value '%s' is not compatible!" % x)
-        if len(r) > self.ncols():
-            r = c[self.ncols()]
-        elif len(r) < self.ncols():
-            r = r + [0] * (self.ncols() - len(r))
-        return self.stack(vector(r))
+        if len(r) > obj.ncols():
+            r = c[obj.ncols()]
+        elif len(r) < obj.ncols():
+            r = r + [0] * (obj.ncols() - len(r))
+        return obj.stack(vector(r))
 
-    def insert_row(self, index, r=None):
+    @classmethod
+    def insert_row(cls, obj, index, r=None):
         r"""
         """
         if not r:
-            r = [0] * self.ncols()
+            r = [0] * obj.ncols()
         else:
             for x in r:
-                if not x in self.base_ring():
+                if not x in obj.base_ring():
                     raise TypeError("Value '%s' is not compatible!" % x)
-            if len(r) > self.ncols():
-                r = c[self.ncols()]
-            elif len(r) < self.ncols():
-                r = r + [0] * (self.ncols() - len(r))
-        top = self.matrix_from_rows(range(index))
-        bottom = self.matrix_from_rows(range(index,self.nrows()))
+            if len(r) > obj.ncols():
+                r = c[obj.ncols()]
+            elif len(r) < obj.ncols():
+                r = r + [0] * (obj.ncols() - len(r))
+        top = obj.matrix_from_rows(range(index))
+        bottom = obj.matrix_from_rows(range(index,obj.nrows()))
         return top.stack(vector(r)).stack(bottom)
 
-    def remove_row(self, index=None):
+    @classmethod
+    def remove_row(cls, obj, index=None):
         r"""
         TESTS::
         sage: from sage.matrix.matrix_space import MatrixSpace
         sage: S = MatrixSpace(ZZ, 4,3)
-        sage: from sage_widget_adapters import MatrixGridViewAdapter
-        sage: A = MatrixGridViewAdapter(S,range(12))
-        sage: A.remove_row(2)
+        sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+        sage: A = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
+        sage: MatrixGridViewAdapter.remove_row(A, 2)
         [ 0  1  2]
         [ 3  4  5]
         [ 9 10 11]
-        sage: A.remove_row()
-        [ 0  1  2]
-        [ 3  4  5]
-        [ 6  7  8]
+        sage: MatrixGridViewAdapter.remove_row(A)
+        [0 1 2]
+        [3 4 5]
+        [6 7 8]
         """
         if index is None:
-            index = self.nrows() - 1
-        return self.delete_rows([index])
+            index = obj.nrows() - 1
+        return obj.delete_rows([index])
 
-    def append_column(self, c = None):
+    @classmethod
+    def append_column(cls, obj, c = None):
         r"""
         """
         if not c:
-            self.augment(vector([0]*self.nrows()))
+            obj.augment(vector([0]*obj.nrows()))
         for x in c:
-            if not x in self.base_ring():
+            if not x in obj.base_ring():
                 raise TypeError("Value '%s' is not compatible!" % x)
-        if len(c) > self.nrows():
-            c = c[self.nrows()]
-        elif len(c) < self.nrows():
-            c = c + [0] * (self.nrows() - len(c))
-        return self.augment(vector(c))
+        if len(c) > obj.nrows():
+            c = c[obj.nrows()]
+        elif len(c) < obj.nrows():
+            c = c + [0] * (obj.nrows() - len(c))
+        return obj.augment(vector(c))
 
-    def insert_column(self, index, c=None):
+    @classmethod
+    def insert_column(cls, obj, index, c=None):
         r"""
         """
         if not c:
-            c = [0] * self.nrows()
+            c = [0] * obj.nrows()
         else:
             for x in c:
-                if not x in self.base_ring():
+                if not x in obj.base_ring():
                     raise TypeError("Value '%s' is not compatible!" % x)
-            if len(c) > self.nrows():
-                c = c[self.nrows()]
-            elif len(c) < self.nrows():
-                c = c + [0] * (self.nrows() - len(c))
-        left = self.matrix_from_columns(range(index))
-        right = self.matrix_from_columns(range(index,self.nrows()))
+            if len(c) > obj.nrows():
+                c = c[obj.nrows()]
+            elif len(c) < obj.nrows():
+                c = c + [0] * (obj.nrows() - len(c))
+        left = obj.matrix_from_columns(range(index))
+        right = obj.matrix_from_columns(range(index,obj.nrows()))
         return left.stack(vector(c)).stack(right)
 
-    def remove_column(self, index):
+    @classmethod
+    def remove_column(cls, obj, index=None):
         r"""
         TESTS::
-        sage: from sage_widget_adapters import MatrixGridViewAdapter
-        sage: m = MatrixGridViewAdapter([[0,1,2],[3,4,5],[6,7,8],[9,10,11]])
-        sage: m.remove_column(1)
+        sage: from sage.matrix.matrix_space import MatrixSpace
+        sage: S = MatrixSpace(ZZ, 4,3)
+        sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+        sage: A = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
+        sage: MatrixGridViewAdapter.remove_column(A, 1)
         [ 0  2]
         [ 3  5]
         [ 6  8]
         [ 9 11]
-        sage: A.remove_column()
+        sage: MatrixGridViewAdapter.remove_column(A)
         [ 0  1]
         [ 3  4]
-        [ 6  4]
+        [ 6  7]
         [ 9 10]
         """
         if index is None:
-            index = self.ncols() - 1
-        return self.delete_columns([index])
+            index = obj.ncols() - 1
+        return obj.delete_columns([index])
