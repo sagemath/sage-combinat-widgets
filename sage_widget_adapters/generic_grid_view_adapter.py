@@ -19,27 +19,36 @@ Generic Grid View Adapter
 """
 from sage.all import SageObject
 from traitlets import Any
+from sage.misc.abstract_method import abstract_method
 
 class GridViewAdapter:
     objclass = SageObject
+    cellclass = None
     traitclass = Any
 
     @staticmethod
     def cell_to_unicode(cell_content):
+        r"""
+        From a cell value `cell_content`,
+        return matching unicode string.
+        """
         return str(cell_content)
 
-    @staticmethod
-    def unicode_to_cell(s):
-        raise NotImplementedError
+    @classmethod
+    def unicode_to_cell(cls, s):
+        r"""
+        From an unicode string `s`,
+        return matching cell value.
+        """
+        return cls.cellclass(s)
 
     @staticmethod
+    @abstract_method
     def compute_cells(obj):
         r"""
         From an object `obj`,
         return a dictionary { coordinates pair : integer }
-        This method must be implemented in subclasses.
         """
-        raise NotImplementedError
 
     @classmethod
     def _validate(cls, obj):
@@ -53,32 +62,111 @@ class GridViewAdapter:
         try:
             new_value = cls.objclass(obj)
         except:
-            raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, objclass))
+            raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
 
-    @staticmethod
+    @classmethod
+    @abstract_method
     def from_cells(cls, cells={}):
         r"""
         From a dictionary { coordinates pair : integer }
         return a Sage object.
-        This method must be implemented in subclasses.
         """
-        raise NotImplementedError
 
     @staticmethod
+    @abstract_method
     def get_cell(obj, pos):
         r"""
         From an object and a tuple `pos`,
         return the object cell value at position `pos`.
-        This method must be implemented in subclasses.
         """
-        raise NotImplementedError
+
+    @classmethod
+    @abstract_method
+    def set_cell(cls, obj, pos, val):
+        r"""
+        From a Sage object, a position (pair of coordinates) `pos` and a value `val`,
+        return a new Sage object.
+        with a modified cell at position `pos`.
+        """
 
     @staticmethod
-    def set_cell(obj, pos, val):
+    @abstract_method(optional = True)
+    def addable_cells(obj):
         r"""
-        From an object, tuple `pos` and a value `val`,
-        return a new Sage object
-        with a modified cell at position pos.
-        This method must be implemented in subclasses.
+        For Sage object `obj`,
+        list those cell positions where a user could want to add a cell,
+        and get a still valid Sage object for this adapter.
         """
-        raise NotImplementedError
+
+    @staticmethod
+    @abstract_method(optional = True)
+    def removable_cells(obj):
+        r"""
+        For Sage object `obj`,
+        list those cell positions where a user could want to remove a cell,
+        and get a still valid Sage object for this adapter.
+        """
+
+    @classmethod
+    @abstract_method(optional = True)
+    def add_cell(obj, cls, pos, val):
+        r"""
+        If possible, add a cell to object `obj`
+        at position `pos` and with value `val`.
+        """
+
+    @classmethod
+    @abstract_method(optional = True)
+    def remove_cell(cls, obj, pos):
+        r"""
+        If possible, remove a cell from object `obj`
+        at position `pos`.
+        """
+
+    @classmethod
+    @abstract_method(optional = True)
+    def append_row(cls, obj, r=None):
+        r"""
+        If possible, append a row to object `obj`
+        with values from list `r`.
+        """
+
+    @classmethod
+    @abstract_method(optional = True)
+    def insert_row(obj, index, r=None):
+        r"""
+        If possible, insert a row to object `obj`
+        at index `index`, with values from list `r`.
+        """
+
+    @classmethod
+    @abstract_method(optional = True)
+    def remove_row(cls, obj, index=None):
+        r"""
+        If possible, remove a row from object `obj`
+        at index `index`.
+        """
+
+    @classmethod
+    @abstract_method(optional = True)
+    def append_column(cls, obj, r=None):
+        r"""
+        If possible, append a column to object `obj`
+        with values from list `r`.
+        """
+
+    @classmethod
+    @abstract_method(optional = True)
+    def insert_column(cls, obj, index, r=None):
+        r"""
+        If possible, insert a column to object `obj`
+        at index `index`, with values from list `r`.
+        """
+
+    @classmethod
+    @abstract_method(optional = True)
+    def remove_column(cls, obj, index=None):
+        r"""
+        If possible, remove a column from object `obj`
+        at index `index`.
+        """
