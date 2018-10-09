@@ -26,17 +26,14 @@ from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class TableauGridViewAdapter(GridViewAdapter):
     objclass = Tableau
-    traitclass = Int
-
-    @staticmethod
-    def unicode_to_cell(s):
-        return int(s)
+    cellclass = Integer # i.e. sage.rings.integer.Integer
+    traitclass = Int # i.e. traitlets.Int
 
     @staticmethod
     def compute_cells(obj):
         r"""
         From a tableau,
-        return a dictionary { coordinates pair : integer }
+        return a dictionary { coordinates pair : int }
         TESTS:
         sage: from sage.combinat.tableau import Tableau
         sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
@@ -44,12 +41,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         sage: TableauGridViewAdapter.compute_cells(t)
         {(0, 0): 1, (0, 1): 2, (0, 2): 5, (0, 3): 6, (1, 0): 3, (2, 0): 4}
         """
-        cells = {}
-        for i in range(len(obj)):
-            r = obj[i]
-            for j in range(len(r)):
-                cells[(i,j)] = int(r[j])
-        return cells
+        return {(i,j):int(obj[i][j]) for (i,j) in obj.cells()}
 
     @classmethod
     def from_cells(cls, cells={}):
@@ -70,10 +62,9 @@ class TableauGridViewAdapter(GridViewAdapter):
             rows.append(row)
             i += 1
         try:
-            obj = cls.objclass(rows)
+            return cls.objclass(rows)
         except:
             raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
-        return obj
 
     @staticmethod
     def get_cell(obj, pos):
@@ -87,7 +78,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         7
         """
         try:
-            return obj.__call__(pos)
+            return obj[pos[0]][pos[1]]
         except:
             raise ValueError("Cell %s does not exist!" % str(pos))
 
@@ -103,18 +94,11 @@ class TableauGridViewAdapter(GridViewAdapter):
         [[1, 2, 5, 6], [3, 8], [4]]
         """
         tl = obj.to_list()
-        nl = []
-        for i in range(len(tl)):
-            l = tl[i]
-            if i == pos[0]:
-                l[pos[1]] = val
-            nl.append(l)
+        tl[pos[0]][pos[1]] = val
         try:
-            new_obj = cls.objclass(nl)
+            return cls.objclass(tl)
         except:
             raise ValueError("Value '%s' is not compatible!" % val)
-        else:
-            return new_obj
 
     @staticmethod
     def addable_cells(obj):
@@ -163,20 +147,13 @@ class TableauGridViewAdapter(GridViewAdapter):
             raise ValueError("Position '%s' is not addable." % str(pos))
         tl = obj.to_list()
         if pos[0] >= len(tl):
-            nl = tl + [[Integer(val)]]
+            tl = tl + [[Integer(val)]]
         else:
-            nl = []
-            for i in range(len(tl)):
-                l = tl[i]
-                if i == pos[0]:
-                    l.append(Integer(val))
-                nl.append(l)
+            tl[pos[0]].append(Integer(val))
         try:
-            new_obj = cls.objclass(nl)
+            return cls.objclass(tl)
         except:
             raise ValueError("Cannot create a %s with this list!" % cls.objclass)
-        else:
-            return new_obj
 
     @classmethod
     def remove_cell(cls, obj, pos):
@@ -196,15 +173,10 @@ class TableauGridViewAdapter(GridViewAdapter):
         if not pos in cls.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
         tl = obj.to_list()
-        nl = []
-        for i in range(len(tl)):
-            l = tl[i]
-            if i == pos[0]:
-                l.pop()
-            nl.append(l)
+        tl[pos[0]].pop()
+        if not tl[pos[0]]:
+            tl.pop()
         try:
-            new_obj = cls.objclass(nl)
+            return cls.objclass(tl)
         except:
             raise ValueError("Cannot create a %s with this list!" % cls.objclass)
-        else:
-            return new_obj

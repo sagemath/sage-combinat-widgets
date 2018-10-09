@@ -28,25 +28,28 @@ Grid View Adapter for matrices
 """
 from sage.matrix.matrix2 import Matrix as MatrixClass
 from sage.matrix.constructor import Matrix
-from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter, SAGETYPE_TO_TRAITTYPE
 
 class MatrixGridViewAdapter(GridViewAdapter):
     objclass = MatrixClass
 
-    @staticmethod
-    def cell_to_unicode(cell_content):
-        return str(cell_content)
+    def __init__(self, obj):
+        r"""
+        Init an adapter object, set attributes `cellclass` and `traitclass` (where applicable)
+        """
+        super(MatrixGridViewAdapter, self).__init__()
+        self.cellclass = obj.base_ring().random_elemen().__class__
+        for k in SAGETYPE_TO_TRAITTYPE.keys():
+            if k in str(self.cellclass):
+                self.traitclass = SAGETYPE_TO_TRAITTYPE[k]
+                break
 
     @staticmethod
     def unicode_to_cell(s):
-        if obj.base_ring().is_subring(ZZ):
-            return ZZ(s)
-        if obj.base_ring().is_subring(QQ):
-            return QQ(float(s))
-        if obj.base_ring().is_subring(RDF):
-            return RDF(s)
-        if obj.base_ring().is_subring(CDF):
-            return CDF(s)
+        r"""
+        From an unicode string `s`,
+        return matching matrix cell value.
+        """
         try:
             return obj.base_ring()(s)
         except:
@@ -58,9 +61,10 @@ class MatrixGridViewAdapter(GridViewAdapter):
     @staticmethod
     def compute_cells(obj):
         r"""
-        From a tableau,
-        return a dictionary { coordinates pair : integer }
+        From a matrix `obj`,
+        return a dictionary { coordinates pair : python-typed cell value }
         """
+        return { (i,j):obj[i][j] for j in range(len(obj[i])) for i in range(len(obj)) }
         cells = {}
         for i in obj.numrows():
             r = obj[i]
