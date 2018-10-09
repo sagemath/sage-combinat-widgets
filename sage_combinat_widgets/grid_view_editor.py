@@ -100,12 +100,14 @@ class GridViewEditor(BindableEditorClass):
         except:
             raise TypeError("Is this object really grid-representable?")
         super(GridViewEditor, self).__init__()
+        self.value = obj
         if adapter:
             self.adapter = adapter
         else:
             self.adapter = get_adapter(obj.__class__)
         if not self.adapter:
             raise TypeError("Cannot find an Adapter for this object (%s)" % obj.__class__)
+        self.compute()
 
     def validate(self, obj, value=None, obj_class=None):
         r"""
@@ -134,13 +136,20 @@ class GridViewEditor(BindableEditorClass):
         except:
             print("Cannot compute cells for this object")
             self.cells = {}
+        celltype = self.adapter.celltype
         traitclass = self.adapter.traitclass
-        default_value = self.adapter.traitclass_default_value
+        default_value = self.adapter.cell_default_value
         traits_to_add = {}
         for pos in self.addable_cells():
             # Empty traits for addable cells
             emptytraitname = 'add_%d_%d' % pos
-            emptytrait = traitclass(default_value)
+            try:
+                emptytrait = traitclass(default_value)
+            except:
+                try:
+                    emptytrait = traitclass(celltype)
+                except:
+                    raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, celltype, default_value))
             emptytrait.name = emptytraitname
             traits_to_add[emptytraitname] = emptytrait
         for pos, val in self.cells.items():
@@ -149,7 +158,14 @@ class GridViewEditor(BindableEditorClass):
             if traitname in self._trait_values:
                 self._trait_values[traitname] = traitvalue
             else:
-                trait = traitclass(traitvalue)
+                try:
+                    trait = traitclass(traitvalue)
+                except:
+                    try:
+                        trait = traitclass(celltype)
+                        trait.value = traitvalue
+                    except:
+                        raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, celltype, default_value))
                 trait.name = traitname
                 traits_to_add[traitname] = trait
         self.traitclass = traitclass

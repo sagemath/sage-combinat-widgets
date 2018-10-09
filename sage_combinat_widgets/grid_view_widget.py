@@ -137,10 +137,10 @@ class GridViewWidget(GridViewEditor, VBox):
         if not cell_layout:
             if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
                 cell_layout = buttoncell_layout
-                cast = self.value.bool_to_cell
+                cast = self.adapter.bool_to_cell
             else:
                 cell_layout = textcell_layout
-                cast = self.value.unicode_to_cell
+                cast = self.adapter.unicode_to_cell
         self.cell_layout = cell_layout
         self.cell_widget_classes = cell_widget_classes
         self.blank_widget_class = blank_widget_class
@@ -203,7 +203,7 @@ class GridViewWidget(GridViewEditor, VBox):
                     if cell_content is None:
                         cell_string = ''
                     else:
-                        cell_string = self.value.cell_to_unicode(cell_content)
+                        cell_string = self.adapter.cell_to_unicode(cell_content)
                     cell = cell_widget_class(cell_string,
                                              (i,j),
                                              self.cell_layout,

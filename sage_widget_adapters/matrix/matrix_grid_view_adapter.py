@@ -41,11 +41,11 @@ class MatrixGridViewAdapter(GridViewAdapter):
 
     def __init__(self, obj):
         r"""
-        Init an adapter object, set attributes `cellclass` and `traitclass` (where applicable)
+        Init an adapter object, set attributes `celltype` and `traitclass` (where applicable)
         """
         super(MatrixGridViewAdapter, self).__init__()
-        self.cellclass = obj.base_ring().random_element().__class__
-        self.traitclass_default_value = obj.base_ring().zero()
+        self.celltype = obj.base_ring().random_element().__class__
+        self.cell_default_value = obj.base_ring().zero()
 
     @staticmethod
     def compute_cells(obj):

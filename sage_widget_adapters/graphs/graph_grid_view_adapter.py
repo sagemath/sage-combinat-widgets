@@ -37,6 +37,8 @@ from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class GraphGridViewAdapter(GridViewAdapter):
     objclass = Graph
+    celltype = bool
+    cell_default_value = False
 
     @staticmethod
     def cell_to_unicode(cell_content):

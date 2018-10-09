@@ -25,14 +25,12 @@ AUTHORS:
 """
 from sage.combinat.tableau import *
 from sage.rings.integer import Integer
-#from traitlets import Int
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class TableauGridViewAdapter(GridViewAdapter):
     objclass = Tableau
-    cellclass = Integer # i.e. sage.rings.integer.Integer
-    #traitclass = Int # i.e. traitlets.Int
-    traitclass_default_value = Integer(0)
+    celltype = Integer # i.e. sage.rings.integer.Integer
+    cell_default_value = Integer(0)
 
     @staticmethod
     def compute_cells(obj):

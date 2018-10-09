@@ -27,9 +27,9 @@ from sage.misc.abstract_method import abstract_method
 
 class GridViewAdapter:
     objclass = SageObject
-    cellclass = None
+    celltype = None
     traitclass = traitlets.Instance
-    traitclass_default_value = traitlets.Undefined
+    cell_default_value = traitlets.Undefined
 
     @staticmethod
     def cell_to_unicode(cell_content):
@@ -45,7 +45,7 @@ class GridViewAdapter:
         From an unicode string `s`,
         return matching cell value.
         """
-        return cls.cellclass(s)
+        return cls.celltype(s)
 
     @staticmethod
     @abstract_method
