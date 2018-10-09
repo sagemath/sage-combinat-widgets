@@ -25,61 +25,44 @@ Grid View Adapter for matrices
     :meth:`~MatrixGridViewAdapter.append_column` | Append a column
     :meth:`~MatrixGridViewAdapter.insert_column` | Insert a column at given index
     :meth:`~MatrixGridViewAdapter.remove_column` | Remove a column at given index
+
+AUTHORS:
+- Odile Bénassy, Nicolas Thiéry
+
 """
-from sage.matrix.matrix2 import Matrix as MatrixClass
-from sage.matrix.constructor import Matrix
-from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter, SAGETYPE_TO_TRAITTYPE
+from sage.matrix.matrix2 import Matrix
+from sage.matrix.constructor import matrix
+from itertools import product
+from sage.sets.finite_enumerated_set import FiniteEnumeratedSet
+from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class MatrixGridViewAdapter(GridViewAdapter):
-    objclass = MatrixClass
+    objclass = Matrix
 
     def __init__(self, obj):
         r"""
         Init an adapter object, set attributes `cellclass` and `traitclass` (where applicable)
         """
         super(MatrixGridViewAdapter, self).__init__()
-        self.cellclass = obj.base_ring().random_elemen().__class__
-        for k in SAGETYPE_TO_TRAITTYPE.keys():
-            if k in str(self.cellclass):
-                self.traitclass = SAGETYPE_TO_TRAITTYPE[k]
-                break
-
-    @staticmethod
-    def unicode_to_cell(s):
-        r"""
-        From an unicode string `s`,
-        return matching matrix cell value.
-        """
-        try:
-            return obj.base_ring()(s)
-        except:
-            try:
-                return obj.base_ring()(float(s))
-            except:
-                raise TypeError("Unable to cast this value: %s" % s)
+        self.cellclass = obj.base_ring().random_element().__class__
+        self.traitclass_default_value = obj.base_ring().zero()
 
     @staticmethod
     def compute_cells(obj):
         r"""
         From a matrix `obj`,
-        return a dictionary { coordinates pair : python-typed cell value }
+        return a dictionary { coordinates pair : cell value (as a Sage object) }
         """
-        return { (i,j):obj[i][j] for j in range(len(obj[i])) for i in range(len(obj)) }
-        cells = {}
-        for i in obj.numrows():
-            r = obj[i]
-            for j in obj.numcols():
-                cells[(i,j)] = r[j]
-        return cells
+        return {(i,j):obj[i][j] for (i,j) in product(range(len(obj[0])), range(obj.nrows()))}
 
     @classmethod
     def from_cells(cls, cells={}):
-        rows = []
-        i = 0
-        while i < max(pos[0] for pos in cells):
-            row = (cells[pos] for pos in cells if pos[0] == i)
-            rows.append(row)
-            i += 1
+        nrows, ncols = 0, 0
+        width = 0
+        for pos in cells:
+            nrows = max(nrows, pos[0]+1)
+            ncols = max(ncols, pos[1]+1)
+        rows = [[cells[(i,j)] for j in range(ncols)] for i in range(nrows)]
         return matrix(rows)
 
     @staticmethod
@@ -110,7 +93,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         """
         if not val in obj.base_ring():
             raise TypeError("Value '%s' is not compatible!" % val)
-        B = Matrix(obj.base_ring(), 1, 1, val)
+        B = matrix(obj.base_ring(), 1, 1, val)
         obj.set_block(pos[0], pos[1], B)
         return obj
 

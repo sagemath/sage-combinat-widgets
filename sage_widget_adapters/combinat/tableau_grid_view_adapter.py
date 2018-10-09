@@ -10,7 +10,7 @@ Grid View Adapter for tableaux
     :delim: |
 
     :meth:`~TableauGridViewAdapter.unicode_to_cell` | Static method for typecasting unicode to cell content
-    :meth:`~TableauGridViewAdapter.compute_cells` | Compute tableau cells as a dictionary { coordinate pair : integer }
+    :meth:`~TableauGridViewAdapter.compute_cells` | Compute tableau cells as a dictionary { coordinate pair : Integer }
     :meth:`~TableauGridViewAdapter.from_cells` | Create a new tableau from a cells dictionary
     :meth:`~TableauGridViewAdapter.get_cell` | Get the tableau cell content
     :meth:`~TableauGridViewAdapter.set_cell` | Set the tableau cell content
@@ -18,22 +18,27 @@ Grid View Adapter for tableaux
     :meth:`~TableauGridViewAdapter.removable_cells` | List removable cells
     :meth:`~TableauGridViewAdapter.add_cell` | Add a cell
     :meth:`~TableauGridViewAdapter.remove_cell` | Remove a cell
+
+AUTHORS:
+- Odile Bénassy, Nicolas Thiéry
+
 """
 from sage.combinat.tableau import *
 from sage.rings.integer import Integer
-from traitlets import Int
+#from traitlets import Int
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class TableauGridViewAdapter(GridViewAdapter):
     objclass = Tableau
     cellclass = Integer # i.e. sage.rings.integer.Integer
-    traitclass = Int # i.e. traitlets.Int
+    #traitclass = Int # i.e. traitlets.Int
+    traitclass_default_value = Integer(0)
 
     @staticmethod
     def compute_cells(obj):
         r"""
         From a tableau,
-        return a dictionary { coordinates pair : int }
+        return a dictionary { coordinates pair : Integer }
         TESTS:
         sage: from sage.combinat.tableau import Tableau
         sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
@@ -41,12 +46,12 @@ class TableauGridViewAdapter(GridViewAdapter):
         sage: TableauGridViewAdapter.compute_cells(t)
         {(0, 0): 1, (0, 1): 2, (0, 2): 5, (0, 3): 6, (1, 0): 3, (2, 0): 4}
         """
-        return {(i,j):int(obj[i][j]) for (i,j) in obj.cells()}
+        return {(i,j):obj[i][j] for (i,j) in obj.cells()}
 
     @classmethod
     def from_cells(cls, cells={}):
         r"""
-        From a dictionary { coordinates pair : integer }
+        From a dictionary { coordinates pair : Integer }
         return a corresponding tableau
         TESTS:
         sage: from sage.combinat.tableau import Tableau
@@ -147,9 +152,9 @@ class TableauGridViewAdapter(GridViewAdapter):
             raise ValueError("Position '%s' is not addable." % str(pos))
         tl = obj.to_list()
         if pos[0] >= len(tl):
-            tl = tl + [[Integer(val)]]
+            tl = tl + [[val]]
         else:
-            tl[pos[0]].append(Integer(val))
+            tl[pos[0]].append(val)
         try:
             return cls.objclass(tl)
         except:

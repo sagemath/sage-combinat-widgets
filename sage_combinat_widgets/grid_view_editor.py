@@ -18,38 +18,13 @@ import re, traitlets
 from six import add_metaclass
 from copy import copy
 from sage.misc.bindable_class import BindableClass
+from sage.misc.abstract_method import abstract_method
 from sage.combinat.tableau import *
 from sage.all import SageObject, matrix, Integer
 from sage.rings.real_mpfr import RealLiteral
 from sage.graphs.graph import Graph
 from sage.combinat.partition import Partition
 from sage.structure.list_clone import ClonableList
-
-SAGETYPE_TO_TRAITTYPE = {
-    bool: traitlets.Bool,
-    int: traitlets.Integer,
-    float: traitlets.Float,
-    list: traitlets.List,
-    set: traitlets.Set,
-    dict: traitlets.Dict,
-    Integer: traitlets.Integer,
-    RealLiteral: traitlets.Float
-    }
-
-def simplecast(x):
-    r"""
-    From Sage math objects to ordinary python types.
-    TESTS::
-        sage: from sage_combinat_widgets.grid_view_editor import simplecast
-        sage: a = 1
-        sage: type(simplecast(a))
-        <class 'int'>
-    """
-    if type(x) == sage.rings.integer.Integer:
-        return int(x)
-    if type(x) == sage.rings.real_mpfr.RealLiteral:
-        return float(x)
-    return x
 
 def extract_coordinates(s):
     r"""
@@ -64,18 +39,21 @@ def extract_coordinates(s):
         return tuple(int(i) for i in m.groups())
 
 def get_adapter(cls):
+    r"""
+    Return an adapter object for Sage object class `cls`.
+    """
     from sage.combinat.tableau import Tableau
     if issubclass(cls, Tableau):
         from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
-        return TableauGridViewAdapter
+        return TableauGridViewAdapter()
     from sage.matrix.matrix2 import Matrix
     if issubclass(cls, Matrix):
         from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-        return MatrixGridViewAdapter
+        return MatrixGridViewAdapter(cls) # FIXME : init needs to know the matrix space
     from sage.graphs.graph import Graph
     if issubclass(cls, Graph):
         from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        return GraphGridViewAdapter
+        return GraphGridViewAdapter()
 
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass(traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
@@ -94,7 +72,6 @@ class GridViewEditor(BindableEditorClass):
     that are refered to through object cells as a dictionary
     with coordinates (row_number, cell_number_in_row) as keys
     """
-    value = traitlets.Any()
 
     def __init__(self, obj, adapter=None):
         r"""
@@ -129,7 +106,6 @@ class GridViewEditor(BindableEditorClass):
             self.adapter = get_adapter(obj.__class__)
         if not self.adapter:
             raise TypeError("Cannot find an Adapter for this object (%s)" % obj.__class__)
-        self.set_value(obj)
 
     def validate(self, obj, value=None, obj_class=None):
         r"""
@@ -158,41 +134,18 @@ class GridViewEditor(BindableEditorClass):
         except:
             print("Cannot compute cells for this object")
             self.cells = {}
-        if hasattr(obj, 'traitclass'):
-            traitclass = obj.traitclass
-        else:
-            obj_class = obj.__class__
-            if issubclass(obj_class, Graph): # a graph
-                traitclass = traitlets.Any
-            elif issubclass(obj_class, Partition): # a Partition
-                traitclass = traitlets.Unicode
-            elif issubclass(obj_class, ClonableList): # e.g. a tableau
-                traitclass = traitlets.Integer
-            elif hasattr(obj, 'nrows'): # e.g. a matrix
-                if type(obj[0][0]) in SAGETYPE_TO_TRAITTYPE:
-                    traitclass = SAGETYPE_TO_TRAITTYPE[type(obj[0][0])]
-                else:
-                    traitclass = traitlets.Instance
-            elif hasattr(obj, 'row'): # e.g. a vector
-                if not self.cells:
-                    cells = [((i, j), obj[i+j]) for i in range(matrix(obj).nrows()) for j in range(matrix(obj).ncols())]
-                    for pos, val in cells:
-                        self.cells[pos] = val or traitclass.default_value
-                if type(obj[0]) in SAGETYPE_TO_TRAITTYPE:
-                    traitclass = SAGETYPE_TO_TRAITTYPE[type(obj[0])]
-            else:
-                traitclass = traitlets.Instance
+        traitclass = self.adapter.traitclass
+        default_value = self.adapter.traitclass_default_value
         traits_to_add = {}
         for pos in self.addable_cells():
             # Empty traits for addable cells
             emptytraitname = 'add_%d_%d' % pos
-            emptytrait = traitclass(traitclass.default_value)
+            emptytrait = traitclass(default_value)
             emptytrait.name = emptytraitname
             traits_to_add[emptytraitname] = emptytrait
         for pos, val in self.cells.items():
             traitname = 'cell_%d_%d' % pos
-            # Simple type casting, e.g. sage.rings.integer.Integer -> int ...
-            traitvalue = simplecast(val)
+            traitvalue = val
             if traitname in self._trait_values:
                 self._trait_values[traitname] = traitvalue
             else:
@@ -202,8 +155,11 @@ class GridViewEditor(BindableEditorClass):
         self.traitclass = traitclass
         self.add_traits(**traits_to_add)
 
+    @abstract_method
     def draw(self):
-        pass
+        r"""
+        Build the visual representation
+        """
 
     def get_value(self):
         return self.value
@@ -211,7 +167,7 @@ class GridViewEditor(BindableEditorClass):
     def set_value(self, obj):
         if not self.validate(obj):
             raise ValueError("Object %s is not compatible." % str(obj))
-        self.value = obj # FIXME here try to find the relevant Adapter
+        self.value = obj
         self.compute()
 
     def get_cells(self):

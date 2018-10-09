@@ -27,6 +27,10 @@ Grid View Adapter for grid-representable graphs
     :meth:`~GraphGridViewAdapter.append_column` | Append a column
     :meth:`~GraphGridViewAdapter.insert_column` | Insert a column at given index
     :meth:`~GraphGridViewAdapter.remove_column` | Remove a column at given index
+
+AUTHORS:
+- Odile Bénassy, Nicolas Thiéry
+
 """
 from sage.graphs.graph import Graph
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
@@ -210,22 +214,6 @@ class GraphGridViewAdapter(GridViewAdapter):
         return obj
 
     @classmethod
-    def insert_row(cls, obj, index):
-        r"""
-        Add a row at index
-        Here, all rows play the same part,
-        so we merely call add_row
-        TESTS:
-        sage: from sage.graphs.generators.basic import GridGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = GridGraph((3,2))
-        sage: GraphGridViewAdapter.insert_row(g, 1)
-        Grid Graph for [3, 2]: Graph on 8 vertices
-        """
-        # FIXME implement
-        return obj
-
-    @classmethod
     def remove_row(cls, obj, index=None):
         r"""
         Remove a row from the graph
@@ -259,22 +247,6 @@ class GraphGridViewAdapter(GridViewAdapter):
             row_max = max(row_max, t[0])
             col_max = max(col_max, t[1])
         obj.add_vertices([(i, col_max + 1) for i in range(row_max + 1)])
-        return obj
-
-    @classmethod
-    def insert_column(cls, obj, index):
-        r"""
-        Add a column at index
-        Here, all columns play the same part,
-        so we merely call add_column
-        TESTS:
-        sage: from sage.graphs.generators.basic import GridGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = GridGraph((3,2))
-        sage: GraphGridViewAdapter.insert_column(g, 1)
-        Grid Graph for [3, 2]: Graph on 9 vertices
-        """
-        # FIXME implement
         return obj
 
     @classmethod

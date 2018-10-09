@@ -16,15 +16,20 @@ Generic Grid View Adapter
     :meth:`~GridViewAdapter._validate` | Validate a new object
     :meth:`~GridViewAdapter.get_cell` | Get the object cell content
     :meth:`~GridViewAdapter.set_cell` | Set the object cell content
+
+AUTHORS:
+- Odile Bénassy, Nicolas Thiéry
+
 """
 from sage.all import SageObject
-from traitlets import Any
+import traitlets
 from sage.misc.abstract_method import abstract_method
 
 class GridViewAdapter:
     objclass = SageObject
     cellclass = None
-    traitclass = Any
+    traitclass = traitlets.Instance
+    traitclass_default_value = traitlets.Undefined
 
     @staticmethod
     def cell_to_unicode(cell_content):
