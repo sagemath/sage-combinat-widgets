@@ -51,7 +51,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
                 self.celltype = obj.base_ring().an_element().__class__
             except:
                 raise TypeError("Cannot determine matrix base ring elements class.")
-        self.cell_default_value = obj.base_ring().zero()
+        self.cellzero = obj.base_ring().zero()
 
     @staticmethod
     def compute_cells(obj):

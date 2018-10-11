@@ -156,7 +156,7 @@ class GridViewEditor(BindableEditorClass):
             self.cells = {}
         celltype = self.adapter.celltype
         traitclass = self.adapter.traitclass
-        default_value = self.adapter.cell_default_value
+        default_value = self.adapter.cellzero
         traits_to_add = {}
         for pos in self.addable_cells():
             # Empty traits for addable cells

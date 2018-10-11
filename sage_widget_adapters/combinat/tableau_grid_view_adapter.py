@@ -30,7 +30,7 @@ from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 class TableauGridViewAdapter(GridViewAdapter):
     objclass = Tableau
     celltype = Integer # i.e. sage.rings.integer.Integer
-    cell_default_value = Integer(0)
+    cellzero = Integer(0)
 
     @staticmethod
     def compute_cells(obj):
