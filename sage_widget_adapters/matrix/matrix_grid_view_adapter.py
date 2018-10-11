@@ -44,7 +44,13 @@ class MatrixGridViewAdapter(GridViewAdapter):
         Init an adapter object, set attributes `celltype` and `traitclass` (where applicable)
         """
         super(MatrixGridViewAdapter, self).__init__()
-        self.celltype = obj.base_ring().random_element().__class__
+        try:
+            self.celltype = obj.base_ring().random_element().__class__
+        except:
+            try:
+                self.celltype = obj.base_ring().an_element().__class__
+            except:
+                raise TypeError("Cannot determine matrix base ring elements class.")
         self.cell_default_value = obj.base_ring().zero()
 
     @staticmethod

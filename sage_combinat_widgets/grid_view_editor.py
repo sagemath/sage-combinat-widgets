@@ -5,10 +5,15 @@ An editable GridViewEditor for Sage Jupyter Notebook
 EXAMPLES ::
     sage: from sage_combinat_widgets import GridViewEditor
     sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
-    sage: w = GridViewEditor(t)
+    sage: e = GridViewEditor(t)
+    sage: e.addable_cells()
+    [(0, 4), (1, 1), (3, 0)]
     sage: from sage.graphs.generators.basic import GridGraph
     sage: g = GridGraph((4,3))
-    sage: w = GridViewEditor(g)
+    sage: e = GridViewEditor(g)
+    sage: R = PolynomialRing(QQ, 9, 'x')
+    sage: A = matrix(R, 3, 3, R.gens())
+    sage: e = GridViewEditor(A)
 
 AUTHORS:
 - Odile Bénassy, Nicolas Thiéry
@@ -38,20 +43,27 @@ def extract_coordinates(s):
     if m:
         return tuple(int(i) for i in m.groups())
 
-def get_adapter(cls):
+def get_adapter(obj):
     r"""
-    Return an adapter object for Sage object class `cls`.
+    Return an adapter object for Sage object `obj`.
+    TESTS::
+       sage: from sage_combinat_widgets.grid_view_editor import get_adapter
+       sage: from sage.combinat.tableau import StandardTableaux
+       sage: t = StandardTableaux(7).random_element()
+       sage: ta = get_adapter(t)
+       sage: ta.__class__
+       <class 'sage_widget_adapters.combinat.tableau_grid_view_adapter.TableauGridViewAdapter'>
     """
     from sage.combinat.tableau import Tableau
-    if issubclass(cls, Tableau):
+    if issubclass(obj.__class__, Tableau):
         from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
         return TableauGridViewAdapter()
     from sage.matrix.matrix2 import Matrix
-    if issubclass(cls, Matrix):
+    if issubclass(obj.__class__, Matrix):
         from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-        return MatrixGridViewAdapter(cls) # FIXME : init needs to know the matrix space
+        return MatrixGridViewAdapter(obj)
     from sage.graphs.graph import Graph
-    if issubclass(cls, Graph):
+    if issubclass(obj.__class__, Graph):
         from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
         return GraphGridViewAdapter()
 
@@ -75,22 +87,28 @@ class GridViewEditor(BindableEditorClass):
 
     def __init__(self, obj, adapter=None):
         r"""
+        Initialize editor.
+
+        INPUT:
+        * a Sage object `obj`
+        * an adapter object (optional)
+
         TESTS::
 
             sage: from sage_combinat_widgets import GridViewEditor
             sage: from sage.all import matrix, graphs
             sage: from sage.graphs.generic_graph import GenericGraph
             sage: g = graphs.AztecDiamondGraph(3)
-            sage: w = GridViewEditor(g)
+            sage: e = GridViewEditor(g)
             sage: t = StandardTableaux(5).random_element()
-            sage: w = GridViewEditor(t)
+            sage: e = GridViewEditor(t)
             sage: f = x^5
             sage: v = vector((1,2,3))
-            sage: w = GridViewEditor(v) # doctest: +IGNORE_EXCEPTION_DETAIL
+            sage: e = GridViewEditor(v) # doctest: +IGNORE_EXCEPTION_DETAIL
             Traceback (most recent call last):
             ...
             TypeError: Cannot find an Adapter for this object (<class 'sage.modules.vector_integer_dense.Vector_integer_dense'>)
-            sage: w = GridViewEditor(f) # doctest: +IGNORE_EXCEPTION_DETAIL
+            sage: e = GridViewEditor(f) # doctest: +IGNORE_EXCEPTION_DETAIL
             Traceback (most recent call last):
             ...
             TypeError: Is this object really grid-representable?
@@ -104,7 +122,7 @@ class GridViewEditor(BindableEditorClass):
         if adapter:
             self.adapter = adapter
         else:
-            self.adapter = get_adapter(obj.__class__)
+            self.adapter = get_adapter(obj)
         if not self.adapter:
             raise TypeError("Cannot find an Adapter for this object (%s)" % obj.__class__)
         self.compute()
@@ -231,6 +249,9 @@ class GridViewEditor(BindableEditorClass):
         self.set_value(obj)
 
     def addable_cells(self):
+        r"""
+        List addable cells for editor value
+        """
         if hasattr(self.adapter, 'addable_cells'):
             return self.adapter.addable_cells(self.value)
         return []
