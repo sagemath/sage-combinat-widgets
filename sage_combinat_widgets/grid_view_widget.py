@@ -145,7 +145,6 @@ class GridViewWidget(GridViewEditor, VBox):
         self.cell_widget_classes = cell_widget_classes
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
-        self.compute()
         self.draw()
         self.add_links(cast)
 

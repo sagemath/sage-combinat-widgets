@@ -23,7 +23,6 @@ import re, traitlets
 from six import add_metaclass
 from copy import copy
 from sage.misc.bindable_class import BindableClass
-from sage.misc.abstract_method import abstract_method
 from sage.combinat.tableau import *
 from sage.all import SageObject, matrix, Integer
 from sage.rings.real_mpfr import RealLiteral
@@ -189,20 +188,21 @@ class GridViewEditor(BindableEditorClass):
         self.traitclass = traitclass
         self.add_traits(**traits_to_add)
 
-    @abstract_method
     def draw(self):
         r"""
         Build the visual representation
         """
+        pass
 
     def get_value(self):
         return self.value
 
-    def set_value(self, obj):
+    def set_value(self, obj, compute=False):
         if not self.validate(obj):
             raise ValueError("Object %s is not compatible." % str(obj))
         self.value = obj
-        self.compute()
+        if compute:
+            self.compute()
 
     def get_cells(self):
         return self.cells
@@ -251,13 +251,18 @@ class GridViewEditor(BindableEditorClass):
         """
         if not change.name.startswith('cell_'):
             return
-        if change.new == change.old:
+        if change.new == change.old or not change.new:
             return
         pos = extract_coordinates(change.name)
         val = change.new
         obj = copy(self.value)
         new_obj = self.adapter.set_cell(obj, pos, val)
         self.set_value(new_obj)
+        # Edit the cell dictionary
+        self.cells[pos] = val
+        # Edit the trait
+        traitname = 'cell_%d_%d' % pos
+        self.set_trait(traitname, val)
 
     def addable_cells(self):
         r"""
