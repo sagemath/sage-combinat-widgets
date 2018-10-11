@@ -238,6 +238,17 @@ class GridViewEditor(BindableEditorClass):
 
     @traitlets.observe(traitlets.All)
     def set_cell(self, change):
+        r"""
+        TESTS:
+        sage: from sage_combinat_widgets import GridViewEditor
+        sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+        sage: e = GridViewEditor(t)
+        sage: from traitlets import Bunch
+        sage: change = Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'})
+        sage: e.set_cell(change)
+        sage: e.value
+        [[1, 2, 7, 6], [3], [4]]
+        """
         if not change.name.startswith('cell_'):
             return
         if change.new == change.old:
@@ -245,8 +256,8 @@ class GridViewEditor(BindableEditorClass):
         pos = extract_coordinates(change.name)
         val = change.new
         obj = copy(self.value)
-        obj.set_cell(pos, val)
-        self.set_value(obj)
+        new_obj = self.adapter.set_cell(obj, pos, val)
+        self.set_value(new_obj)
 
     def addable_cells(self):
         r"""
