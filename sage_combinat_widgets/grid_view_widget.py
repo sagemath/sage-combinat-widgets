@@ -103,12 +103,12 @@ class GridViewWidget(GridViewEditor, VBox):
         r"""
         TESTS::
 
-            sage: from sage_combinat_widgets import *
+            sage: from sage_combinat_widgets.grid_view_widget import *
             sage: t = StandardTableaux(15).random_element()
             sage: w = GridViewWidget(t)
             sage: from sage.graphs.generators.families import AztecDiamondGraph
             sage: az = AztecDiamondGraph(4)
-            sage: w = GridViewWidget(az)
+            sage: w = GridViewWidget(az, cell_widget_classes=[ButtonCell], blank_widget_class=BlankButton)
         """
         GridViewEditor.__init__(self, obj)
         VBox.__init__(self)

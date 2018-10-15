@@ -64,7 +64,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         From a matrix `obj`,
         return a dictionary { coordinates pair : cell value (as a Sage object) }
         """
-        return {(i,j):obj[i][j] for (i,j) in product(range(len(obj[0])), range(obj.nrows()))}
+        return {(i,j):obj[i][j] for (i,j) in product(range(obj.nrows()), range(len(obj[0])))}
 
     @classmethod
     def from_cells(cls, cells={}):
