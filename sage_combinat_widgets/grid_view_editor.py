@@ -303,19 +303,28 @@ class GridViewEditor(BindableEditorClass):
         r"""
         List addable cells for editor value
         """
-        if hasattr(self.adapter, 'addable_cells'):
-            return self.adapter.addable_cells(self.value)
-        return []
+        return self.adapter.addable_cells(self.value)
 
     def removable_cells(self):
-        if hasattr(self.adapter, 'removable_cells'):
-            return self.adapter.removable_cells(self.value)
-        return []
+        r"""
+        List removable cells for editor value
+        """
+        return self.adapter.removable_cells(self.value)
 
     @traitlets.observe(traitlets.All)
     def add_cell(self, change):
-        if not change.name.startswith('add_') or not change.new or \
-           change.new == self.cast(self.adapter.cellzero):
+        r"""
+        TESTS:
+        sage: from sage_combinat_widgets import GridViewEditor
+        sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+        sage: e = GridViewEditor(t)
+        sage: from traitlets import Bunch
+        sage: change = Bunch({'name': 'add_1_1', 'old': 0, 'new': 7, 'owner': e, 'type': 'change'})
+        sage: e.add_cell(change)
+        sage: e.value
+        [[1, 2, 5, 6], [3, 7], [4]]
+        """
+        if not change.name.startswith('add_') or not change.new:
             return
         pos = extract_coordinates(change.name)
         val = change.new
@@ -340,21 +349,40 @@ class GridViewEditor(BindableEditorClass):
             trait = self.traitclass(self.adapter.celltype)
             trait.value = traitvalue
             traits_to_add[traitname] = trait
-        addable_traitname = 'add_%d_%d' % pos
-        if self.has_trait(addable_traitname):
-            delattr(self.__class__, addable_traitname)
-            del self._trait_values[addable_traitname]
-        for pos in self.adapter.addable_cells(self.value):
+        previous_addable_traitname = 'add_%d_%d' % pos
+        if self.has_trait(previous_addable_traitname):
+            del(self.traits()[previous_addable_traitname])
+            #del self._trait_values[addable_traitname]
+        for pos in self.addable_cells():
             emptytraitname = 'add_%d_%d' % pos
             if not self.has_trait(emptytraitname):
                 emptytrait = self.traitclass(self.adapter.celltype)
-                emptytrait.value = self.adapter.cellzero
                 emptytrait.name = emptytraitname
+                emptytrait.value = self.adapter.cellzero
                 traits_to_add[emptytraitname] = emptytrait
         self.add_traits(**traits_to_add)
         self.draw()
 
-    def remove_cell(self, pos):
+    @traitlets.observe(traitlets.All)
+    def remove_cell(self, change):
+        r"""
+        TESTS:
+        sage: from sage_combinat_widgets import GridViewEditor
+        sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+        sage: e = GridViewEditor(t)
+        sage: from traitlets import Bunch
+        sage: e.remove_cell(Bunch({'name': 'cell_0_3', 'old': 6, 'new': 0, 'owner': e, 'type': 'change'}))
+        sage: e.value
+        [[1, 2, 5], [3], [4]]
+        sage: e.remove_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 0, 'owner': e, 'type': 'change'}))
+        sage: e.value
+        [[1, 2, 5], [3]]
+        """
+        if not change.name.startswith('cell_'):
+            return
+        if change.new: # should probably compare to cellzero
+            return
+        pos = extract_coordinates(change.name)
         if not hasattr(self.adapter, 'remove_cell'):
             raise TypeError("Cannot remove cell from this object.")
         obj = copy(self.value)
@@ -366,14 +394,11 @@ class GridViewEditor(BindableEditorClass):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
         del(self.cells[pos])
         traitname = 'cell_%d_%d' % pos
-        traitvalue = val
         if self.has_trait(traitname):
-            trait = self.traits[traitname]
-            del(trait)
-            del(self.traits[traitname])
-            delattr(self, traitname)
-            del(self._trait_values[traitname])
+            del(self.traits()[traitname])
+            #del(self._trait_values[traitname])
         self.value = obj
+        self.draw()
 
     def append_row(self, r=None):
         if not hasattr(self.adapter, 'append_row'):

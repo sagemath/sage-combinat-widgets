@@ -105,12 +105,10 @@ class GridViewWidget(GridViewEditor, VBox):
 
             sage: from sage_combinat_widgets import *
             sage: t = StandardTableaux(15).random_element()
-            sage: ta = TableauGridViewAdapter(t.parent(), t)
-            sage: w = GridViewWidget(ta)
+            sage: w = GridViewWidget(t)
             sage: from sage.graphs.generators.families import AztecDiamondGraph
             sage: az = AztecDiamondGraph(4)
-            sage: aza = GraphGridViewAdapter(az)
-            sage: w = GridViewWidget(aza)
+            sage: w = GridViewWidget(az)
         """
         GridViewEditor.__init__(self, obj)
         VBox.__init__(self)
@@ -167,13 +165,11 @@ class GridViewWidget(GridViewEditor, VBox):
         def cell_widget_class_index(pos):
             # Such function can enable for example various shapes or colors
             return 0
-        addable_positions = []
+        addable_positions = self.addable_cells()
         addable_rows = []
         removable_positions = self.removable_cells()
-        if self.addable_widget_class and self.addable_cells():
-            addable_positions = sorted(list(self.addable_cells()))
-            addable_rows = [(i,[pos for pos in addable_positions if pos[0]==i]) \
-                            for i in uniq([t[0] for t in addable_positions])]
+        addable_rows = [(i,[pos for pos in addable_positions if pos[0]==i]) \
+                        for i in uniq([t[0] for t in addable_positions])]
         for i in range(len(rows)):
             j = 0
             hbox_children = []
