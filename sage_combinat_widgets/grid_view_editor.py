@@ -227,8 +227,7 @@ class GridViewEditor(BindableEditorClass):
         Build the visual representation
         and cdlink objects -- with cast function `cast`.
         """
-        self.reset_links()
-        self.add_links()
+        pass
 
     def get_value(self):
         return self.value
@@ -315,7 +314,8 @@ class GridViewEditor(BindableEditorClass):
 
     @traitlets.observe(traitlets.All)
     def add_cell(self, change):
-        if not change.name.startswith('add_'):
+        if not change.name.startswith('add_') or not change.new or \
+           change.new == self.cast(self.adapter.cellzero):
             return
         pos = extract_coordinates(change.name)
         val = change.new
@@ -351,7 +351,6 @@ class GridViewEditor(BindableEditorClass):
                 emptytrait.value = self.adapter.cellzero
                 emptytrait.name = emptytraitname
                 traits_to_add[emptytraitname] = emptytrait
-        #print(traits_to_add)
         self.add_traits(**traits_to_add)
         self.draw()
 

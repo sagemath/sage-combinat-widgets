@@ -141,7 +141,7 @@ class GridViewWidget(GridViewEditor, VBox):
             except:
                 child = None
             if child and hasattr(child, 'value') and traitname in self.traits():
-                cdlink((child, 'value'), (self, traitname), self.cast)
+                self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
         for pos in self.addable_cells():
             # A directional link to trait 'add_i_j'
             traitname = 'add_%d_%d' % (pos)
