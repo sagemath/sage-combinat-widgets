@@ -25,7 +25,7 @@ from sage.all import SageObject
 import traitlets
 from sage.misc.abstract_method import abstract_method
 
-class GridViewAdapter:
+class GridViewAdapter(object):
     objclass = SageObject
     celltype = None
     traitclass = traitlets.Instance

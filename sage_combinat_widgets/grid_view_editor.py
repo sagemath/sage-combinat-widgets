@@ -50,8 +50,8 @@ def get_adapter(obj):
        sage: from sage.combinat.tableau import StandardTableaux
        sage: t = StandardTableaux(7).random_element()
        sage: ta = get_adapter(t)
-       sage: ta.__class__
-       <class 'sage_widget_adapters.combinat.tableau_grid_view_adapter.TableauGridViewAdapter'>
+       sage: ta.cellzero
+       0
     """
     from sage.combinat.tableau import Tableau
     if issubclass(obj.__class__, Tableau):
@@ -65,6 +65,34 @@ def get_adapter(obj):
     if issubclass(obj.__class__, Graph):
         from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
         return GraphGridViewAdapter()
+
+class cdlink(traitlets.link):
+    r"""
+    A directional link (for a start) with type casting
+    """
+    def __init__(self, source, target, cast):
+        r"""
+        TESTS::
+            sage: from sage_combinat_widgets.grid_view_editor import cdlink
+            sage: from ipywidgets import Checkbox, Text
+            sage: b = Checkbox()
+            sage: t = Text()
+            sage: l = cdlink((b, 'value'), (t, 'value'), str)
+            sage: t.value
+            u'False'
+        """
+        self.source, self.target, self.to_cell = source, target, cast
+        try:
+            setattr(target[0], target[1], cast(getattr(source[0], source[1])))
+        finally:
+            source[0].observe(self._update_target, names=source[1])
+            target[0].observe(self._update_source, names=target[1])
+
+    def _update_target(self, change):
+        if self.updating:
+            return
+        with self._busy_updating():
+            setattr(self.target[0], self.target[1], self.to_cell(change.new))
 
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass(traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
@@ -103,11 +131,11 @@ class GridViewEditor(BindableEditorClass):
             sage: e = GridViewEditor(t)
             sage: f = x^5
             sage: v = vector((1,2,3))
-            sage: e = GridViewEditor(v) # doctest: +IGNORE_EXCEPTION_DETAIL
+            sage: e = GridViewEditor(v)
             Traceback (most recent call last):
             ...
-            TypeError: Cannot find an Adapter for this object (<class 'sage.modules.vector_integer_dense.Vector_integer_dense'>)
-            sage: e = GridViewEditor(f) # doctest: +IGNORE_EXCEPTION_DETAIL
+            TypeError: Cannot find an Adapter for this object (<type 'sage.modules.vector_integer_dense.Vector_integer_dense'>)
+            sage: e = GridViewEditor(f)
             Traceback (most recent call last):
             ...
             TypeError: Is this object really grid-representable?
@@ -125,6 +153,7 @@ class GridViewEditor(BindableEditorClass):
         if not self.adapter:
             raise TypeError("Cannot find an Adapter for this object (%s)" % obj.__class__)
         self.compute()
+        self.links = []
 
     def validate(self, obj, value=None, obj_class=None):
         r"""
@@ -188,11 +217,18 @@ class GridViewEditor(BindableEditorClass):
         self.traitclass = traitclass
         self.add_traits(**traits_to_add)
 
-    def draw(self):
+    def reset_links(self):
+        for lnk in self.links:
+            lnk.unlink()
+        self.links = []
+
+    def draw(self, cast=None):
         r"""
         Build the visual representation
+        and cdlink objects -- with cast function `cast`.
         """
-        pass
+        self.reset_links()
+        self.add_links()
 
     def get_value(self):
         return self.value
@@ -301,7 +337,8 @@ class GridViewEditor(BindableEditorClass):
         if self.has_trait(traitname):
             self.set_trait(traitname, traitvalue)
         else:
-            trait = self.traitclass(traitvalue)
+            trait = self.traitclass(self.adapter.celltype)
+            trait.value = traitvalue
             traits_to_add[traitname] = trait
         addable_traitname = 'add_%d_%d' % pos
         if self.has_trait(addable_traitname):
@@ -310,7 +347,8 @@ class GridViewEditor(BindableEditorClass):
         for pos in self.adapter.addable_cells(self.value):
             emptytraitname = 'add_%d_%d' % pos
             if not self.has_trait(emptytraitname):
-                emptytrait = self.traitclass(self.traitclass.default_value)
+                emptytrait = self.traitclass(self.adapter.celltype)
+                emptytrait.value = self.adapter.cellzero
                 emptytrait.name = emptytraitname
                 traits_to_add[emptytraitname] = emptytrait
         #print(traits_to_add)

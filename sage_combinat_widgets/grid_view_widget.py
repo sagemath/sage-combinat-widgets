@@ -1,8 +1,8 @@
-from .grid_view_editor import GridViewEditor
+from .grid_view_editor import *
 from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, Button
 from sage.misc.misc import uniq
-from traitlets import observe, link
+from traitlets import observe
 
 textcell_layout = Layout(width='3em',height='2em', margin='0', padding='0')
 buttoncell_layout = Layout(width='5em',height='4em', margin='0', padding='0')
@@ -25,25 +25,6 @@ try:
             break
 except:
     pass # We are in the test environment
-
-
-class cdlink(link):
-    r"""
-    A directional link (for a start) with type casting
-    """
-    def __init__(self, source, target, cast):
-        self.source, self.target, self.to_cell = source, target, cast
-        try:
-            setattr(target[0], target[1], cast(getattr(source[0], source[1])))
-        finally:
-            source[0].observe(self._update_target, names=source[1])
-            target[0].observe(self._update_source, names=target[1])
-
-    def _update_target(self, change):
-        if self.updating:
-            return
-        with self._busy_updating():
-            setattr(self.target[0], self.target[1], self.to_cell(change.new))
 
 class TextCell(Text):
     r"""A regular text grid cell
@@ -145,10 +126,10 @@ class GridViewWidget(GridViewEditor, VBox):
         self.cell_widget_classes = cell_widget_classes
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
+        self.cast = cast
         self.draw()
-        self.add_links(cast)
 
-    def add_links(self, cast):
+    def add_links(self):
         r"""
         Link each individual widget cell
         to its corresponding trait in the editor
@@ -160,14 +141,14 @@ class GridViewWidget(GridViewEditor, VBox):
             except:
                 child = None
             if child and hasattr(child, 'value') and traitname in self.traits():
-                cdlink((child, 'value'), (self, traitname), cast)
+                cdlink((child, 'value'), (self, traitname), self.cast)
         for pos in self.addable_cells():
             # A directional link to trait 'add_i_j'
             traitname = 'add_%d_%d' % (pos)
             try:
                 child = self.children[pos[0]].children[pos[1]]
                 if child and hasattr(child, 'value') and traitname in self.traits():
-                    cdlink((child, 'value'), (self, traitname), cast)
+                    self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
             except:
                 pass
 
@@ -178,6 +159,7 @@ class GridViewWidget(GridViewEditor, VBox):
         * Blank cells for empty cells in a row
         * Addable cells if any
         """
+        self.reset_links()
         positions = sorted(list(self.cells.keys()))
         rows = [[(pos, self.cells[pos]) for pos in positions if pos[0]==i] \
                 for i in uniq([t[0] for t in positions])]
@@ -224,3 +206,4 @@ class GridViewWidget(GridViewEditor, VBox):
             if row[0] > i:
                 vbox_children.append(HBox([self.addable_widget_class((i,j), self.cell_layout) for c in row[1]]))
         self.children = vbox_children
+        self.add_links()

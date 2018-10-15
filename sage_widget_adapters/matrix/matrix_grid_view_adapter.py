@@ -42,6 +42,11 @@ class MatrixGridViewAdapter(GridViewAdapter):
     def __init__(self, obj):
         r"""
         Init an adapter object, set attributes `celltype` and `traitclass` (where applicable)
+        TESTS::
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: from sage.matrix.constructor import Matrix
+            sage: m = Matrix(QQ, 3, 3, range(9))/2
+            sage: ma = MatrixGridViewAdapter(m)
         """
         super(MatrixGridViewAdapter, self).__init__()
         try:
@@ -92,7 +97,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         [  0 2/3   1]
         [3/2   2 5/2]
         [  3 7/2   4]
-        sage: MatrixGridViewAdapter.set_cell(A, (2,2), pi) # doctest: +IGNORE_EXCEPTION_DETAIL
+        sage: MatrixGridViewAdapter.set_cell(A, (2,2), pi)
         Traceback (most recent call last):
         ...
         TypeError: Value 'pi' is not compatible!
