@@ -27,9 +27,7 @@ from sage.misc.abstract_method import abstract_method
 
 class GridViewAdapter(object):
     objclass = SageObject
-    celltype = None
     traitclass = traitlets.Instance
-    cellzero = traitlets.Undefined
 
     @staticmethod
     def cell_to_unicode(cell_content):

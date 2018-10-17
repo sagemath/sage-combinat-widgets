@@ -127,6 +127,19 @@ class GridViewWidget(GridViewEditor, VBox):
         self.cast = cast
         self.draw()
 
+    def to_cell(self, val):
+        r"""
+        From a widget cell value `val`,
+        return a valid editor cell value.
+        TESTS::
+            sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
+            sage: t = StandardTableaux(5).random_element()
+            sage: w = GridViewWidget(t)
+            sage: w.to_cell('3')
+            3
+        """
+        return self.cast(val)
+
     def add_links(self):
         r"""
         Link each individual widget cell

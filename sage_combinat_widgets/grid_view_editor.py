@@ -155,6 +155,14 @@ class GridViewEditor(BindableEditorClass):
         self.compute()
         self.links = []
 
+    def to_cell(self, val):
+        r"""
+        From a widget cell value `val`,
+        return a valid editor cell value.
+        Will be overloaded in widget code.
+        """
+        return val
+
     def validate(self, obj, value=None, obj_class=None):
         r"""
         Validate the object type
@@ -324,7 +332,8 @@ class GridViewEditor(BindableEditorClass):
         sage: e.value
         [[1, 2, 5, 6], [3, 7], [4]]
         """
-        if not change.name.startswith('add_') or not change.new:
+        if not change.name.startswith('add_') \
+             or self.to_cell(change.new) == self.adapter.cellzero:
             return
         pos = extract_coordinates(change.name)
         val = change.new
