@@ -176,6 +176,22 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Is this object really grid-representable?")
         return issubclass(obj.__class__, SageObject)
 
+    def modified_add_traits(self, **traits):
+        r"""
+        Dynamically add trait attributes to the HasTraits instance.
+        Modified code according to Ryan Morshead's pull request
+        Cf https://github.com/ipython/traitlets/pull/501
+        """
+        cls = self.__class__
+        attrs = {"__module__": cls.__module__}
+        if hasattr(cls, "__qualname__"):
+          # __qualname__ introduced in Python 3.3 (see PEP 3155)
+          attrs["__qualname__"] = cls.__qualname__
+        attrs.update(traits)
+        self.__class__ = type(cls.__name__, (cls,), attrs)
+        for trait in traits.values():
+            trait.instance_init(self)
+
     def compute(self, obj=None):
         r"""We have an object value
         but we want to compute cells
@@ -224,7 +240,7 @@ class GridViewEditor(BindableEditorClass):
                 trait.name = traitname
                 traits_to_add[traitname] = trait
         self.traitclass = traitclass
-        self.add_traits(**traits_to_add)
+        self.modified_add_traits(**traits_to_add)
 
     def reset_links(self):
         for lnk in self.links:
@@ -373,7 +389,7 @@ class GridViewEditor(BindableEditorClass):
                 emptytrait.name = emptytraitname
                 emptytrait.value = self.adapter.cellzero
                 traits_to_add[emptytraitname] = emptytrait
-        self.add_traits(**traits_to_add)
+        self.modified_add_traits(**traits_to_add)
         self.draw()
 
     @traitlets.observe(traitlets.All)
