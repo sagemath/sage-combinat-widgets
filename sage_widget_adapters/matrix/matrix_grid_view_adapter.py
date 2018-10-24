@@ -143,9 +143,10 @@ class MatrixGridViewAdapter(GridViewAdapter):
             if not x in obj.base_ring():
                 raise TypeError("Value '%s' is not compatible!" % x)
         if len(r) > obj.ncols():
-            r = c[obj.ncols()]
+            print("Row is too long. Truncating")
+            r = r[:obj.ncols()]
         elif len(r) < obj.ncols():
-            r = r + [0] * (obj.ncols() - len(r))
+            r = list(r) + [0] * (obj.ncols() - len(r))
         return obj.stack(vector(r))
 
     @classmethod
@@ -210,9 +211,10 @@ class MatrixGridViewAdapter(GridViewAdapter):
             if not x in obj.base_ring():
                 raise TypeError("Value '%s' is not compatible!" % x)
         if len(c) > obj.nrows():
-            c = c[obj.nrows()]
+            print("Column is too long. Truncating")
+            c = c[:obj.nrows()]
         elif len(c) < obj.nrows():
-            c = c + [0] * (obj.nrows() - len(c))
+            c = list(c) + [0] * (obj.nrows() - len(c))
         return obj.augment(vector(c))
 
     @classmethod
