@@ -246,6 +246,7 @@ class GridViewEditor(BindableEditorClass):
         self.value = obj
         if compute:
             self.compute()
+            self.draw()
 
     def get_cells(self):
         return self.cells
@@ -333,12 +334,14 @@ class GridViewEditor(BindableEditorClass):
         [[1, 2, 5, 6], [3, 7], [4]]
         """
         if not change.name.startswith('add_') \
-             or self.to_cell(change.new) == self.adapter.cellzero:
+           or self.to_cell(change.new) == self.adapter.cellzero:
             return
-        pos = extract_coordinates(change.name)
-        val = change.new
         if not hasattr(self.adapter, 'add_cell'):
             raise TypeError("Cannot add cell to this object.")
+        if hasattr(self.adapter.add_cell, '_optional') and self.adapter.add_cell._optional: # Not implemented
+            return
+        val = change.new
+        pos = extract_coordinates(change.name)
         obj = copy(self.value)
         try:
             obj = self.adapter.add_cell(obj, pos, val)
@@ -389,11 +392,15 @@ class GridViewEditor(BindableEditorClass):
         """
         if not change.name.startswith('cell_'):
             return
+        if not hasattr(self.adapter, 'add_cell'):
+            raise TypeError("Cannot add cell to this object.")
+        if hasattr(self.adapter.add_cell, '_optional') and self.adapter.add_cell._optional: # Not implemented
+            return
+        if change.old == traitlets.Undefined: # Do nothing ar widget initializing
+            return
         if change.new: # should probably compare to cellzero
             return
         pos = extract_coordinates(change.name)
-        if not hasattr(self.adapter, 'remove_cell'):
-            raise TypeError("Cannot remove cell from this object.")
         obj = copy(self.value)
         try:
             obj = self.adapter.remove_cell(obj, pos)
@@ -417,7 +424,7 @@ class GridViewEditor(BindableEditorClass):
             obj = self.adapter.append_row(obj, r)
         except:
             raise ValueError("Unable to append row")
-        self.set_value(obj) # Will take care of everything
+        self.set_value(obj, True) # Will take care of everything
 
     def insert_row(self, index, r=None):
         if not hasattr(self.adapter, 'insert_row'):
@@ -427,7 +434,7 @@ class GridViewEditor(BindableEditorClass):
             obj = self.adapter.insert_row(obj, index, r)
         except:
             raise ValueError("Unable to insert row")
-        self.set_value(obj) # Will take care of everything
+        self.set_value(obj, True) # Will take care of everything
 
     def remove_row(self, index=None):
         if not hasattr(self.adapter, 'remove_row'):
@@ -437,7 +444,7 @@ class GridViewEditor(BindableEditorClass):
             obj = self.adapter.remove_row(obj, index)
         except:
             raise ValueError("Unable to remove row")
-        self.set_value(obj) # Will take care of everything
+        self.set_value(obj, True) # Will take care of everything
 
     def append_column(self, r=None):
         if not hasattr(self.adapter, 'append_column'):
@@ -447,7 +454,7 @@ class GridViewEditor(BindableEditorClass):
             obj = self.adapter.append_column(obj, r)
         except:
             raise ValueError("Unable to append column")
-        self.set_value(obj) # Will take care of everything
+        self.set_value(obj, True) # Will take care of everything
 
     def insert_column(self, index, r=None):
         if not hasattr(self.adapter, 'insert_column'):
@@ -457,7 +464,7 @@ class GridViewEditor(BindableEditorClass):
             obj = self.adapter.insert_column(obj, index, r)
         except:
             raise ValueError("Unable to insert column")
-        self.set_value(obj) # Will take care of everything
+        self.set_value(obj, True) # Will take care of everything
 
     def remove_column(self, index=None):
         if not hasattr(self.adapter, 'remove_column'):
@@ -467,4 +474,4 @@ class GridViewEditor(BindableEditorClass):
             obj = self.adapter.remove_column(obj, index)
         except:
             raise ValueError("Unable to remove column")
-        self.set_value(obj) # Will take care of everything
+        self.set_value(obj, True) # Will take care of everything

@@ -34,6 +34,7 @@ from sage.matrix.matrix2 import Matrix
 from sage.matrix.constructor import matrix
 from itertools import product
 from sage.sets.finite_enumerated_set import FiniteEnumeratedSet
+from sage.modules.free_module_element import vector
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class MatrixGridViewAdapter(GridViewAdapter):
@@ -131,32 +132,6 @@ class MatrixGridViewAdapter(GridViewAdapter):
         if obj.ncols() == 1:
             return [(obj.nrows()-1, 0)]
         return []
-
-    @classmethod
-    def add_cell(cls, obj, pos, val):
-        r"""
-        No cell should be added in isolation
-        except for vectors
-        """
-        if not pos in obj.addable_cells():
-            raise ValueError("Position '%s' is not addable." % str(pos))
-        if pos[0] == 0:
-            return obj.augment(vector([val]))
-        if pos[1] == 0:
-            return obj.stack(vector([val]))
-
-    @classmethod
-    def remove_cell(cls, obj, pos):
-        r"""
-        No cell should be removed in isolation
-        except for vectors
-        """
-        if not pos in obj.removable_cells():
-            return obj
-        if pos[0] == 0:
-            return obj.matrix_from_columns(range(obj.ncols()-1))
-        if pos[1] == 1:
-            return obj.matrix_from_rows(range(obj.nrows()-1))
 
     @classmethod
     def append_row(cls, obj, r=None):

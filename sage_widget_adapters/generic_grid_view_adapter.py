@@ -37,15 +37,14 @@ class GridViewAdapter(object):
         """
         return str(cell_content)
 
-    @classmethod
-    def unicode_to_cell(cls, s):
+    def unicode_to_cell(self, s):
         r"""
         From an unicode string `s`,
         return matching cell value.
         """
         if s:
-            return cls.celltype(s)
-        return cls.cellzero
+            return self.celltype(s)
+        return self.cellzero
 
     @staticmethod
     @abstract_method
