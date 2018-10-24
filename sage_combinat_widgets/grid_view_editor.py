@@ -29,6 +29,7 @@ from sage.rings.real_mpfr import RealLiteral
 from sage.graphs.graph import Graph
 from sage.combinat.partition import Partition
 from sage.structure.list_clone import ClonableList
+from sage.misc.abstract_method import AbstractMethod
 
 def extract_coordinates(s):
     r"""
@@ -338,8 +339,8 @@ class GridViewEditor(BindableEditorClass):
             return
         if not hasattr(self.adapter, 'add_cell'):
             raise TypeError("Cannot add cell to this object.")
-        if hasattr(self.adapter.add_cell, '_optional') and self.adapter.add_cell._optional: # Not implemented
-            return
+        if self.adapter.add_cell.im_func.__class__ is AbstractMethod:
+            return # Method not implemented
         val = change.new
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
