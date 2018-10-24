@@ -151,6 +151,18 @@ class MatrixGridViewAdapter(GridViewAdapter):
     @classmethod
     def insert_row(cls, obj, index, r=None):
         r"""
+        TESTS::
+        sage: from sage.matrix.matrix_space import MatrixSpace
+        sage: S = MatrixSpace(ZZ, 4,3)
+        sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+        sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+        sage: ma = MatrixGridViewAdapter(m)
+        sage: ma.insert_row(m, 1, (1,2,3))
+        [ 1  7  1]
+        [ 1  2  3]
+        [ 0  0  3]
+        [ 0 -1  2]
+        [ 1  0 -3]
         """
         if not r:
             r = [0] * obj.ncols()
@@ -159,9 +171,10 @@ class MatrixGridViewAdapter(GridViewAdapter):
                 if not x in obj.base_ring():
                     raise TypeError("Value '%s' is not compatible!" % x)
             if len(r) > obj.ncols():
-                r = c[obj.ncols()]
+                print("Row is too long. Truncating")
+                r = r[:obj.ncols()]
             elif len(r) < obj.ncols():
-                r = r + [0] * (obj.ncols() - len(r))
+                r = list(r) + [0] * (obj.ncols() - len(r))
         top = obj.matrix_from_rows(range(index))
         bottom = obj.matrix_from_rows(range(index,obj.nrows()))
         return top.stack(vector(r)).stack(bottom)
@@ -188,7 +201,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         return obj.delete_rows([index])
 
     @classmethod
-    def append_column(cls, obj, c = None):
+    def append_column(cls, obj, c=None):
         r"""
         """
         if not c:
@@ -205,6 +218,23 @@ class MatrixGridViewAdapter(GridViewAdapter):
     @classmethod
     def insert_column(cls, obj, index, c=None):
         r"""
+        TESTS::
+        sage: from sage.matrix.matrix_space import MatrixSpace
+        sage: S = MatrixSpace(ZZ, 4,3)
+        sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+        sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+        sage: ma = MatrixGridViewAdapter(m)
+        sage: ma.insert_column(m, 1, (1,1,1))
+        [ 1  1  7  1]
+        [ 0  1  0  3]
+        [ 0  1 -1  2]
+        [ 1  0  0 -3]
+        sage: ma.insert_column(m, 2, (1,1,1,2,2,2))
+        Column is too long. Truncating
+        [ 1  7  1  1]
+        [ 0  0  1  3]
+        [ 0 -1  1  2]
+        [ 1  0  2 -3]
         """
         if not c:
             c = [0] * obj.nrows()
@@ -213,12 +243,13 @@ class MatrixGridViewAdapter(GridViewAdapter):
                 if not x in obj.base_ring():
                     raise TypeError("Value '%s' is not compatible!" % x)
             if len(c) > obj.nrows():
-                c = c[obj.nrows()]
+                print("Column is too long. Truncating")
+                c = c[:obj.nrows()]
             elif len(c) < obj.nrows():
-                c = c + [0] * (obj.nrows() - len(c))
+                c = list(c) + [0] * (obj.nrows() - len(c))
         left = obj.matrix_from_columns(range(index))
-        right = obj.matrix_from_columns(range(index,obj.nrows()))
-        return left.stack(vector(c)).stack(right)
+        right = obj.matrix_from_columns(range(index,obj.ncols()))
+        return left.augment(vector(c)).augment(right)
 
     @classmethod
     def remove_column(cls, obj, index=None):

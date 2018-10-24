@@ -446,22 +446,22 @@ class GridViewEditor(BindableEditorClass):
             raise ValueError("Unable to remove row")
         self.set_value(obj, True) # Will take care of everything
 
-    def append_column(self, r=None):
+    def append_column(self, c=None):
         if not hasattr(self.adapter, 'append_column'):
             raise TypeError("Cannot append column to this object.")
         obj = copy(self.value)
         try:
-            obj = self.adapter.append_column(obj, r)
+            obj = self.adapter.append_column(obj, c)
         except:
             raise ValueError("Unable to append column")
         self.set_value(obj, True) # Will take care of everything
 
-    def insert_column(self, index, r=None):
+    def insert_column(self, index, c=None):
         if not hasattr(self.adapter, 'insert_column'):
             raise TypeError("Cannot insert column to this object.")
         obj = copy(self.value)
         try:
-            obj = self.adapter.insert_column(obj, index, r)
+            obj = self.adapter.insert_column(obj, index, c)
         except:
             raise ValueError("Unable to insert column")
         self.set_value(obj, True) # Will take care of everything
