@@ -95,6 +95,18 @@ def compute_tooltip(t):
     """
     return str(t)[-1:1]
 
+def get_model_id(w):
+    r"""
+    For some reason, our widgets seem to lose their model_id
+    This function recovers it
+    """
+    st = w.get_manager_state()['state']
+    kk = list(st.keys())
+    kk.reverse()
+    for u in kk:
+        if 'VBox' in st[u]['state']['_model_name']:
+            return u
+
 class GridViewWidget(GridViewEditor, VBox):
     r"""A widget for all grid-representable Sage objects
     """
@@ -112,7 +124,7 @@ class GridViewWidget(GridViewEditor, VBox):
         """
         GridViewEditor.__init__(self, obj)
         VBox.__init__(self)
-        self._model_id = list(self.get_manager_state()['state'].keys())[-1] # For some reason, it lost its _model_id
+        self._model_id = get_model_id(self)
         if not cell_layout:
             if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
                 cell_layout = buttoncell_layout
