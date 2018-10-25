@@ -98,13 +98,13 @@ def compute_tooltip(t):
 def get_model_id(w):
     r"""
     For some reason, our widgets seem to lose their model_id
-    This function recovers it
+    This *hack* recovers it
     """
     st = w.get_manager_state()['state']
     kk = list(st.keys())
     kk.reverse()
     for u in kk:
-        if 'VBox' in st[u]['state']['_model_name']:
+        if 'VBox' in st[u]['state']['_model_name'] and st[u]['state']['children'] == []:
             return u
 
 class GridViewWidget(GridViewEditor, VBox):
