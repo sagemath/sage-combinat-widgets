@@ -5,9 +5,15 @@ Sage Combinat Widgets
 .. image:: https://mybinder.org/badge.svg
    :target: https://mybinder.org/v2/gh/sagemath/sage-combinat-widgets/master
 
-Jupyter widgets for Sage Combinat:
+Jupyter editable widgets for Sage Combinat:
+
 - Standard/Semi-standard/Generic Tableau
 - Partition
+
+Also : 
+
+- Matrices
+- Graphs
 
 Installation
 ------------
@@ -40,15 +46,7 @@ Once the package is installed, you can use it in Sage Jupyter Notebook.
     w = TableauWidget(t)
     display(w)
 
-See the `demo notebook <demo_Grid.ipynb>`_.
-
-
-Source code
------------
-
-All source code is stored in the folder ``sage_combinat_widget`` using the same name as the
-package. This is not mandatory but highly recommended for clarity. All source folder
-must contain a ``__init__.py`` file with needed includes.
+See the `demo notebook <demo_GridViewWidget.ipynb>`_.
 
 Tests
 -----
