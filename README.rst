@@ -2,6 +2,9 @@
 Sage Combinat Widgets
 =====================
 
+.. image:: https://mybinder.org/badge.svg
+   :target: https://mybinder.org/v2/gh/sagemath/sage-combinat-widgets/master
+
 Jupyter widgets for Sage Combinat:
 - Standard/Semi-standard/Generic Tableau
 - Partition
