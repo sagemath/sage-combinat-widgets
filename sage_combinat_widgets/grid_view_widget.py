@@ -100,11 +100,8 @@ def get_model_id(w):
     For some reason, our widgets seem to lose their model_id
     This *hack* recovers it
     """
-    st = w.get_manager_state()['state']
-    kk = list(st.keys())
-    kk.reverse()
-    for u in kk:
-        if 'VBox' in st[u]['state']['_model_name'] and st[u]['state']['children'] == []:
+    for u in w.widgets:
+        if w.widgets[u] == w:
             return u
 
 class GridViewWidget(GridViewEditor, VBox):
