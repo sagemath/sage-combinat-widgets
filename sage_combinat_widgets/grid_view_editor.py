@@ -355,7 +355,7 @@ class GridViewEditor(BindableEditorClass):
             return
         if not hasattr(self.adapter, 'add_cell'):
             raise TypeError("Cannot add cell to this object.")
-        if self.adapter.add_cell.im_func.__class__ is AbstractMethod:
+        if self.adapter.add_cell.__func__.__class__ is AbstractMethod:
             return # Method not implemented
         val = change.new
         pos = extract_coordinates(change.name)
