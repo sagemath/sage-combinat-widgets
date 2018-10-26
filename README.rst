@@ -8,7 +8,8 @@ Sage Combinat Widgets
 Jupyter editable widgets for Sage Combinat:
 
 - Standard/Semi-standard/Generic Tableau
-- Partition
+
+  .. commented - Partition
 
 Also : 
 
