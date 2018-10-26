@@ -437,58 +437,40 @@ class GridViewEditor(BindableEditorClass):
         if not hasattr(self.adapter, 'append_row'):
             raise TypeError("Cannot append row to this object.")
         obj = copy(self.value)
-        try:
-            obj = self.adapter.append_row(obj, r)
-        except:
-            raise ValueError("Unable to append row")
+        obj = self.adapter.append_row(obj, r)
         self.set_value(obj, True) # Will take care of everything
 
     def insert_row(self, index, r=None):
         if not hasattr(self.adapter, 'insert_row'):
             raise TypeError("Cannot insert row to this object.")
         obj = copy(self.value)
-        try:
-            obj = self.adapter.insert_row(obj, index, r)
-        except:
-            raise ValueError("Unable to insert row")
+        obj = self.adapter.insert_row(obj, index, r)
         self.set_value(obj, True) # Will take care of everything
 
     def remove_row(self, index=None):
         if not hasattr(self.adapter, 'remove_row'):
             raise TypeError("Cannot remove row from this object.")
         obj = copy(self.value)
-        try:
-            obj = self.adapter.remove_row(obj, index)
-        except:
-            raise ValueError("Unable to remove row")
+        obj = self.adapter.remove_row(obj, index)
         self.set_value(obj, True) # Will take care of everything
 
     def append_column(self, c=None):
         if not hasattr(self.adapter, 'append_column'):
             raise TypeError("Cannot append column to this object.")
         obj = copy(self.value)
-        try:
-            obj = self.adapter.append_column(obj, c)
-        except:
-            raise ValueError("Unable to append column")
+        obj = self.adapter.append_column(obj, c)
         self.set_value(obj, True) # Will take care of everything
 
     def insert_column(self, index, c=None):
         if not hasattr(self.adapter, 'insert_column'):
             raise TypeError("Cannot insert column to this object.")
         obj = copy(self.value)
-        try:
-            obj = self.adapter.insert_column(obj, index, c)
-        except:
-            raise ValueError("Unable to insert column")
+        obj = self.adapter.insert_column(obj, index, c)
         self.set_value(obj, True) # Will take care of everything
 
     def remove_column(self, index=None):
         if not hasattr(self.adapter, 'remove_column'):
             raise TypeError("Cannot remove column from this object.")
         obj = copy(self.value)
-        try:
-            obj = self.adapter.remove_column(obj, index)
-        except:
-            raise ValueError("Unable to remove column")
+        obj = self.adapter.remove_column(obj, index)
         self.set_value(obj, True) # Will take care of everything
