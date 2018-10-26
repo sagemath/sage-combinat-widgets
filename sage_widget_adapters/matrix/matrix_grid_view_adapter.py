@@ -17,8 +17,6 @@ Grid View Adapter for matrices
     :meth:`~MatrixGridViewAdapter.set_cell` | Set the matrix cell value
     :meth:`~MatrixGridViewAdapter.addable_cells` | List addable cells
     :meth:`~MatrixGridViewAdapter.removable_cells` | List removable cells
-    :meth:`~MatrixGridViewAdapter.add_cell` | Add a cell
-    :meth:`~MatrixGridViewAdapter.remove_cell` | Remove a cell
     :meth:`~MatrixGridViewAdapter.append_row` | Append a row
     :meth:`~MatrixGridViewAdapter.insert_row` | Insert a row at given index
     :meth:`~MatrixGridViewAdapter.remove_row` | Remove a row at given index
@@ -50,6 +48,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
             sage: ma = MatrixGridViewAdapter(m)
         """
         super(MatrixGridViewAdapter, self).__init__()
+        self.ring = obj.base_ring()
         try:
             self.celltype = obj.base_ring().random_element().__class__
         except:
@@ -58,6 +57,21 @@ class MatrixGridViewAdapter(GridViewAdapter):
             except:
                 raise TypeError("Cannot determine matrix base ring elements class.")
         self.cellzero = obj.base_ring().zero()
+
+    def unicode_to_cell(self, s):
+        r"""
+        From an unicode string `s`,
+        return matching cell value.
+        """
+        if s:
+            try:
+                return self.celltype(s)
+            except:
+                try:
+                    return self.ring(s)
+                except:
+                    raise ValueError("Cannot cast unicode %s to object %s cell" % (s, self.value))
+        return self.cellzero
 
     @staticmethod
     def compute_cells(obj):
@@ -133,24 +147,19 @@ class MatrixGridViewAdapter(GridViewAdapter):
             return [(obj.nrows()-1, 0)]
         return []
 
-    @classmethod
-    def append_row(cls, obj, r=None):
+    def append_row(self, obj, r=None):
         r"""
         """
         if not r:
-            return obj.stack(vector([0] * obj.ncols()))
-        for x in r:
-            if not x in obj.base_ring():
-                raise TypeError("Value '%s' is not compatible!" % x)
+            return obj.stack(vector([self.cellzero] * obj.ncols()))
         if len(r) > obj.ncols():
             print("Row is too long. Truncating")
             r = r[:obj.ncols()]
         elif len(r) < obj.ncols():
-            r = list(r) + [0] * (obj.ncols() - len(r))
-        return obj.stack(vector(r))
+            r = list(r) + [self.cellzero] * (obj.ncols() - len(r))
+        return obj.stack(vector([self.unicode_to_cell(x) for x in r]))
 
-    @classmethod
-    def insert_row(cls, obj, index, r=None):
+    def insert_row(self, obj, index, r=None):
         r"""
         TESTS::
         sage: from sage.matrix.matrix_space import MatrixSpace
@@ -166,19 +175,16 @@ class MatrixGridViewAdapter(GridViewAdapter):
         [ 1  0 -3]
         """
         if not r:
-            r = [0] * obj.ncols()
+            r = [self.cellzero] * obj.ncols()
         else:
-            for x in r:
-                if not x in obj.base_ring():
-                    raise TypeError("Value '%s' is not compatible!" % x)
             if len(r) > obj.ncols():
                 print("Row is too long. Truncating")
                 r = r[:obj.ncols()]
             elif len(r) < obj.ncols():
-                r = list(r) + [0] * (obj.ncols() - len(r))
+                r = list(r) + [self.cellzero] * (obj.ncols() - len(r))
         top = obj.matrix_from_rows(range(index))
         bottom = obj.matrix_from_rows(range(index,obj.nrows()))
-        return top.stack(vector(r)).stack(bottom)
+        return top.stack(vector([self.unicode_to_cell(x) for x in r])).stack(bottom)
 
     @classmethod
     def remove_row(cls, obj, index=None):
@@ -201,24 +207,19 @@ class MatrixGridViewAdapter(GridViewAdapter):
             index = obj.nrows() - 1
         return obj.delete_rows([index])
 
-    @classmethod
-    def append_column(cls, obj, c=None):
+    def append_column(self, obj, c=None):
         r"""
         """
         if not c:
-            obj.augment(vector([0]*obj.nrows()))
-        for x in c:
-            if not x in obj.base_ring():
-                raise TypeError("Value '%s' is not compatible!" % x)
+            return obj.augment(vector([self.cellzero]*obj.nrows()))
         if len(c) > obj.nrows():
             print("Column is too long. Truncating")
             c = c[:obj.nrows()]
         elif len(c) < obj.nrows():
-            c = list(c) + [0] * (obj.nrows() - len(c))
-        return obj.augment(vector(c))
+            c = list(c) + [self.cellzero] * (obj.nrows() - len(c))
+        return obj.augment(vector([self.unicode_to_cell(x) for x in c]))
 
-    @classmethod
-    def insert_column(cls, obj, index, c=None):
+    def insert_column(self, obj, index, c=None):
         r"""
         TESTS::
         sage: from sage.matrix.matrix_space import MatrixSpace
@@ -239,19 +240,16 @@ class MatrixGridViewAdapter(GridViewAdapter):
         [ 1  0  2 -3]
         """
         if not c:
-            c = [0] * obj.nrows()
+            c = [self.cellzero] * obj.nrows()
         else:
-            for x in c:
-                if not x in obj.base_ring():
-                    raise TypeError("Value '%s' is not compatible!" % x)
             if len(c) > obj.nrows():
                 print("Column is too long. Truncating")
                 c = c[:obj.nrows()]
             elif len(c) < obj.nrows():
-                c = list(c) + [0] * (obj.nrows() - len(c))
+                c = list(c) + [self.cellzero] * (obj.nrows() - len(c))
         left = obj.matrix_from_columns(range(index))
         right = obj.matrix_from_columns(range(index,obj.ncols()))
-        return left.augment(vector(c)).augment(right)
+        return left.augment(vector([self.unicode_to_cell(x) for x in c])).augment(right)
 
     @classmethod
     def remove_column(cls, obj, index=None):

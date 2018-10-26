@@ -16,6 +16,16 @@ Generic Grid View Adapter
     :meth:`~GridViewAdapter._validate` | Validate a new object
     :meth:`~GridViewAdapter.get_cell` | Get the object cell content
     :meth:`~GridViewAdapter.set_cell` | Set the object cell content
+    :meth:`~GridViewAdapter.addable_cells` | List addable cells
+    :meth:`~GridViewAdapter.removable_cells` | List removable cells
+    :meth:`~GridViewAdapter.add_cell` | Add a cell at given position
+    :meth:`~GridViewAdapter.remove_cell` | Remove a cell from given position
+    :meth:`~GridViewAdapter.append_row` | Append a row
+    :meth:`~GridViewAdapter.insert_row` | Insert a row at given index
+    :meth:`~GridViewAdapter.remove_row` | Remove a row at given index
+    :meth:`~GridViewAdapter.append_column` | Append a column
+    :meth:`~GridViewAdapter.insert_column` | Insert a column at given index
+    :meth:`~GridViewAdapter.remove_column` | Remove a column at given index
 
 AUTHORS:
 - Odile Bénassy, Nicolas Thiéry
@@ -111,9 +121,8 @@ class GridViewAdapter(object):
         and get a still valid Sage object for this adapter.
         """
 
-    @classmethod
     @abstract_method(optional = True)
-    def add_cell(obj, cls, pos, val):
+    def add_cell(self, obj, pos, val):
         r"""
         If possible, add a cell to object `obj`
         at position `pos` and with value `val`.
@@ -127,17 +136,15 @@ class GridViewAdapter(object):
         at position `pos`.
         """
 
-    @classmethod
     @abstract_method(optional = True)
-    def append_row(cls, obj, r=None):
+    def append_row(self, obj, r=None):
         r"""
         If possible, append a row to object `obj`
         with values from list `r`.
         """
 
-    @classmethod
     @abstract_method(optional = True)
-    def insert_row(obj, index, r=None):
+    def insert_row(self, obj, index, r=None):
         r"""
         If possible, insert a row to object `obj`
         at index `index`, with values from list `r`.
@@ -151,17 +158,15 @@ class GridViewAdapter(object):
         at index `index`.
         """
 
-    @classmethod
     @abstract_method(optional = True)
-    def append_column(cls, obj, r=None):
+    def append_column(self, obj, r=None):
         r"""
         If possible, append a column to object `obj`
         with values from list `r`.
         """
 
-    @classmethod
     @abstract_method(optional = True)
-    def insert_column(cls, obj, index, r=None):
+    def insert_column(self, obj, index, r=None):
         r"""
         If possible, insert a column to object `obj`
         at index `index`, with values from list `r`.

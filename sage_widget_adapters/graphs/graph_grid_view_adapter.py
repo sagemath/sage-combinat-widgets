@@ -45,10 +45,6 @@ class GraphGridViewAdapter(GridViewAdapter):
         return ''
 
     @staticmethod
-    def unicode_to_cell(s):
-        return None
-
-    @staticmethod
     def cell_to_bool(cell_content):
         return False
 
