@@ -101,7 +101,9 @@ class TableauGridViewAdapter(GridViewAdapter):
         try:
             return cls.objclass(tl)
         except:
-            raise ValueError("Value '%s' is not compatible!" % val)
+            print("Value '%s' is not compatible!" % val)
+        finally:
+            return obj
 
     @staticmethod
     def addable_cells(obj):
@@ -156,7 +158,8 @@ class TableauGridViewAdapter(GridViewAdapter):
         try:
             return cls.objclass(tl)
         except:
-            raise ValueError("Cannot create a %s with this list!" % cls.objclass)
+            print("Cell %s with value '%s' cannot be added to this object!" % (pos, val))
+            return obj
 
     @classmethod
     def remove_cell(cls, obj, pos):
@@ -183,3 +186,9 @@ class TableauGridViewAdapter(GridViewAdapter):
             return cls.objclass(tl)
         except:
             raise ValueError("Cannot create a %s with this list!" % cls.objclass)
+
+class SemistandardTableauGridViewAdapter(TableauGridViewAdapter):
+    objclass = SemistandardTableau
+
+class StandardTableauGridViewAdapter(SemistandardTableauGridViewAdapter):
+    objclass = StandardTableau
