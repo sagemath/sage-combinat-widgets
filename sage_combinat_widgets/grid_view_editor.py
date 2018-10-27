@@ -56,6 +56,13 @@ def get_adapter(obj):
     """
     from sage.combinat.tableau import Tableau
     if issubclass(obj.__class__, Tableau):
+        from sage.combinat.tableau import SemistandardTableau, StandardTableau
+        if issubclass(obj.__class__, StandardTableau):
+            from sage_widget_adapters.combinat.tableau_grid_view_adapter import StandardTableauGridViewAdapter
+            return StandardTableauGridViewAdapter()
+        if issubclass(obj.__class__, SemistandardTableau):
+            from sage_widget_adapters.combinat.tableau_grid_view_adapter import SemistandardTableauGridViewAdapter
+            return SemistandardTableauGridViewAdapter()
         from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
         return TableauGridViewAdapter()
     from sage.matrix.matrix2 import Matrix
@@ -361,12 +368,14 @@ class GridViewEditor(BindableEditorClass):
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
         try:
-            obj = self.adapter.add_cell(obj, pos, val)
+            new_obj = self.adapter.add_cell(obj, pos, val)
         except:
             raise ValueError("Unable to add cell (position=%s and value=%s)" % (str(pos), str(val)))
-        if not self.validate(obj):
+        if not self.validate(new_obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
-        self.value = obj
+        if new_obj == obj: # The proposed change was invalid -> stop here
+            return
+        self.value = new_obj
         self.cells[pos] = val
         # Adding a new trait and more addable cell(s)
         traits_to_add = {}
@@ -409,9 +418,9 @@ class GridViewEditor(BindableEditorClass):
         """
         if not change.name.startswith('cell_'):
             return
-        if not hasattr(self.adapter, 'add_cell'):
-            raise TypeError("Cannot add cell to this object.")
-        if hasattr(self.adapter.add_cell, '_optional') and self.adapter.add_cell._optional: # Not implemented
+        if not hasattr(self.adapter, 'remove_cell'):
+            raise TypeError("Cannot remove cell from this object.")
+        if hasattr(self.adapter.remove_cell, '_optional') and self.adapter.remove_cell._optional: # Not implemented
             return
         if change.old == traitlets.Undefined: # Do nothing ar widget initializing
             return
@@ -420,17 +429,17 @@ class GridViewEditor(BindableEditorClass):
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
         try:
-            obj = self.adapter.remove_cell(obj, pos)
+            new_obj = self.adapter.remove_cell(obj, pos)
         except:
             raise ValueError("Unable to remove cell (position=%s)" % str(pos))
-        if not self.validate(obj):
+        if not self.validate(new_obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
         del(self.cells[pos])
         traitname = 'cell_%d_%d' % pos
         if self.has_trait(traitname):
             del(self.traits()[traitname])
             #del(self._trait_values[traitname])
-        self.value = obj
+        self.value = new_obj
         self.draw()
 
     def append_row(self, r=None):
