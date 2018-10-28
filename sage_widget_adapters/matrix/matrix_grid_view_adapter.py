@@ -50,13 +50,18 @@ class MatrixGridViewAdapter(GridViewAdapter):
         super(MatrixGridViewAdapter, self).__init__()
         self.ring = obj.base_ring()
         try:
-            self.celltype = obj.base_ring().random_element().__class__
+            self.celltype = self.ring.element_class
         except:
             try:
-                self.celltype = obj.base_ring().an_element().__class__
+                if hasattr(self.ring, 'an_element'):
+                    self.celltype = self.ring.an_element().__class__
+                elif hasattr(self.ring, 'random_element'):
+                    self.celltype = self.ring.random_element().__class__
+                else:
+                    raise TypeError("Cannot determine matrix base ring elements class.")
             except:
                 raise TypeError("Cannot determine matrix base ring elements class.")
-        self.cellzero = obj.base_ring().zero()
+        self.cellzero = self.ring.zero()
 
     def unicode_to_cell(self, s):
         r"""
@@ -65,10 +70,10 @@ class MatrixGridViewAdapter(GridViewAdapter):
         """
         if s:
             try:
-                return self.celltype(s)
+                return self.ring(s)
             except:
                 try:
-                    return self.ring(s)
+                    return self.celltype(s)
                 except:
                     raise ValueError("Cannot cast unicode %s to object %s cell" % (s, self.value))
         return self.cellzero
