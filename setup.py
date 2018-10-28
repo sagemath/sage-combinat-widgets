@@ -14,6 +14,9 @@ def readfile(filename):
 # For the tests
 class SageTest(TestCommand):
     def run_tests(self):
+        errno = os.system("sage -t --force-lib sage_widget_adapters")
+        if errno != 0:
+            sys.exit(1)
         errno = os.system("sage -t --force-lib sage_combinat_widgets")
         if errno != 0:
             sys.exit(1)
