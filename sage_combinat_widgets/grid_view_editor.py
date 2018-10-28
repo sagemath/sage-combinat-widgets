@@ -309,7 +309,7 @@ class GridViewEditor(BindableEditorClass):
         r"""
         TESTS:
         sage: from sage_combinat_widgets import GridViewEditor
-        sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+        sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
         sage: e = GridViewEditor(t)
         sage: from traitlets import Bunch
         sage: change = Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'})
@@ -349,13 +349,19 @@ class GridViewEditor(BindableEditorClass):
         r"""
         TESTS:
         sage: from sage_combinat_widgets import GridViewEditor
-        sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+        sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
         sage: e = GridViewEditor(t)
         sage: from traitlets import Bunch
-        sage: change = Bunch({'name': 'add_1_1', 'old': 0, 'new': 7, 'owner': e, 'type': 'change'})
+        sage: change = Bunch({'name': 'add_1_1', 'old': 0, 'new': 8, 'owner': e, 'type': 'change'})
         sage: e.add_cell(change)
         sage: e.value
-        [[1, 2, 5, 6], [3, 7], [4]]
+        [[1, 2, 5, 6], [3, 8], [4]]
+        sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+        sage: e = GridViewEditor(t)
+        sage: e.add_cell(change)
+        Cell (1, 1) with value '8' cannot be added to this object!
+        sage: e.value
+        [[1, 2, 5, 6], [3], [4]]
         """
         if not change.name.startswith('add_') \
            or self.to_cell(change.new) == self.adapter.cellzero:
@@ -367,10 +373,7 @@ class GridViewEditor(BindableEditorClass):
         val = change.new
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
-        try:
-            new_obj = self.adapter.add_cell(obj, pos, val)
-        except:
-            raise ValueError("Unable to add cell (position=%s and value=%s)" % (str(pos), str(val)))
+        new_obj = self.adapter.add_cell(obj, pos, val)
         if not self.validate(new_obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
         if new_obj == obj: # The proposed change was invalid -> stop here
@@ -406,7 +409,7 @@ class GridViewEditor(BindableEditorClass):
         r"""
         TESTS:
         sage: from sage_combinat_widgets import GridViewEditor
-        sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+        sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
         sage: e = GridViewEditor(t)
         sage: from traitlets import Bunch
         sage: e.remove_cell(Bunch({'name': 'cell_0_3', 'old': 6, 'new': 0, 'owner': e, 'type': 'change'}))
