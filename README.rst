@@ -24,7 +24,7 @@ Local install from source
 
 Download the source from the git repository::
 
-    $ git clone https://github.com/nthiery/odile/sage_combinat_widgets.git
+    $ git clone https://github.com/sagemath/sage-combinat-widgets.git
 
 Change to the root directory and run::
 
@@ -41,11 +41,10 @@ Usage
 
 Once the package is installed, you can use it in Sage Jupyter Notebook.
 
-    from sage_combinat_widgets import TableauWidget
-    S = StandardTableaux(15)
-    t = S.random_element()
+    from sage_combinat_widgets import GridViewWidget
+    S = StandardTableaux(15).random_element()
     w = TableauWidget(t)
-    display(w)
+    w
 
 See the `demo notebook <demo_GridViewWidget.ipynb>`_.
 
