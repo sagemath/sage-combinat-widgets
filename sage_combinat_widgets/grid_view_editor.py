@@ -325,6 +325,9 @@ class GridViewEditor(BindableEditorClass):
         val = change.new
         obj = copy(self.value)
         new_obj = self.adapter.set_cell(obj, pos, val)
+        if new_obj == obj:
+            # FIXME reverse the display change
+            return
         self.set_value(new_obj)
         # Edit the cell dictionary
         self.cells[pos] = val
@@ -377,6 +380,7 @@ class GridViewEditor(BindableEditorClass):
         if not self.validate(new_obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
         if new_obj == obj: # The proposed change was invalid -> stop here
+            # FIXME reverse the display change
             return
         self.value = new_obj
         self.cells[pos] = val
@@ -431,12 +435,12 @@ class GridViewEditor(BindableEditorClass):
             return
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
-        try:
-            new_obj = self.adapter.remove_cell(obj, pos)
-        except:
-            raise ValueError("Unable to remove cell (position=%s)" % str(pos))
+        new_obj = self.adapter.remove_cell(obj, pos)
         if not self.validate(new_obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
+        if new_obj == obj: # The proposed change was invalid -> stop here
+            # FIXME reverse the display change
+            return
         del(self.cells[pos])
         traitname = 'cell_%d_%d' % pos
         if self.has_trait(traitname):

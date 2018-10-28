@@ -5,6 +5,7 @@ from sage.misc.misc import uniq
 from traitlets import observe
 
 textcell_layout = Layout(width='3em',height='2em', margin='0', padding='0')
+textcell_wider_layout = Layout(width='7em',height='3em', margin='0', padding='0')
 buttoncell_layout = Layout(width='5em',height='4em', margin='0', padding='0')
 css_lines = []
 css_lines.append(".widget-text INPUT { border-collapse: collapse !important}")
@@ -36,6 +37,19 @@ class TextCell(Text):
 
     def __init__(self, content, position, layout=textcell_layout, **kws):
         super(TextCell, self).__init__(content, layout=layout, continuous_update=False, **kws)
+        self.position = position
+        self.add_class('gridcell')
+
+class WiderTextCell(Text):
+    r"""A regular text grid cell
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import WiderTextCell
+        sage: b = WiderTextCell('my text', (1,2))
+    """
+
+    def __init__(self, content, position, layout=textcell_wider_layout, **kws):
+        super(WiderTextCell, self).__init__(content, layout=layout, continuous_update=False, **kws)
         self.position = position
         self.add_class('gridcell')
 

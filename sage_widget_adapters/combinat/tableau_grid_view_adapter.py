@@ -184,7 +184,8 @@ class TableauGridViewAdapter(GridViewAdapter):
         try:
             return cls.objclass(tl)
         except:
-            raise ValueError("Cannot create a %s with this list!" % cls.objclass)
+            print("Cell (%s,%s) cannot be removed from this object!" % pos)
+            return obj
 
 class SemistandardTableauGridViewAdapter(TableauGridViewAdapter):
     objclass = SemistandardTableau
