@@ -102,7 +102,6 @@ class TableauGridViewAdapter(GridViewAdapter):
             return cls.objclass(tl)
         except:
             print("Value '%s' is not compatible!" % val)
-        finally:
             return obj
 
     @staticmethod
