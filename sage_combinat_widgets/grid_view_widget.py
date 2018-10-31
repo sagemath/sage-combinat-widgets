@@ -7,13 +7,16 @@ from traitlets import observe
 textcell_layout = Layout(width='3em',height='2em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em',height='3em', margin='0', padding='0')
 buttoncell_layout = Layout(width='5em',height='4em', margin='0', padding='0')
+buttoncell_smaller_layout = Layout(width='2em',height='2em', margin='0', padding='0')
 css_lines = []
 css_lines.append(".widget-text INPUT { border-collapse: collapse !important}")
-css_lines.append(".gridbutton {border:1px solid #999}")
-css_lines.append(".blankbutton {border:0px !important; background-color: white}")
+css_lines.append(".gridbutton {border:1px solid #999; color:#666}")
+css_lines.append(".blankbutton, .addablebutton {background-color: white; color:#666}")
+css_lines.append(".blankbutton {border:0px !important}")
 css_lines.append(".blankcell INPUT {border:0px !important}")
 css_lines.append(".addablecell INPUT, .removablecell INPUT {background-position: right top; background-size: 1em; background-repeat: no-repeat}")
-css_lines.append(".addablecell INPUT {border:1px dashed #999 !important; background-image: url('Plus.png')}")
+css_lines.append(".addablecell INPUT {background-image: url('Plus.png')}")
+css_lines.append(".addablecell INPUT, .addablebutton INPUT {border:1px dashed #999 !important}")
 css_lines.append(".removablecell INPUT {background-image: url('Minus.png')}")
 css = HTML("<style>%s</style>" % '\n'.join(css_lines))
 
@@ -62,9 +65,23 @@ class ButtonCell(Button):
     """
 
     def __init__(self, content, position, layout=buttoncell_layout, **kws):
-        super(ButtonCell, self).__init__(layout=layout, **kws)
+        super(ButtonCell, self).__init__(layout=layout, disabled=True, **kws)
         self.position = position
         self.add_class('gridbutton')
+
+class AddableButtonCell(Button):
+    r"""An addable placeholder for adding a button cell to the widget
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import AddableButtonCell
+        sage: a = AddableButtonCell((3,4))
+    """
+
+    def __init__(self, position, layout=buttoncell_layout, **kws):
+        super(AddableButtonCell, self).__init__(layout=layout, **kws)
+        self.position = position
+        self.add_class('addablebutton')
+        self.description = '+'
 
 class BlankCell(Text):
     r"""A blank placeholder cell
@@ -90,16 +107,16 @@ class BlankButton(Button):
         super(BlankButton, self).__init__(layout=layout, disabled=True)
         self.add_class('blankbutton')
 
-class AddableCell(Text):
+class AddableTextCell(Text):
     r"""An addable placeholder for adding a cell to the widget
 
     TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import AddableCell
-        sage: a = AddableCell((3,4))
+        sage: from sage_combinat_widgets.grid_view_widget import AddableTextCell
+        sage: a = AddableTextCell((3,4))
     """
 
     def __init__(self, position, layout=textcell_layout):
-        super(AddableCell, self).__init__('', layout=layout, continuous_update=False)
+        super(AddableTextCell, self).__init__('', layout=layout, continuous_update=False)
         self.position = position
         self.add_class('addablecell')
 
@@ -122,7 +139,7 @@ class GridViewWidget(GridViewEditor, VBox):
     r"""A widget for all grid-representable Sage objects
     """
 
-    def __init__(self, obj, cell_layout=None, cell_widget_classes=[TextCell], blank_widget_class=BlankCell, addable_widget_class=AddableCell):
+    def __init__(self, obj, cell_layout=None, cell_widget_classes=[TextCell], blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
         r"""
         TESTS::
 
@@ -224,7 +241,11 @@ class GridViewWidget(GridViewEditor, VBox):
                                              tooltip=compute_tooltip((i,j)) # For buttons, menus ..
                     )
                     if (i,j) in removable_positions:
-                        cell.add_class('removablecell')
+                        if issubclass(cell_widget_class, Button):
+                            cell.description = '-'
+                            cell.disabled = False
+                        else:
+                            cell.add_class('removablecell')
                     hbox_children.append(cell)
                 elif (i,j) in addable_positions:
                     hbox_children.append(self.addable_widget_class((i,j), self.cell_layout))
