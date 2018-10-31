@@ -95,7 +95,7 @@ class GridViewAdapter(object):
         """
 
     @classmethod
-    @abstract_method
+    @abstract_method(optional = True)
     def set_cell(cls, obj, pos, val):
         r"""
         From a Sage object, a position (pair of coordinates) `pos` and a value `val`,
