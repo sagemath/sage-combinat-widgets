@@ -5,7 +5,7 @@ Sage Combinat Widgets
 .. image:: https://mybinder.org/badge.svg
    :target: https://mybinder.org/v2/gh/sagemath/sage-combinat-widgets/master
 
-Jupyter editable widgets for Sage Combinat:
+Jupyter editable widgets for Sagemath objects:
 
 - Standard/Semi-standard/Generic Tableau
 
@@ -14,7 +14,7 @@ Jupyter editable widgets for Sage Combinat:
 Also : 
 
 - Matrices
-- Graphs
+- grid-representable Graphs
 
 Installation
 ------------
