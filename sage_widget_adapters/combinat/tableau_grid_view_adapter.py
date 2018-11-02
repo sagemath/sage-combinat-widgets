@@ -9,7 +9,8 @@ Grid View Adapter for tableaux
     :widths: 30, 70
     :delim: |
 
-    :meth:`~TableauGridViewAdapter.unicode_to_cell` | Static method for typecasting unicode to cell content
+    :meth:`~TableauGridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
+    :meth:`~TableauGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
     :meth:`~TableauGridViewAdapter.compute_cells` | Compute tableau cells as a dictionary { coordinate pair : Integer }
     :meth:`~TableauGridViewAdapter.from_cells` | Create a new tableau from a cells dictionary
     :meth:`~TableauGridViewAdapter.get_cell` | Get the tableau cell content
@@ -85,8 +86,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         except:
             raise ValueError("Cell %s does not exist!" % str(pos))
 
-    @classmethod
-    def set_cell(cls, obj, pos, val):
+    def set_cell(self, obj, pos, val):
         r"""
         Set cell value
         TESTS::
@@ -99,7 +99,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         tl = obj.to_list()
         tl[pos[0]][pos[1]] = val
         try:
-            return cls.objclass(tl)
+            return self.objclass(tl)
         except:
             print("Value '%s' is not compatible!" % val)
             return obj

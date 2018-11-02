@@ -9,8 +9,8 @@ Generic Grid View Adapter
     :widths: 30, 70
     :delim: |
 
-    :meth:`~GridViewAdapter.cell_to_unicode` | Static method for typecasting cell content to unicode
-    :meth:`~GridViewAdapter.unicode_to_cell` | Static method for typecasting unicode to cell content
+    :meth:`~GridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
+    :meth:`~GridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
     :meth:`~GridViewAdapter.compute_cells` | Compute object cells as a dictionary { coordinate pair : integer }
     :meth:`~GridViewAdapter.from_cells` | Create a new Sage object from a cells dictionary
     :meth:`~GridViewAdapter._validate` | Validate a new object
@@ -40,20 +40,22 @@ class GridViewAdapter(object):
     traitclass = traitlets.Instance
 
     @staticmethod
-    def cell_to_unicode(cell_content):
+    def cell_to_display(cell_content, display_type):
         r"""
         From a cell value `cell_content`,
         return matching unicode string.
         """
-        return str(cell_content)
+        if display_type == unicode:
+            return str(cell_content)
+        return cell_content
 
-    def unicode_to_cell(self, s):
+    def display_to_cell(self, display_value, display_type):
         r"""
         From an unicode string `s`,
         return matching cell value.
         """
-        if s:
-            return self.celltype(s)
+        if display_value:
+            return self.celltype(display_value)
         return self.cellzero
 
     @staticmethod
@@ -94,14 +96,14 @@ class GridViewAdapter(object):
         return the object cell value at position `pos`.
         """
 
-    @classmethod
-    @abstract_method(optional = True)
-    def set_cell(cls, obj, pos, val):
+    def set_cell(self, obj, pos, val):
         r"""
         From a Sage object, a position (pair of coordinates) `pos` and a value `val`,
         return a new Sage object.
         with a modified cell at position `pos`.
         """
+        if hasattr(self, 'cellzero'):
+            return self.cellzero
 
     @staticmethod
     @abstract_method(optional = True)

@@ -9,8 +9,8 @@ Grid View Adapter for matrices
     :widths: 30, 70
     :delim: |
 
-    :meth:`~TableauGridViewAdapter.cell_to_unicode` | Static method for typecasting cell content to unicode
-    :meth:`~TableauGridViewAdapter.unicode_to_cell` | Static method for typecasting unicode to cell content
+    :meth:`~GridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
+    :meth:`~GridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
     :meth:`~MatrixGridViewAdapter.compute_cells` | Compute matrix cells as a dictionary { coordinate pair : label }
     :meth:`~MatrixGridViewAdapter.from_cells` | Create a new matrix from a cells dictionary
     :meth:`~MatrixGridViewAdapter.get_cell` | Get the matrix cell value
@@ -63,19 +63,19 @@ class MatrixGridViewAdapter(GridViewAdapter):
                 raise TypeError("Cannot determine matrix base ring elements class.")
         self.cellzero = self.ring.zero()
 
-    def unicode_to_cell(self, s):
+    def display_to_cell(self, display_value, display_type=unicode):
         r"""
-        From an unicode string `s`,
+        From a widget display value `display_value`,
         return matching cell value.
         """
-        if s:
+        if display_value:
             try:
-                return self.ring(s)
+                return self.ring(display_value)
             except:
                 try:
-                    return self.celltype(s)
+                    return self.celltype(display_value)
                 except:
-                    raise ValueError("Cannot cast unicode %s to object %s cell" % (s, self.value))
+                    raise ValueError("Cannot cast display value %s to object %s cell" % (display_value, self.value))
         return self.cellzero
 
     @staticmethod
@@ -105,8 +105,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
             raise ValueError("Entry '%s' does not exist!" % pos)
         return obj[pos[0]][pos[1]]
 
-    @classmethod
-    def set_cell(cls, obj, pos, val):
+    def set_cell(self, obj, pos, val):
         r"""
         Edit matrix cell
         TESTS::
@@ -162,7 +161,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
             r = r[:obj.ncols()]
         elif len(r) < obj.ncols():
             r = list(r) + [self.cellzero] * (obj.ncols() - len(r))
-        return obj.stack(vector([self.unicode_to_cell(x) for x in r]))
+        return obj.stack(vector([self.display_to_cell(x) for x in r]))
 
     def insert_row(self, obj, index, r=None):
         r"""
@@ -189,7 +188,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
                 r = list(r) + [self.cellzero] * (obj.ncols() - len(r))
         top = obj.matrix_from_rows(range(index))
         bottom = obj.matrix_from_rows(range(index,obj.nrows()))
-        return top.stack(vector([self.unicode_to_cell(x) for x in r])).stack(bottom)
+        return top.stack(vector([self.display_to_cell(x) for x in r])).stack(bottom)
 
     @classmethod
     def remove_row(cls, obj, index=None):
@@ -222,7 +221,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
             c = c[:obj.nrows()]
         elif len(c) < obj.nrows():
             c = list(c) + [self.cellzero] * (obj.nrows() - len(c))
-        return obj.augment(vector([self.unicode_to_cell(x) for x in c]))
+        return obj.augment(vector([self.display_to_cell(x) for x in c]))
 
     def insert_column(self, obj, index, c=None):
         r"""
@@ -254,7 +253,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
                 c = list(c) + [self.cellzero] * (obj.nrows() - len(c))
         left = obj.matrix_from_columns(range(index))
         right = obj.matrix_from_columns(range(index,obj.ncols()))
-        return left.augment(vector([self.unicode_to_cell(x) for x in c])).augment(right)
+        return left.augment(vector([self.display_to_cell(x) for x in c])).augment(right)
 
     @classmethod
     def remove_column(cls, obj, index=None):

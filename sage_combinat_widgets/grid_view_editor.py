@@ -182,10 +182,6 @@ class GridViewEditor(BindableEditorClass):
         """
         if obj_class:
             return issubclass(obj.__class__, obj_class)
-        try:
-            cells = list(obj)
-        except:
-            raise TypeError("Is this object really grid-representable?")
         return issubclass(obj.__class__, SageObject)
 
     def modified_add_traits(self, **traits):
@@ -270,7 +266,7 @@ class GridViewEditor(BindableEditorClass):
         return self.value
 
     def set_value(self, obj, compute=False):
-        if not self.validate(obj):
+        if not self.validate(obj, self.value.__class__):
             raise ValueError("Object %s is not compatible." % str(obj))
         self.value = obj
         if compute:

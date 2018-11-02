@@ -9,14 +9,14 @@ Grid View Adapter for grid-representable graphs
     :widths: 30, 70
     :delim: |
 
-    :meth:`~TableauGridViewAdapter.cell_to_unicode` | Static method for typecasting cell content to unicode
-    :meth:`~TableauGridViewAdapter.unicode_to_cell` | Static method for typecasting unicode to cell content
-    :meth:`~TableauGridViewAdapter.cell_to_bool` | Static method for typecasting cell content to boolean
-    :meth:`~TableauGridViewAdapter.bool_to_cell` | Static method for typecasting boolean to cell content
+    :meth:`~GraphGridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
+    :meth:`~GraphGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
+    :meth:`~GraphGridViewAdapter.cell_to_bool` | Static method for typecasting cell content to boolean
+    :meth:`~GraphGridViewAdapter.bool_to_cell` | Static method for typecasting boolean to cell content
     :meth:`~GraphGridViewAdapter.compute_cells` | Compute graph cells as a dictionary { coordinate pair : label }
     :meth:`~GraphGridViewAdapter.from_cells` | Create a new graph from a cells dictionary
-    :meth:`~TableauGridViewAdapter.get_cell` | Get the graph cell content (i.e. None)
-    :meth:`~TableauGridViewAdapter.set_cell` | Set the graph cell content (does nothing)
+    :meth:`~GraphGridViewAdapter.get_cell` | Get the graph cell content (i.e. None)
+    :meth:`~GraphGridViewAdapter.set_cell` | Set the graph cell content (does nothing)
     :meth:`~GraphGridViewAdapter.addable_cells` | List addable cells
     :meth:`~GraphGridViewAdapter.removable_cells` | List removable cells
     :meth:`~GraphGridViewAdapter.add_cell` | Add a cell
@@ -41,16 +41,23 @@ class GraphGridViewAdapter(GridViewAdapter):
     cellzero = False
 
     @staticmethod
-    def cell_to_unicode(cell_content):
-        return ''
+    def cell_to_display(cell_content, display_type=bool):
+        r"""
+        From object cell content
+        to widget display value
+        """
+        if display_type == unicode:
+            return ''
+        return cell_content
 
-    @staticmethod
-    def cell_to_bool(cell_content):
-        return False
-
-    @staticmethod
-    def bool_to_cell(b):
-        return None
+    def display_to_cell(self, display_value, display_type=bool):
+        r"""
+        From widget cell value
+        to object display content
+        """
+        if not display_value or display_type == unicode:
+            return self.cellzero
+        return display_value
 
     @staticmethod
     def compute_cells(obj):
@@ -98,10 +105,6 @@ class GraphGridViewAdapter(GridViewAdapter):
     @staticmethod
     def get_cell(obj, pos):
         return None
-
-    @classmethod
-    def set_cell(cls, obj, pos, val):
-        pass
 
     @staticmethod
     def addable_cells(obj):
