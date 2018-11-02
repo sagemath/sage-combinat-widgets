@@ -2,7 +2,7 @@
 Sage Combinat Widgets
 =====================
 
-.. commented image:: https://mybinder.org/badge.svg
+.. image:: https://mybinder.org/badge.svg
    :target: https://mybinder.org/v2/gh/sagemath/sage-combinat-widgets/master
 
 Jupyter editable widgets for Sage Combinat:
