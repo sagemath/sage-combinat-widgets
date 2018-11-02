@@ -96,14 +96,26 @@ class GridViewAdapter(object):
         return the object cell value at position `pos`.
         """
 
-    def set_cell(self, obj, pos, val):
+    @classmethod
+    def set_cell(cls, obj, pos, val):
         r"""
         From a Sage object, a position (pair of coordinates) `pos` and a value `val`,
         return a new Sage object.
         with a modified cell at position `pos`.
+        TESTS::
+        sage: from sage.combinat.tableau import Tableau
+        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
+        sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
+        sage: TableauGridViewAdapter.set_cell(t, (1,1), 8)
+        [[1, 2, 5, 6], [3, 8], [4]]
         """
-        if hasattr(self, 'cellzero'):
-            return self.cellzero
+        l = obj.to_list()
+        l[pos[0]][pos[1]] = val
+        try:
+            return cls.objclass(l)
+        except:
+            print("Value '%s' is not compatible!" % val)
+            return obj
 
     @staticmethod
     @abstract_method(optional = True)
