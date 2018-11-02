@@ -90,7 +90,7 @@ class ButtonCell(ToggleButton):
 
     TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
-        sage: b = ButtonCell('None', (1,2))
+        sage: b = ButtonCell(True, (1,2))
     """
     displaytype = bool
 

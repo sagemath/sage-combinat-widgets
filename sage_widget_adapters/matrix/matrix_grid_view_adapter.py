@@ -105,7 +105,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
             raise ValueError("Entry '%s' does not exist!" % pos)
         return obj[pos[0]][pos[1]]
 
-    def set_cell(self, obj, pos, val):
+    @classmethod
+    def set_cell(cls, obj, pos, val):
         r"""
         Edit matrix cell
         TESTS::

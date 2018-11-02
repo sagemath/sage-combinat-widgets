@@ -86,24 +86,6 @@ class TableauGridViewAdapter(GridViewAdapter):
         except:
             raise ValueError("Cell %s does not exist!" % str(pos))
 
-    def set_cell(self, obj, pos, val):
-        r"""
-        Set cell value
-        TESTS::
-        sage: from sage.combinat.tableau import Tableau
-        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
-        sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
-        sage: TableauGridViewAdapter.set_cell(t, (1,1), 8)
-        [[1, 2, 5, 6], [3, 8], [4]]
-        """
-        tl = obj.to_list()
-        tl[pos[0]][pos[1]] = val
-        try:
-            return self.objclass(tl)
-        except:
-            print("Value '%s' is not compatible!" % val)
-            return obj
-
     @staticmethod
     def addable_cells(obj):
         r"""
