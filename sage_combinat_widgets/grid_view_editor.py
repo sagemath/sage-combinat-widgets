@@ -432,9 +432,11 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot remove cell from this object.")
         if hasattr(self.adapter.remove_cell, '_optional') and self.adapter.remove_cell._optional: # Not implemented
             return
-        if change.old == traitlets.Undefined: # Do nothing ar widget initializing
+        if change.old == traitlets.Undefined: # Do nothing at widget initializing
             return
-        if change.new: # should probably compare to cellzero
+        if change.new == True: # if it's a button, reverse button toggling
+            change.new = False
+        if change.new != self.adapter.cellzero: # non empty cells are not to be removed
             return
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
