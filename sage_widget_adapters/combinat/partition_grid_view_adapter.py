@@ -9,7 +9,8 @@ Grid View Adapter for partitions
     :widths: 30, 70
     :delim: |
 
-    :meth:`~PartitionGridViewAdapter.unicode_to_cell` | Static method for typecasting unicode to cell content
+    :meth:`~PartitionGridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
+    :meth:`~PartitionGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
     :meth:`~PartitionGridViewAdapter.compute_cells` | Compute partition cells as a dictionary { coordinate pair : Integer }
     :meth:`~PartitionGridViewAdapter.from_cells` | Create a new partition from a cells dictionary
     :meth:`~PartitionGridViewAdapter.get_cell` | Get the partition cell content
@@ -31,20 +32,23 @@ class PartitionGridViewAdapter(GridViewAdapter):
     cellzero = False
 
     @staticmethod
-    def cell_to_unicode(cell_content):
-        return ''
-
-    @staticmethod
-    def unicode_to_cell(s):
-        return False
-
-    @staticmethod
-    def cell_to_bool(cell_content):
+    def cell_to_display(cell_content, display_type=bool):
+        r"""
+        From object cell content
+        to widget display value
+        """
+        if display_type == unicode:
+            return ''
         return cell_content
 
-    @staticmethod
-    def bool_to_cell(b):
-        return b
+    def display_to_cell(self, display_value, display_type=bool):
+        r"""
+        From widget cell value
+        to object display content
+        """
+        if not display_value or display_type == unicode:
+            return self.cellzero
+        return display_value
 
     @staticmethod
     def compute_cells(obj):

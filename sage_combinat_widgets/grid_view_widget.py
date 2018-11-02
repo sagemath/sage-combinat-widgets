@@ -1,6 +1,6 @@
 from .grid_view_editor import *
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, Button
+from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, ToggleButton
 from sage.misc.misc import uniq
 from traitlets import observe
 
@@ -37,6 +37,7 @@ class TextCell(Text):
         sage: from sage_combinat_widgets.grid_view_widget import TextCell
         sage: b = TextCell('my text', (1,2))
     """
+    displaytype = unicode
 
     def __init__(self, content, position, layout=textcell_layout, **kws):
         super(TextCell, self).__init__(content, layout=layout, continuous_update=False, **kws)
@@ -50,38 +51,12 @@ class WiderTextCell(Text):
         sage: from sage_combinat_widgets.grid_view_widget import WiderTextCell
         sage: b = WiderTextCell('my text', (1,2))
     """
+    displaytype = unicode
 
     def __init__(self, content, position, layout=textcell_wider_layout, **kws):
         super(WiderTextCell, self).__init__(content, layout=layout, continuous_update=False, **kws)
         self.position = position
         self.add_class('gridcell')
-
-class ButtonCell(Button):
-    r"""A button grid cell
-
-    TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
-        sage: b = ButtonCell('None', (1,2))
-    """
-
-    def __init__(self, content, position, layout=buttoncell_layout, **kws):
-        super(ButtonCell, self).__init__(layout=layout, disabled=True, **kws)
-        self.position = position
-        self.add_class('gridbutton')
-
-class AddableButtonCell(Button):
-    r"""An addable placeholder for adding a button cell to the widget
-
-    TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import AddableButtonCell
-        sage: a = AddableButtonCell((3,4))
-    """
-
-    def __init__(self, position, layout=buttoncell_layout, **kws):
-        super(AddableButtonCell, self).__init__(layout=layout, **kws)
-        self.position = position
-        self.add_class('addablebutton')
-        self.description = '+'
 
 class BlankCell(Text):
     r"""A blank placeholder cell
@@ -90,22 +65,11 @@ class BlankCell(Text):
         sage: from sage_combinat_widgets.grid_view_widget import BlankCell
         sage: b = BlankCell()
     """
+    displaytype = unicode
 
     def __init__(self, layout=textcell_layout):
         super(BlankCell, self).__init__('', layout=layout, disabled=True)
         self.add_class('blankcell')
-
-class BlankButton(Button):
-    r"""A blank placeholder button
-
-    TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import BlankButton
-        sage: b = BlankButton()
-    """
-
-    def __init__(self, layout=buttoncell_layout):
-        super(BlankButton, self).__init__(layout=layout, disabled=True)
-        self.add_class('blankbutton')
 
 class AddableTextCell(Text):
     r"""An addable placeholder for adding a cell to the widget
@@ -114,11 +78,54 @@ class AddableTextCell(Text):
         sage: from sage_combinat_widgets.grid_view_widget import AddableTextCell
         sage: a = AddableTextCell((3,4))
     """
+    displaytype = unicode
 
     def __init__(self, position, layout=textcell_layout):
         super(AddableTextCell, self).__init__('', layout=layout, continuous_update=False)
         self.position = position
         self.add_class('addablecell')
+
+class ButtonCell(ToggleButton):
+    r"""A button grid cell
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
+        sage: b = ButtonCell('None', (1,2))
+    """
+    displaytype = bool
+
+    def __init__(self, content, position, layout=buttoncell_layout, **kws):
+        super(ButtonCell, self).__init__(content, layout=layout, disabled=True, **kws)
+        self.position = position
+        self.add_class('gridbutton')
+
+class AddableButtonCell(ToggleButton):
+    r"""An addable placeholder for adding a button cell to the widget
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import AddableButtonCell
+        sage: a = AddableButtonCell((3,4))
+    """
+    displaytype = bool
+
+    def __init__(self, position, layout=buttoncell_layout, **kws):
+        super(AddableButtonCell, self).__init__(layout=layout, **kws)
+        self.position = position
+        self.add_class('addablebutton')
+        self.description = '+'
+
+class BlankButton(ToggleButton):
+    r"""A blank placeholder button
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import BlankButton
+        sage: b = BlankButton()
+    """
+    displaytype = bool
+
+    def __init__(self, layout=buttoncell_layout):
+        super(BlankButton, self).__init__(layout=layout, disabled=True)
+        self.add_class('blankbutton')
 
 def compute_tooltip(t):
     r"""From a tuple (i,j),
@@ -156,15 +163,14 @@ class GridViewWidget(GridViewEditor, VBox):
         if not cell_layout:
             if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
                 cell_layout = buttoncell_layout
-                cast = self.adapter.bool_to_cell
             else:
                 cell_layout = textcell_layout
-                cast = self.adapter.unicode_to_cell
         self.cell_layout = cell_layout
         self.cell_widget_classes = cell_widget_classes
+        self.displaytype = cell_widget_classes[0].displaytype
+        self.cast = lambda x:self.adapter.display_to_cell(x, self.displaytype)
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
-        self.cast = cast
         self.draw()
 
     def to_cell(self, val):
@@ -230,10 +236,7 @@ class GridViewWidget(GridViewEditor, VBox):
                 if (i,j) in positions:
                     cell_content = self.cells[(i,j)]
                     cell_widget_class = self.cell_widget_classes[cell_widget_class_index((i,j))]
-                    if cell_content is None:
-                        cell_string = ''
-                    else:
-                        cell_string = self.adapter.cell_to_unicode(cell_content)
+                    cell_string = self.adapter.cell_to_display(cell_content, self.displaytype)
                     cell = cell_widget_class(cell_string,
                                              (i,j),
                                              self.cell_layout,
@@ -241,7 +244,7 @@ class GridViewWidget(GridViewEditor, VBox):
                                              tooltip=compute_tooltip((i,j)) # For buttons, menus ..
                     )
                     if (i,j) in removable_positions:
-                        if issubclass(cell_widget_class, Button):
+                        if issubclass(cell_widget_class, ToggleButton):
                             cell.description = '-'
                             cell.disabled = False
                         else:
