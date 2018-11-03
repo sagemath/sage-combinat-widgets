@@ -87,17 +87,27 @@ class TableauGridViewAdapter(GridViewAdapter):
             raise ValueError("Cell %s does not exist!" % str(pos))
 
     @staticmethod
-    def addable_cells(obj):
+    def addable_cells(obj, borders=False):
         r"""
         List object addable cells
         TESTS::
         sage: from sage.combinat.tableau import Tableau
         sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
-        sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
-        sage: TableauGridViewAdapter.addable_cells(t)
-        [(0, 4), (1, 2), (2, 1), (3, 0)]
+        sage: t = Tableau([[1, 3, 4, 8, 12, 14, 15], [2, 7, 11, 13], [5, 9], [6, 10]])
+        sage: TableauGridViewAdapter.addable_cells(t, True)
+        ([(0, 7), (1, 4), (2, 2), (4, 0)], [(0, 7), (1, 4), (2, 2)], [(1, 4), (2, 2), (4, 0)])
         """
-        return obj.shape().outside_corners()
+        addable_cells = obj.shape().outside_corners()
+        if not borders:
+            return addable_cells
+        no_left_border = [pos for pos in addable_cells if pos[0] < len(obj)]
+        no_top_border = []
+        prev = None
+        for pos in addable_cells:
+            if prev and pos[0] and pos[1] < prev[1]:
+               no_top_border.append(pos)
+            prev = pos
+        return addable_cells, no_left_border, no_top_border
 
     @staticmethod
     def removable_cells(obj):
