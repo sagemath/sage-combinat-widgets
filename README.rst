@@ -8,8 +8,8 @@ Sage Combinat Widgets
 Jupyter editable widgets for Sagemath objects:
 
 - Standard/Semi-standard/Generic Tableau
-
-  .. commented - Partition
+- Partition
+- Skew Tableau
 
 Also : 
 
