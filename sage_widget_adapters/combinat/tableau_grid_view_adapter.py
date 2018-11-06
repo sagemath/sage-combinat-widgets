@@ -120,6 +120,7 @@ class TableauGridViewAdapter(GridViewAdapter):
     def removable_cells(obj):
         r"""
         List object removable cells
+
         TESTS
         ::
             sage: from sage.combinat.tableau import Tableau
@@ -134,6 +135,7 @@ class TableauGridViewAdapter(GridViewAdapter):
     def add_cell(cls, obj, pos, val):
         r"""
         Add cell
+
         TESTS
         ::
             sage: from sage.combinat.tableau import Tableau
@@ -165,6 +167,7 @@ class TableauGridViewAdapter(GridViewAdapter):
     def remove_cell(cls, obj, pos):
         r"""
         Remove cell
+
         TESTS
         ::
             sage: from sage.combinat.tableau import Tableau
@@ -204,13 +207,15 @@ class StandardTableauGridViewAdapter(SemistandardTableauGridViewAdapter):
     @staticmethod
     def removable_cells(obj):
         r"""
-        There is only one removable cell for a Standard Tableau
-        TESTS::
-        sage: from sage.combinat.tableau import StandardTableau
-        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import StandardTableauGridViewAdapter
-        sage: t = StandardTableau([[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]])
-        sage: StandardTableauGridViewAdapter.removable_cells(t)
-        [(3, 1)]
+        There is only one removable cell for a Standard Tableau.
+
+        TESTS
+        ::
+            sage: from sage.combinat.tableau import StandardTableau
+            sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import StandardTableauGridViewAdapter
+            sage: t = StandardTableau([[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]])
+            sage: StandardTableauGridViewAdapter.removable_cells(t)
+            [(3, 1)]
         """
         return [pos for pos in TableauGridViewAdapter.removable_cells(obj) \
                     if obj[pos[0]][pos[1]]==obj.size()]
