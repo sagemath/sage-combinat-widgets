@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+r"""
+An editable Grid View Widget for Sage Jupyter Notebook
+
+AUTHORS: Odile Bénassy, Nicolas Thiéry
+"""
 from .grid_view_editor import *
 from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, ToggleButton
@@ -33,7 +39,8 @@ except:
 class TextCell(Text):
     r"""A regular text grid cell
 
-    TESTS::
+    TESTS
+    ::
         sage: from sage_combinat_widgets.grid_view_widget import TextCell
         sage: b = TextCell('my text', (1,2))
     """
@@ -47,7 +54,8 @@ class TextCell(Text):
 class WiderTextCell(Text):
     r"""A regular text grid cell
 
-    TESTS::
+    TESTS
+    ::
         sage: from sage_combinat_widgets.grid_view_widget import WiderTextCell
         sage: b = WiderTextCell('my text', (1,2))
     """
@@ -61,7 +69,8 @@ class WiderTextCell(Text):
 class BlankCell(Text):
     r"""A blank placeholder cell
 
-    TESTS::
+    TESTS
+    ::
         sage: from sage_combinat_widgets.grid_view_widget import BlankCell
         sage: b = BlankCell()
     """
@@ -74,7 +83,8 @@ class BlankCell(Text):
 class AddableTextCell(Text):
     r"""An addable placeholder for adding a cell to the widget
 
-    TESTS::
+    TESTS
+    ::
         sage: from sage_combinat_widgets.grid_view_widget import AddableTextCell
         sage: a = AddableTextCell((3,4))
     """
@@ -88,7 +98,8 @@ class AddableTextCell(Text):
 class ButtonCell(ToggleButton):
     r"""A button grid cell
 
-    TESTS::
+    TESTS
+    ::
         sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
         sage: b = ButtonCell(True, (1,2))
     """
@@ -102,7 +113,8 @@ class ButtonCell(ToggleButton):
 class AddableButtonCell(ToggleButton):
     r"""An addable placeholder for adding a button cell to the widget
 
-    TESTS::
+    TESTS
+    ::
         sage: from sage_combinat_widgets.grid_view_widget import AddableButtonCell
         sage: a = AddableButtonCell((3,4))
     """
@@ -117,7 +129,8 @@ class AddableButtonCell(ToggleButton):
 class BlankButton(ToggleButton):
     r"""A blank placeholder button
 
-    TESTS::
+    TESTS
+    ::
         sage: from sage_combinat_widgets.grid_view_widget import BlankButton
         sage: b = BlankButton()
     """
@@ -148,7 +161,16 @@ class GridViewWidget(GridViewEditor, VBox):
 
     def __init__(self, obj, cell_layout=None, cell_widget_classes=[TextCell], blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
         r"""
-        TESTS::
+        Grid View Widget initialization.
+
+        INPUT:
+
+            - ``cell_widget_classes``: a list of classes for building cell widgets
+            - ``blank_widget_class``: a widget class for building blank cells
+            - ``addable_widget_class``: a widget class for building blank cells
+
+        TESTS
+        ::
 
             sage: from sage_combinat_widgets.grid_view_widget import *
             sage: t = StandardTableaux(15).random_element()
@@ -177,12 +199,13 @@ class GridViewWidget(GridViewEditor, VBox):
         r"""
         From a widget cell value `val`,
         return a valid editor cell value.
-        TESTS::
-            sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
-            sage: t = StandardTableaux(5).random_element()
-            sage: w = GridViewWidget(t)
-            sage: w.to_cell('3')
-            3
+        TESTS
+        ::
+        sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
+        sage: t = StandardTableaux(5).random_element()
+        sage: w = GridViewWidget(t)
+        sage: w.to_cell('3')
+        3
         """
         return self.cast(val)
 
@@ -212,9 +235,9 @@ class GridViewWidget(GridViewEditor, VBox):
     def draw(self):
         r"""
         Add children to the Box:
-        * Sage object/gris editor cells
-        * Blank cells for empty cells in a row
-        * Addable cells if any
+        - Sage object/gris editor cells
+        - Blank cells for empty cells in a row
+        - Addable cells if any
         """
         self.reset_links()
         positions = sorted(list(self.cells.keys()))

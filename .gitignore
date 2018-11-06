@@ -2,3 +2,4 @@
 *.pyc
 images/
 sage_combinat_widgets.egg-info/
+docs/build/

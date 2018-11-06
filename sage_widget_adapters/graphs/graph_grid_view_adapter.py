@@ -28,8 +28,7 @@ Grid View Adapter for grid-representable graphs
     :meth:`~GraphGridViewAdapter.insert_column` | Insert a column at given index
     :meth:`~GraphGridViewAdapter.remove_column` | Remove a column at given index
 
-AUTHORS:
-- Odile Bénassy, Nicolas Thiéry
+AUTHORS: Odile Bénassy, Nicolas Thiéry
 
 """
 from sage.graphs.graph import Graph
@@ -63,24 +62,26 @@ class GraphGridViewAdapter(GridViewAdapter):
     def compute_cells(obj):
         r"""
         From the graph vertices,
-        return a dictionary { coordinates pair : None }
-        TESTS::
-        sage: from sage.graphs.generators.families import AztecDiamondGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = AztecDiamondGraph(2)
-        sage: GraphGridViewAdapter.compute_cells(g)
-        {(0, 1): None,
-        (0, 2): None,
-        (1, 0): None,
-        (1, 1): None,
-        (1, 2): None,
-        (1, 3): None,
-        (2, 0): None,
-        (2, 1): None,
-        (2, 2): None,
-        (2, 3): None,
-        (3, 1): None,
-        (3, 2): None}
+        make a dictionary { coordinates pair : None }
+
+        TESTS
+        ::
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = AztecDiamondGraph(2)
+            sage: GraphGridViewAdapter.compute_cells(g)
+            {(0, 1): None,
+            (0, 2): None,
+            (1, 0): None,
+            (1, 1): None,
+            (1, 2): None,
+            (1, 3): None,
+            (2, 0): None,
+            (2, 1): None,
+            (2, 2): None,
+            (2, 3): None,
+            (3, 1): None,
+            (3, 2): None}
         """
         cells = {}
         for v in obj.vertices():
@@ -92,11 +93,13 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         From a dictionary { coordinates pair : None }
         return a graph with one vertex for every coordinates pair
-        TESTS:
-        sage: from sage.graphs.generators.families import AztecDiamondGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: GraphGridViewAdapter.from_cells({(0, 0): None, (0, 1): None, (1, 0): None, (1, 1): None, (2, 0): None, (2, 1): None})
-        Graph on 6 vertices
+
+        TESTS
+        ::
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: GraphGridViewAdapter.from_cells({(0, 0): None, (0, 1): None, (1, 0): None, (1, 1): None, (2, 0): None, (2, 1): None})
+            Graph on 6 vertices
         """
         g = Graph()
         g.add_vertices(list(cells.keys()))
@@ -111,15 +114,17 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         No cell should be added in isolation
         except for linear graphs
-        TESTS:
-        sage: from sage.graphs.generators.basic import GridGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = GridGraph((2,3))
-        sage: GraphGridViewAdapter.addable_cells(g)
-        []
-        sage: g = GridGraph((1,3))
-        sage: GraphGridViewAdapter.addable_cells(g)
-        [(0, 3)]
+
+        TESTS
+        ::
+            sage: from sage.graphs.generators.basic import GridGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = GridGraph((2,3))
+            sage: GraphGridViewAdapter.addable_cells(g)
+            []
+            sage: g = GridGraph((1,3))
+            sage: GraphGridViewAdapter.addable_cells(g)
+            [(0, 3)]
         """
         if not obj.num_verts():
             return [(0,0)]
@@ -140,15 +145,17 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         No cell should be removed in isolation
         except for linear graphs
-        TESTS:
-        sage: from sage.graphs.generators.basic import GridGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = GridGraph((2,3))
-        sage: GraphGridViewAdapter.removable_cells(g)
-        []
-        sage: g = GridGraph((1,3))
-        sage: GraphGridViewAdapter.removable_cells(g)
-        [(0, 2)]
+
+        TESTS
+        ::
+            sage: from sage.graphs.generators.basic import GridGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = GridGraph((2,3))
+            sage: GraphGridViewAdapter.removable_cells(g)
+            []
+            sage: g = GridGraph((1,3))
+            sage: GraphGridViewAdapter.removable_cells(g)
+            [(0, 2)]
         """
         row_max, col_max = 0, 0
         for t in obj.vertex_iterator():
@@ -166,12 +173,14 @@ class GraphGridViewAdapter(GridViewAdapter):
     def add_cell(cls, obj, pos, val=None):
         r"""
         Add a cell to the graph.
-        TESTS:
-        sage: from sage.graphs.generators.basic import GridGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = GridGraph((1,2))
-        sage: GraphGridViewAdapter.add_cell(g, (0,2))
-        Grid Graph for [1, 2]: Graph on 3 vertices
+
+        TESTS
+        ::
+            sage: from sage.graphs.generators.basic import GridGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = GridGraph((1,2))
+            sage: GraphGridViewAdapter.add_cell(g, (0,2))
+            Grid Graph for [1, 2]: Graph on 3 vertices
         """
         if not pos in cls.addable_cells(obj):
             raise ValueError("Position '%s' is not addable." % str(pos))
@@ -184,12 +193,14 @@ class GraphGridViewAdapter(GridViewAdapter):
     def remove_cell(cls, obj, pos):
         r"""
         Remove a cell from the graph.
-        TESTS:
-        sage: from sage.graphs.generators.basic import GridGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = GridGraph((1, 2))
-        sage: GraphGridViewAdapter.remove_cell(g, (0,1))
-        Grid Graph for [1, 2]: Graph on 1 vertex
+
+        TESTS
+        ::
+            sage: from sage.graphs.generators.basic import GridGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = GridGraph((1, 2))
+            sage: GraphGridViewAdapter.remove_cell(g, (0,1))
+            Grid Graph for [1, 2]: Graph on 1 vertex
         """
         if not pos in cls.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
@@ -200,12 +211,14 @@ class GraphGridViewAdapter(GridViewAdapter):
     def add_row(cls, obj):
         r"""
         Add a row to the graph.
-        TESTS:
-        sage: from sage.graphs.generators.basic import GridGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = GridGraph((3,2))
-        sage: GraphGridViewAdapter.add_row(g)
-        Grid Graph for [3, 2]: Graph on 8 vertices
+
+        TESTS
+        ::
+            sage: from sage.graphs.generators.basic import GridGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = GridGraph((3,2))
+            sage: GraphGridViewAdapter.add_row(g)
+            Grid Graph for [3, 2]: Graph on 8 vertices
         """
         row_max, col_max = 0, 0
         for t in obj.vertex_iterator():
@@ -218,12 +231,14 @@ class GraphGridViewAdapter(GridViewAdapter):
     def remove_row(cls, obj, index=None):
         r"""
         Remove a row from the graph
+
         TESTS:
-        sage: from sage.graphs.generators.basic import GridGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = GridGraph((3,2))
-        sage: GraphGridViewAdapter.remove_row(g)
-        Grid Graph for [3, 2]: Graph on 4 vertices
+        ::
+            sage: from sage.graphs.generators.basic import GridGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = GridGraph((3,2))
+            sage: GraphGridViewAdapter.remove_row(g)
+            Grid Graph for [3, 2]: Graph on 4 vertices
         """
         row_max, col_max = 0, 0
         for t in obj.vertex_iterator():
@@ -236,12 +251,14 @@ class GraphGridViewAdapter(GridViewAdapter):
     def add_column(cls, obj):
         r"""
         Add a column to the graph.
-        TESTS:
-        sage: from sage.graphs.generators.basic import GridGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = GridGraph((3,2))
-        sage: GraphGridViewAdapter.add_column(g)
-        Grid Graph for [3, 2]: Graph on 9 vertices
+
+        TESTS
+        ::
+            sage: from sage.graphs.generators.basic import GridGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = GridGraph((3,2))
+            sage: GraphGridViewAdapter.add_column(g)
+            Grid Graph for [3, 2]: Graph on 9 vertices
         """
         row_max, col_max = 0, 0
         for t in obj.vertex_iterator():
@@ -254,12 +271,14 @@ class GraphGridViewAdapter(GridViewAdapter):
     def remove_column(cls, obj, index=None):
         r"""
         Remove a column from the graph
-        TESTS:
-        sage: from sage.graphs.generators.basic import GridGraph
-        sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-        sage: g = GridGraph((3,2))
-        sage: GraphGridViewAdapter.remove_column(g)
-        Grid Graph for [3, 2]: Graph on 3 vertices
+
+        TESTS
+        ::
+            sage: from sage.graphs.generators.basic import GridGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = GridGraph((3,2))
+            sage: GraphGridViewAdapter.remove_column(g)
+            Grid Graph for [3, 2]: Graph on 3 vertices
         """
         row_max, col_max = 0, 0
         for t in obj.vertex_iterator():

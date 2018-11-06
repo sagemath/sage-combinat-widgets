@@ -17,10 +17,11 @@ Sage Combinat Widgets
 =====================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
+   :glob:
 
-   tableau_widget
-
+   grid_view_*
+   *
 
 Indices and Tables
 ==================

@@ -27,8 +27,7 @@ Generic Grid View Adapter
     :meth:`~GridViewAdapter.insert_column` | Insert a column at given index
     :meth:`~GridViewAdapter.remove_column` | Remove a column at given index
 
-AUTHORS:
-- Odile Bénassy, Nicolas Thiéry
+AUTHORS: Odile Bénassy, Nicolas Thiéry
 
 """
 from sage.all import SageObject
@@ -72,8 +71,8 @@ class GridViewAdapter(object):
         From an object `obj`,
         Try to build an object of type `cls`.
         TESTS:
-        sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
-        sage: GridViewAdapter._validate(pi)
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: GridViewAdapter._validate(pi)
         """
         try:
             new_value = cls.objclass(obj)
@@ -84,7 +83,7 @@ class GridViewAdapter(object):
     @abstract_method
     def from_cells(cls, cells={}):
         r"""
-        From a dictionary { coordinates pair : integer }
+        From a dictionary { coordinates pair : integer },
         return a Sage object.
         """
 
@@ -102,12 +101,14 @@ class GridViewAdapter(object):
         From a Sage object, a position (pair of coordinates) `pos` and a value `val`,
         return a new Sage object.
         with a modified cell at position `pos`.
-        TESTS::
-        sage: from sage.combinat.tableau import Tableau
-        sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
-        sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
-        sage: TableauGridViewAdapter.set_cell(t, (1,1), 8)
-        [[1, 2, 5, 6], [3, 8], [4]]
+
+        TESTS
+        ::
+            sage: from sage.combinat.tableau import Tableau
+            sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
+            sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
+            sage: TableauGridViewAdapter.set_cell(t, (1,1), 8)
+            [[1, 2, 5, 6], [3, 8], [4]]
         """
         l = obj.to_list()
         l[pos[0]][pos[1]] = val
