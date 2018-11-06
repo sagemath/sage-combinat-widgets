@@ -1,0 +1,14 @@
+.. nodoctest
+
+Combinat Grid View Adapters
+===========================
+
+.. automodule:: sage_widget_adapters.combinat.partition_grid_view_adapter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: sage_widget_adapters.combinat.tableau_grid_view_adapter
+   :members:
+   :undoc-members:
+   :show-inheritance:

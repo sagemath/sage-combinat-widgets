@@ -24,8 +24,7 @@ Grid View Adapter for matrices
     :meth:`~MatrixGridViewAdapter.insert_column` | Insert a column at given index
     :meth:`~MatrixGridViewAdapter.remove_column` | Remove a column at given index
 
-AUTHORS:
-- Odile Bénassy, Nicolas Thiéry
+AUTHORS: Odile Bénassy, Nicolas Thiéry
 
 """
 from sage.matrix.matrix2 import Matrix
@@ -41,7 +40,9 @@ class MatrixGridViewAdapter(GridViewAdapter):
     def __init__(self, obj):
         r"""
         Init an adapter object, set attributes `celltype` and `traitclass` (where applicable)
-        TESTS::
+
+        TESTS
+        ::
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: from sage.matrix.constructor import Matrix
             sage: m = Matrix(QQ, 3, 3, range(9))/2
@@ -108,19 +109,21 @@ class MatrixGridViewAdapter(GridViewAdapter):
     @classmethod
     def set_cell(cls, obj, pos, val):
         r"""
-        Edit matrix cell
-        TESTS::
-        sage: from sage.matrix.constructor import Matrix
-        sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-        sage: A = Matrix(QQ, 3, 3, range(9))/2
-        sage: MatrixGridViewAdapter.set_cell(A, (0,1), 2/3)
-        [  0 2/3   1]
-        [3/2   2 5/2]
-        [  3 7/2   4]
-        sage: MatrixGridViewAdapter.set_cell(A, (2,2), pi)
-        Traceback (most recent call last):
-        ...
-        TypeError: Value 'pi' is not compatible!
+        Edit matrix cell.
+
+        TESTS
+        ::
+            sage: from sage.matrix.constructor import Matrix
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: A = Matrix(QQ, 3, 3, range(9))/2
+            sage: MatrixGridViewAdapter.set_cell(A, (0,1), 2/3)
+            [  0 2/3   1]
+            [3/2   2 5/2]
+            [  3 7/2   4]
+            sage: MatrixGridViewAdapter.set_cell(A, (2,2), pi)
+            Traceback (most recent call last):
+            ...
+            TypeError: Value 'pi' is not compatible!
         """
         if not val in obj.base_ring():
             raise TypeError("Value '%s' is not compatible!" % val)
@@ -166,18 +169,21 @@ class MatrixGridViewAdapter(GridViewAdapter):
 
     def insert_row(self, obj, index, r=None):
         r"""
-        TESTS::
-        sage: from sage.matrix.matrix_space import MatrixSpace
-        sage: S = MatrixSpace(ZZ, 4,3)
-        sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
-        sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-        sage: ma = MatrixGridViewAdapter(m)
-        sage: ma.insert_row(m, 1, (1,2,3))
-        [ 1  7  1]
-        [ 1  2  3]
-        [ 0  0  3]
-        [ 0 -1  2]
-        [ 1  0 -3]
+        Insert a row to a matrix.
+
+        TESTS
+        ::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: ma = MatrixGridViewAdapter(m)
+            sage: ma.insert_row(m, 1, (1,2,3))
+            [ 1  7  1]
+            [ 1  2  3]
+            [ 0  0  3]
+            [ 0 -1  2]
+            [ 1  0 -3]
         """
         if not r:
             r = [self.cellzero] * obj.ncols()
@@ -194,19 +200,22 @@ class MatrixGridViewAdapter(GridViewAdapter):
     @classmethod
     def remove_row(cls, obj, index=None):
         r"""
-        TESTS::
-        sage: from sage.matrix.matrix_space import MatrixSpace
-        sage: S = MatrixSpace(ZZ, 4,3)
-        sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-        sage: A = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
-        sage: MatrixGridViewAdapter.remove_row(A, 2)
-        [ 0  1  2]
-        [ 3  4  5]
-        [ 9 10 11]
-        sage: MatrixGridViewAdapter.remove_row(A)
-        [0 1 2]
-        [3 4 5]
-        [6 7 8]
+        Remove a row from a matrix.
+
+        TESTS
+        ::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: A = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
+            sage: MatrixGridViewAdapter.remove_row(A, 2)
+            [ 0  1  2]
+            [ 3  4  5]
+            [ 9 10 11]
+            sage: MatrixGridViewAdapter.remove_row(A)
+            [0 1 2]
+            [3 4 5]
+            [6 7 8]
         """
         if index is None:
             index = obj.nrows() - 1
@@ -226,23 +235,26 @@ class MatrixGridViewAdapter(GridViewAdapter):
 
     def insert_column(self, obj, index, c=None):
         r"""
-        TESTS::
-        sage: from sage.matrix.matrix_space import MatrixSpace
-        sage: S = MatrixSpace(ZZ, 4,3)
-        sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
-        sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-        sage: ma = MatrixGridViewAdapter(m)
-        sage: ma.insert_column(m, 1, (1,1,1))
-        [ 1  1  7  1]
-        [ 0  1  0  3]
-        [ 0  1 -1  2]
-        [ 1  0  0 -3]
-        sage: ma.insert_column(m, 2, (1,1,1,2,2,2))
-        Column is too long. Truncating
-        [ 1  7  1  1]
-        [ 0  0  1  3]
-        [ 0 -1  1  2]
-        [ 1  0  2 -3]
+        Insert a column to a matrix.
+
+        TESTS
+        ::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: ma = MatrixGridViewAdapter(m)
+            sage: ma.insert_column(m, 1, (1,1,1))
+            [ 1  1  7  1]
+            [ 0  1  0  3]
+            [ 0  1 -1  2]
+            [ 1  0  0 -3]
+            sage: ma.insert_column(m, 2, (1,1,1,2,2,2))
+            Column is too long. Truncating
+            [ 1  7  1  1]
+            [ 0  0  1  3]
+            [ 0 -1  1  2]
+            [ 1  0  2 -3]
         """
         if not c:
             c = [self.cellzero] * obj.nrows()
@@ -259,21 +271,24 @@ class MatrixGridViewAdapter(GridViewAdapter):
     @classmethod
     def remove_column(cls, obj, index=None):
         r"""
-        TESTS::
-        sage: from sage.matrix.matrix_space import MatrixSpace
-        sage: S = MatrixSpace(ZZ, 4,3)
-        sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-        sage: A = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
-        sage: MatrixGridViewAdapter.remove_column(A, 1)
-        [ 0  2]
-        [ 3  5]
-        [ 6  8]
-        [ 9 11]
-        sage: MatrixGridViewAdapter.remove_column(A)
-        [ 0  1]
-        [ 3  4]
-        [ 6  7]
-        [ 9 10]
+        Remove a column from a matrix.
+
+        TESTS
+        ::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: A = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
+            sage: MatrixGridViewAdapter.remove_column(A, 1)
+            [ 0  2]
+            [ 3  5]
+            [ 6  8]
+            [ 9 11]
+            sage: MatrixGridViewAdapter.remove_column(A)
+            [ 0  1]
+            [ 3  4]
+            [ 6  7]
+            [ 9 10]
         """
         if index is None:
             index = obj.ncols() - 1

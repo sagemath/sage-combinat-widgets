@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 r"""
-An editable GridViewEditor for Sage Jupyter Notebook
+An editable Grid View Editor for Sage objects
 
-EXAMPLES ::
+EXAMPLES
+::
+
     sage: from sage_combinat_widgets import GridViewEditor
     sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
     sage: e = GridViewEditor(t)
@@ -15,9 +17,7 @@ EXAMPLES ::
     sage: A = matrix(R, 3, 3, R.gens())
     sage: e = GridViewEditor(A)
 
-AUTHORS:
-- Odile Bénassy, Nicolas Thiéry
-
+AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 import re, traitlets
 from six import add_metaclass
@@ -29,7 +29,10 @@ from sage.misc.abstract_method import AbstractMethod
 
 def extract_coordinates(s):
     r"""
-    TESTS::
+    Extract a coordinate pair from a string with tokens.
+
+    TESTS
+    ::
         sage: from sage_combinat_widgets.grid_view_editor import extract_coordinates
         sage: extract_coordinates('add_0_4')
         (0, 4)
@@ -42,18 +45,26 @@ def extract_coordinates(s):
 def get_adapter(obj):
     r"""
     Return an adapter object for Sage object `obj`.
-    TESTS::
-       sage: from sage_combinat_widgets.grid_view_editor import get_adapter
-       sage: from sage.combinat.partition import Partition
-       sage: p = Partition([3,2,1,1])
-       sage: pa = get_adapter(p)
-       sage: pa.cellzero
-       False
-       sage: from sage.combinat.tableau import StandardTableaux
-       sage: t = StandardTableaux(7).random_element()
-       sage: ta = get_adapter(t)
-       sage: ta.cellzero
-       0
+
+    INPUT:
+
+        - ``obj`` -- a Sage object
+
+    OUTPUT: an adapter object
+
+    TESTS
+    ::
+        sage: from sage_combinat_widgets.grid_view_editor import get_adapter
+        sage: from sage.combinat.partition import Partition
+        sage: p = Partition([3,2,1,1])
+        sage: pa = get_adapter(p)
+        sage: pa.cellzero
+        False
+        sage: from sage.combinat.tableau import StandardTableaux
+        sage: t = StandardTableaux(7).random_element()
+        sage: ta = get_adapter(t)
+        sage: ta.cellzero
+        0
     """
     from sage.combinat.partition import Partition
     if issubclass(obj.__class__, Partition):
@@ -85,7 +96,16 @@ class cdlink(traitlets.link):
     """
     def __init__(self, source, target, cast):
         r"""
-        TESTS::
+        Type-casting directional link initialisation.
+
+        INPUT:
+
+            - ``source`` -- a pair (source widget, trait name)
+            - ``target`` -- a pair (target widget, trait name)
+            - ``cast`` -- a cast function
+
+        TESTS
+        ::
             sage: from sage_combinat_widgets.grid_view_editor import cdlink
             sage: from ipywidgets import Checkbox, Text
             sage: b = Checkbox()
@@ -130,10 +150,12 @@ class GridViewEditor(BindableEditorClass):
         Initialize editor.
 
         INPUT:
-        * a Sage object `obj`
-        * an adapter object (optional)
 
-        TESTS::
+            - ``obj`` -- a Sage object
+            - ``adapter`` -- an adapter object (optional)
+
+        TESTS
+        ::
 
             sage: from sage_combinat_widgets import GridViewEditor
             sage: from sage.all import matrix, graphs
@@ -279,9 +301,11 @@ class GridViewEditor(BindableEditorClass):
     def set_value_from_cells(self, obj_class=None, cells={}):
         r"""We have an object value, but we want to change it according to cells
         Yet we want to keep the same class (or warn if that's impossible)
-        INPUT::
-        * an object class (by default: self.value.__class__)
-        * a cells dictionary (i,j)->val
+
+        INPUT:
+
+            -  ``obj_class`` -- an object class (by default: self.value.__class__)
+            -  ``cells`` -- a dictionary (i,j)->val
         """
         if not obj_class and self.value:
             obj_class = self.value.__class__
