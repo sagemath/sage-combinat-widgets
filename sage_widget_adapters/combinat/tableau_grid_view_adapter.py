@@ -33,6 +33,10 @@ class TableauGridViewAdapter(GridViewAdapter):
     cellzero = Integer(0)
 
     @staticmethod
+    def length(obj):
+        return len(obj)
+
+    @staticmethod
     def compute_cells(obj):
         r"""
         From a tableau,

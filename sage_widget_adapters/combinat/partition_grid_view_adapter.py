@@ -50,6 +50,10 @@ class PartitionGridViewAdapter(GridViewAdapter):
         return display_value
 
     @staticmethod
+    def length(obj):
+        return len(p)
+
+    @staticmethod
     def compute_cells(obj):
         r"""
         From a partition,

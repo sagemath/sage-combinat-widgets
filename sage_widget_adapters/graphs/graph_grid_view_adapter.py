@@ -59,6 +59,10 @@ class GraphGridViewAdapter(GridViewAdapter):
         return display_value
 
     @staticmethod
+    def length(obj):
+        return max(pos[0] for pos in self.cells)
+
+    @staticmethod
     def compute_cells(obj):
         r"""
         From the graph vertices,

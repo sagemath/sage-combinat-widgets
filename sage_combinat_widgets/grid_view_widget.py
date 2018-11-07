@@ -159,7 +159,8 @@ class GridViewWidget(GridViewEditor, VBox):
     r"""A widget for all grid-representable Sage objects
     """
 
-    def __init__(self, obj, cell_layout=None, cell_widget_classes=[TextCell], blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
+    def __init__(self, obj, display_convention='en', cell_layout=None, cell_widget_classes=[TextCell], \
+                 blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
         r"""
         Grid View Widget initialization.
 
@@ -182,6 +183,7 @@ class GridViewWidget(GridViewEditor, VBox):
         GridViewEditor.__init__(self, obj)
         VBox.__init__(self)
         self._model_id = get_model_id(self)
+        self.display_convention = display_convention
         if not cell_layout:
             if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
                 cell_layout = buttoncell_layout
@@ -217,7 +219,7 @@ class GridViewWidget(GridViewEditor, VBox):
         for pos in self.cells.keys():
             traitname = 'cell_%d_%d' % (pos)
             try:
-                child = self.children[pos[0]].children[pos[1]]
+                child = self.get_child(pos)
             except:
                 child = None
             if child and hasattr(child, 'value') and traitname in self.traits():
@@ -226,7 +228,7 @@ class GridViewWidget(GridViewEditor, VBox):
             # A directional link to trait 'add_i_j'
             traitname = 'add_%d_%d' % (pos)
             try:
-                child = self.children[pos[0]].children[pos[1]]
+                child = self.get_child(pos)
                 if child and hasattr(child, 'value') and traitname in self.traits():
                     self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
             except:
@@ -284,5 +286,15 @@ class GridViewWidget(GridViewEditor, VBox):
         for row in addable_rows:
             if row[0] > i:
                 vbox_children.append(HBox([self.addable_widget_class((i,j), self.cell_layout) for c in row[1]]))
+        if self.display_convention == 'fr':
+            vbox_children.reverse()
         self.children = vbox_children
         self.add_links()
+
+    def get_child(self, pos):
+        r"""
+        Get child widget corresponding to self.cells[pos]
+        """
+        if self.display_convention == 'fr':
+            return self.children[self.adapter.length(self.value) - pos[0]].children[pos[1]]
+        return self.children[pos[0]].children[pos[1]]

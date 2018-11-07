@@ -80,6 +80,10 @@ class MatrixGridViewAdapter(GridViewAdapter):
         return self.cellzero
 
     @staticmethod
+    def length(obj):
+        return obj.nrows()
+
+    @staticmethod
     def compute_cells(obj):
         r"""
         From a matrix `obj`,

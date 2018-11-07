@@ -57,6 +57,15 @@ class GridViewAdapter(object):
             return self.celltype(display_value)
         return self.cellzero
 
+
+    @staticmethod
+    @abstract_method
+    def length(obj):
+        r"""
+        From an object `obj`,
+        return its size i.e. number of rows
+        """
+
     @staticmethod
     @abstract_method
     def compute_cells(obj):
