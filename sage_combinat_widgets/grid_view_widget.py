@@ -6,7 +6,7 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from .grid_view_editor import *
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, ToggleButton
+from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, ToggleButton, ValueWidget
 from sage.misc.misc import uniq
 from traitlets import observe
 
@@ -155,7 +155,7 @@ def get_model_id(w):
         if w.widgets[u] == w:
             return u
 
-class GridViewWidget(GridViewEditor, VBox):
+class GridViewWidget(GridViewEditor, VBox, ValueWidget):
     r"""A widget for all grid-representable Sage objects
     """
 
@@ -179,6 +179,21 @@ class GridViewWidget(GridViewEditor, VBox):
             sage: from sage.graphs.generators.families import AztecDiamondGraph
             sage: az = AztecDiamondGraph(4)
             sage: w = GridViewWidget(az, cell_widget_classes=[ButtonCell], blank_widget_class=BlankButton)
+
+        Compatibility with `@interact`: the widget should be a
+        :class:`ipywidgets.ValueWidget` and have a description field::
+
+            sage: isinstance(w, ValueWidget)
+            True
+            sage: w.description
+
+        Basic compabitility test::
+
+            sage: def f(x = w): return az.average_distance()
+            sage: f = interact(f)
+            <html>...</html>
+
+        .. TODO:: provide a meaningful description?
         """
         GridViewEditor.__init__(self, obj)
         VBox.__init__(self)
@@ -195,6 +210,7 @@ class GridViewWidget(GridViewEditor, VBox):
         self.cast = lambda x:self.adapter.display_to_cell(x, self.displaytype)
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
+        self.description = None
         self.draw()
 
     def to_cell(self, val):
