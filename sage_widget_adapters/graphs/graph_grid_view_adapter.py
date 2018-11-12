@@ -59,8 +59,8 @@ class GraphGridViewAdapter(GridViewAdapter):
         return display_value
 
     @staticmethod
-    def length(obj):
-        return max(pos[0] for pos in self.cells)
+    def height(obj):
+        return max(v[0] for v in obj.vertices()) + 1
 
     @staticmethod
     def compute_cells(obj):

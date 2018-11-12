@@ -11,6 +11,7 @@ Generic Grid View Adapter
 
     :meth:`~GridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
     :meth:`~GridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
+    :meth:`~GridViewAdapter.height` | Static method -- get objet number of rows
     :meth:`~GridViewAdapter.compute_cells` | Compute object cells as a dictionary { coordinate pair : integer }
     :meth:`~GridViewAdapter.from_cells` | Create a new Sage object from a cells dictionary
     :meth:`~GridViewAdapter._validate` | Validate a new object
@@ -59,12 +60,16 @@ class GridViewAdapter(object):
 
 
     @staticmethod
-    @abstract_method
-    def length(obj):
+    def height(obj):
         r"""
-        From an object `obj`,
-        return its size i.e. number of rows
+        From a grid-representable object `obj`,
+        return its height i.e. number of rows.
+        Needed for cartesian system display,
+        i.e. "French-style" display.
         """
+        if hasattr(obj, '__len__'):
+            return len(obj)
+        raise NotImplementedError
 
     @staticmethod
     @abstract_method
