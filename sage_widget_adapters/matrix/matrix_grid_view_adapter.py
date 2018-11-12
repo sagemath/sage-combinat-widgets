@@ -141,8 +141,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         TESTS::
             sage: from sage.matrix.constructor import Matrix
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-            sage: A = Matrix(QQ, 3, 3, range(9))/2
-            sage: MatrixGridViewAdapter.get_cell(A, (1,2))
+            sage: m = Matrix(QQ, 3, 3, range(9))/2
+            sage: MatrixGridViewAdapter.get_cell(m, (1,2))
             5/2
         """
         if pos[0] >= obj.nrows() or pos[1] >= obj.ncols():
@@ -157,12 +157,12 @@ class MatrixGridViewAdapter(GridViewAdapter):
         TESTS::
             sage: from sage.matrix.constructor import Matrix
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-            sage: A = Matrix(QQ, 3, 3, range(9))/2
-            sage: MatrixGridViewAdapter.set_cell(A, (0,1), 2/3)
+            sage: m = Matrix(QQ, 3, 3, range(9))/2
+            sage: MatrixGridViewAdapter.set_cell(m, (0,1), 2/3)
             [  0 2/3   1]
             [3/2   2 5/2]
             [  3 7/2   4]
-            sage: MatrixGridViewAdapter.set_cell(A, (2,2), pi)
+            sage: MatrixGridViewAdapter.set_cell(m, (2,2), pi)
             Traceback (most recent call last):
             ...
             TypeError: Value 'pi' is not compatible!
@@ -275,12 +275,12 @@ class MatrixGridViewAdapter(GridViewAdapter):
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-            sage: A = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
-            sage: MatrixGridViewAdapter.remove_row(A, 2)
+            sage: m = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
+            sage: MatrixGridViewAdapter.remove_row(m, 2)
             [ 0  1  2]
             [ 3  4  5]
             [ 9 10 11]
-            sage: MatrixGridViewAdapter.remove_row(A)
+            sage: MatrixGridViewAdapter.remove_row(m)
             [0 1 2]
             [3 4 5]
             [6 7 8]
@@ -363,13 +363,13 @@ class MatrixGridViewAdapter(GridViewAdapter):
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-            sage: A = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
-            sage: MatrixGridViewAdapter.remove_column(A, 1)
+            sage: m = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
+            sage: MatrixGridViewAdapter.remove_column(m, 1)
             [ 0  2]
             [ 3  5]
             [ 6  8]
             [ 9 11]
-            sage: MatrixGridViewAdapter.remove_column(A)
+            sage: MatrixGridViewAdapter.remove_column(m)
             [ 0  1]
             [ 3  4]
             [ 6  7]
