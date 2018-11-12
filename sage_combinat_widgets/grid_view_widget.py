@@ -312,5 +312,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         Get child widget corresponding to self.cells[pos]
         """
         if self.display_convention == 'fr':
-            return self.children[self.adapter.length(self.value) - pos[0]].children[pos[1]]
+            try:
+                return self.children[self.adapter.height(self.value) - pos[0]].children[pos[1]]
+            except:
+                raise NotImplementedError
         return self.children[pos[0]].children[pos[1]]
