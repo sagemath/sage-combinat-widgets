@@ -39,7 +39,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
 
     def __init__(self, obj):
         r"""
-        Init an adapter object, set attributes `celltype` and `traitclass` (where applicable)
+        Init an adapter object, set attributes `celltype` and `cellzero`.
 
         TESTS::
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter

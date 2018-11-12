@@ -36,6 +36,15 @@ import traitlets
 from sage.misc.abstract_method import abstract_method
 
 class GridViewAdapter(object):
+    r"""
+    A generic grid view adapter.
+
+    ATTRIBUTES::
+        * ``objclass`` -- object class for this adapter
+        * ``traitclass`` -- cells trait class
+        * ``celltype`` -- cell content object type (to be defined in subclasses)
+        * ``cellzero`` -- cell content zero (to be defined in subclasses)
+    """
     objclass = SageObject
     traitclass = traitlets.Instance
 

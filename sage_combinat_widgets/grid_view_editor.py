@@ -219,7 +219,6 @@ class GridViewEditor(BindableEditorClass):
         r"""We have an object value
         but we want to compute cells
         as a dictionary (row_number, cell_number_in_row) -> trait
-        The cell traitclass will depend on the object
         """
         if not obj:
             obj = self.value
@@ -325,15 +324,15 @@ class GridViewEditor(BindableEditorClass):
     @traitlets.observe(traitlets.All)
     def set_cell(self, change):
         r"""
-        TESTS:
-        sage: from sage_combinat_widgets import GridViewEditor
-        sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
-        sage: e = GridViewEditor(t)
-        sage: from traitlets import Bunch
-        sage: change = Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'})
-        sage: e.set_cell(change)
-        sage: e.value
-        [[1, 2, 7, 6], [3], [4]]
+        TESTS::
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: from traitlets import Bunch
+            sage: change = Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'})
+            sage: e.set_cell(change)
+            sage: e.value
+            [[1, 2, 7, 6], [3], [4]]
         """
         if not change.name.startswith('cell_'):
             return
@@ -369,20 +368,20 @@ class GridViewEditor(BindableEditorClass):
     def add_cell(self, change):
         r"""
         TESTS:
-        sage: from sage_combinat_widgets import GridViewEditor
-        sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
-        sage: e = GridViewEditor(t)
-        sage: from traitlets import Bunch
-        sage: change = Bunch({'name': 'add_1_1', 'old': 0, 'new': 8, 'owner': e, 'type': 'change'})
-        sage: e.add_cell(change)
-        sage: e.value
-        [[1, 2, 5, 6], [3, 8], [4]]
-        sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
-        sage: e = GridViewEditor(t)
-        sage: e.add_cell(change)
-        Cell (1, 1) with value '8' cannot be added to this object!
-        sage: e.value
-        [[1, 2, 5, 6], [3], [4]]
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: from traitlets import Bunch
+            sage: change = Bunch({'name': 'add_1_1', 'old': 0, 'new': 8, 'owner': e, 'type': 'change'})
+            sage: e.add_cell(change)
+            sage: e.value
+            [[1, 2, 5, 6], [3, 8], [4]]
+            sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: e.add_cell(change)
+            Cell (1, 1) with value '8' cannot be added to this object!
+            sage: e.value
+            [[1, 2, 5, 6], [3], [4]]
         """
         if not change.name.startswith('add_') \
            or self.to_cell(change.new) == self.adapter.cellzero:
@@ -431,17 +430,17 @@ class GridViewEditor(BindableEditorClass):
     @traitlets.observe(traitlets.All)
     def remove_cell(self, change):
         r"""
-        TESTS:
-        sage: from sage_combinat_widgets import GridViewEditor
-        sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
-        sage: e = GridViewEditor(t)
-        sage: from traitlets import Bunch
-        sage: e.remove_cell(Bunch({'name': 'cell_0_3', 'old': 6, 'new': 0, 'owner': e, 'type': 'change'}))
-        sage: e.value
-        [[1, 2, 5], [3], [4]]
-        sage: e.remove_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 0, 'owner': e, 'type': 'change'}))
-        sage: e.value
-        [[1, 2, 5], [3]]
+        TESTS::
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: from traitlets import Bunch
+            sage: e.remove_cell(Bunch({'name': 'cell_0_3', 'old': 6, 'new': 0, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            [[1, 2, 5], [3], [4]]
+            sage: e.remove_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 0, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            [[1, 2, 5], [3]]
         """
         if not change.name.startswith('cell_'):
             return
