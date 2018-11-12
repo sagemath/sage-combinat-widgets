@@ -35,6 +35,9 @@ from sage.modules.free_module_element import vector
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class MatrixGridViewAdapter(GridViewAdapter):
+    r"""
+    Grid view adapter for matrices.
+    """
     objclass = Matrix
 
     def __init__(self, obj):
@@ -46,6 +49,10 @@ class MatrixGridViewAdapter(GridViewAdapter):
             sage: from sage.matrix.constructor import Matrix
             sage: m = Matrix(QQ, 3, 3, range(9))/2
             sage: ma = MatrixGridViewAdapter(m)
+            sage: ma.celltype
+            <type 'sage.rings.rational.Rational'>
+            sage: ma.cellzero
+            0
         """
         super(MatrixGridViewAdapter, self).__init__()
         self.ring = obj.base_ring()
@@ -67,6 +74,18 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         From a widget display value `display_value`,
         return matching cell value.
+
+        TESTS::
+            sage: from sage.matrix.constructor import Matrix
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: m = Matrix(QQ, 3, 2, range(6))/2
+            sage: ma = MatrixGridViewAdapter(m)
+            sage: ma.display_to_cell('2/3')
+            2/3
+            sage: ma.display_to_cell('pi')
+            Traceback (most recent call last):
+            ...
+            ValueError: Cannot cast display value pi to matrix cell
         """
         if display_value:
             try:
@@ -75,7 +94,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
                 try:
                     return self.celltype(display_value)
                 except:
-                    raise ValueError("Cannot cast display value %s to object %s cell" % (display_value, self.value))
+                    raise ValueError("Cannot cast display value %s to matrix cell" % (display_value))
         return self.cellzero
 
     @staticmethod
@@ -83,11 +102,29 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         From a matrix `obj`,
         return a dictionary { coordinates pair : cell value (as a Sage object) }
+
+        TESTS::
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: from sage.matrix.constructor import Matrix
+            sage: m = Matrix(QQ, 3, 2, range(6))/2
+            sage: MatrixGridViewAdapter.compute_cells(m)
+            {(0, 0): 0, (0, 1): 1/2, (1, 0): 1, (1, 1): 3/2, (2, 0): 2, (2, 1): 5/2}
         """
         return {(i,j):obj[i][j] for (i,j) in product(range(obj.nrows()), range(len(obj[0])))}
 
     @classmethod
     def from_cells(cls, cells={}):
+        r"""
+        From a dictionary { coordinates pair : integer },
+        return a matrix with corresponding cells.
+
+        TESTS::
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: from sage.matrix.constructor import Matrix
+            sage: MatrixGridViewAdapter.from_cells({(0, 0): 0, (0, 1): 1/2, (0, 2): 1, (1, 0): 3/2, (1, 1): 2, (1, 2): 5/2})
+            [  0 1/2   1]
+            [3/2   2 5/2]
+        """
         nrows, ncols = 0, 0
         width = 0
         for pos in cells:
@@ -100,6 +137,13 @@ class MatrixGridViewAdapter(GridViewAdapter):
     def get_cell(obj, pos):
         r"""
         Get cell content
+
+        TESTS::
+            sage: from sage.matrix.constructor import Matrix
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: A = Matrix(QQ, 3, 3, range(9))/2
+            sage: MatrixGridViewAdapter.get_cell(A, (1,2))
+            5/2
         """
         if pos[0] >= obj.nrows() or pos[1] >= obj.ncols():
             raise ValueError("Entry '%s' does not exist!" % pos)
@@ -134,6 +178,13 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         No cell should be added in isolation
         except for vectors
+
+        TESTS::
+            sage: from sage.matrix.constructor import Matrix
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: m = Matrix(QQ, 2, 3, range(6))/2
+            sage: MatrixGridViewAdapter.addable_cells(m)
+            []
         """
         if obj.nrows() == 1:
             return [(0, obj.ncols())]
@@ -146,6 +197,13 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         No cell should be removed in isolation
         except for vectors
+
+        TESTS::
+            sage: from sage.matrix.constructor import Matrix
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: m = Matrix(QQ, 2, 3, range(6))/2
+            sage: MatrixGridViewAdapter.removable_cells(m)
+            []
         """
         if obj.nrows() == 1:
             return [(0, obj.ncols()-1)]
@@ -155,6 +213,20 @@ class MatrixGridViewAdapter(GridViewAdapter):
 
     def append_row(self, obj, r=None):
         r"""
+        Append a row to a matrix.
+
+        TESTS::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: ma = MatrixGridViewAdapter(m)
+            sage: ma.append_row(m, (1,2,3))
+            [ 1  7  1]
+            [ 0  0  3]
+            [ 0 -1  2]
+            [ 1  0 -3]
+            [ 1  2  3]
         """
         if not r:
             return obj.stack(vector([self.cellzero] * obj.ncols()))
@@ -167,7 +239,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
 
     def insert_row(self, obj, index, r=None):
         r"""
-        Insert a row to a matrix.
+        Insert a row into a matrix.
 
         TESTS::
             sage: from sage.matrix.matrix_space import MatrixSpace
@@ -219,6 +291,25 @@ class MatrixGridViewAdapter(GridViewAdapter):
 
     def append_column(self, obj, c=None):
         r"""
+        Append a column to a matrix.
+
+        TESTS::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: ma = MatrixGridViewAdapter(m)
+            sage: ma.append_column(m, (1,1,1))
+            [ 1  7  1  1]
+            [ 0  0  3  1]
+            [ 0 -1  2  1]
+            [ 1  0 -3  0]
+            sage: ma.append_column(m, (1,1,1,1,2,2))
+            Column is too long. Truncating
+            [ 1  7  1  1]
+            [ 0  0  3  1]
+            [ 0 -1  2  1]
+            [ 1  0 -3  1]
         """
         if not c:
             return obj.augment(vector([self.cellzero]*obj.nrows()))
@@ -231,7 +322,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
 
     def insert_column(self, obj, index, c=None):
         r"""
-        Insert a column to a matrix.
+        Insert a column into a matrix.
 
         TESTS::
             sage: from sage.matrix.matrix_space import MatrixSpace

@@ -28,6 +28,14 @@ from sage.rings.integer import Integer
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class TableauGridViewAdapter(GridViewAdapter):
+    r"""
+    Grid view adapter for Young tableaux.
+
+    ATTRIBUTES::
+        * ``objclass`` -- Tableau
+        * ``celltype`` -- Integer
+        * ``cellzero`` -- Integer(0)
+    """
     objclass = Tableau
     celltype = Integer # i.e. sage.rings.integer.Integer
     cellzero = Integer(0)
@@ -139,13 +147,13 @@ class TableauGridViewAdapter(GridViewAdapter):
             [[1, 2, 5, 6], [3, 7], [4], [8]]
             sage: TableauGridViewAdapter.add_cell(t, (1, 2), 8)
             [[1, 2, 5, 6], [3, 7, 8], [4]]
-            sage: TableauGridViewAdapter.add_cell(t, (2, 0), 9) # doctest: +IGNORE_EXCEPTION_DETAIL
+            sage: TableauGridViewAdapter.add_cell(t, (2, 0), 9)
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 0)' is not addable.
         """
         if not pos in cls.addable_cells(obj):
-            raise ValueError("Position '%s' is not addable." % str(pos))
+            raise ValueError("Cell position '%s' is not addable." % str(pos))
         tl = obj.to_list()
         if pos[0] >= len(tl):
             tl = tl + [[val]]
@@ -168,7 +176,7 @@ class TableauGridViewAdapter(GridViewAdapter):
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
             sage: TableauGridViewAdapter.remove_cell(t, (1, 1))
             [[1, 2, 5, 6], [3], [4]]
-            sage: TableauGridViewAdapter.remove_cell(t, (2, 1)) # doctest: +IGNORE_EXCEPTION_DETAIL
+            sage: TableauGridViewAdapter.remove_cell(t, (2, 1))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 1)' is not removable.

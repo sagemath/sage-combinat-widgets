@@ -52,7 +52,14 @@ class GridViewAdapter(object):
     def cell_to_display(cell_content, display_type):
         r"""
         From a cell value `cell_content`,
-        return matching unicode string.
+        return widget display value.
+
+        TESTS::
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: GridViewAdapter.cell_to_display(1, unicode)
+            '1'
+            sage: GridViewAdapter.cell_to_display(True, bool)
+            True
         """
         if display_type == unicode:
             return str(cell_content)
@@ -62,11 +69,18 @@ class GridViewAdapter(object):
         r"""
         From an unicode string `s`,
         return matching cell value.
+
+        TESTS::
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: a = GridViewAdapter()
+            sage: a.display_to_cell('1', unicode)
+            Traceback (most recent call last):
+            ...
+            AttributeError: 'GridViewAdapter' object has no attribute 'celltype'
         """
         if display_value:
             return self.celltype(display_value)
         return self.cellzero
-
 
     @staticmethod
     def height(obj):

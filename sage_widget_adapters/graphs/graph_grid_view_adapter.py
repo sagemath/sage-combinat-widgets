@@ -35,6 +35,14 @@ from sage.graphs.graph import Graph
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class GraphGridViewAdapter(GridViewAdapter):
+    r"""
+    Grid view adapter for grid-representable graphs.
+
+    ATTRIBUTES::
+        * ``objclass`` -- Graph
+        * ``celltype`` -- bool
+        * ``cellzero`` -- False
+    """
     objclass = Graph
     celltype = bool
     cellzero = False
@@ -43,7 +51,14 @@ class GraphGridViewAdapter(GridViewAdapter):
     def cell_to_display(cell_content, display_type=bool):
         r"""
         From object cell content
-        to widget display value
+        to widget display value.
+
+        TESTS::
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: GraphGridViewAdapter.cell_to_display(True)
+            True
+            sage: GraphGridViewAdapter.cell_to_display("my string", unicode)
+            ''
         """
         if display_type == unicode:
             return ''
@@ -53,6 +68,14 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         From widget cell value
         to object display content
+
+        TESTS::
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: ga = GraphGridViewAdapter()
+            sage: ga.display_to_cell(True)
+            True
+            sage: ga.display_to_cell('')
+            False
         """
         if not display_value or display_type == unicode:
             return self.cellzero
@@ -60,6 +83,19 @@ class GraphGridViewAdapter(GridViewAdapter):
 
     @staticmethod
     def height(obj):
+        r"""
+        From a grid-representable graph `obj`,
+        return its height i.e. number of rows.
+        Needed for cartesian system display,
+        i.e. "French-style" display.
+
+        TESTS::
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = AztecDiamondGraph(2)
+            sage: GraphGridViewAdapter.height(g)
+            4
+        """
         return max(v[0] for v in obj.vertices()) + 1
 
     @staticmethod
@@ -109,6 +145,17 @@ class GraphGridViewAdapter(GridViewAdapter):
 
     @staticmethod
     def get_cell(obj, pos):
+        r"""
+        From a graph `graph` and a tuple `pos`,
+        return the object cell value at position `pos`.
+
+        TESTS::
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = AztecDiamondGraph(2)
+            sage: GraphGridViewAdapter.get_cell(g, (1,3)) is None
+            True
+        """
         return None
 
     @staticmethod

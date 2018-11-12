@@ -26,6 +26,14 @@ from sage.combinat.partition import *
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class PartitionGridViewAdapter(GridViewAdapter):
+    r"""
+    Grid view adapter for partitions.
+
+    ATTRIBUTES::
+        * ``objclass`` -- Partition
+        * ``celltype`` -- bool
+        * ``cellzero`` -- False
+    """
     objclass = Partition
     celltype = bool
     cellzero = False
@@ -34,7 +42,14 @@ class PartitionGridViewAdapter(GridViewAdapter):
     def cell_to_display(cell_content, display_type=bool):
         r"""
         From object cell content
-        to widget display value
+        to widget display value.
+
+        TESTS::
+            sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
+            sage: PartitionGridViewAdapter.cell_to_display(True)
+            True
+            sage: PartitionGridViewAdapter.cell_to_display("my string", unicode)
+            ''
         """
         if display_type == unicode:
             return ''
@@ -44,6 +59,14 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         From widget cell value
         to object display content
+
+        TESTS::
+            sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
+            sage: pa = PartitionGridViewAdapter()
+            sage: pa.display_to_cell(True)
+            True
+            sage: pa.display_to_cell('')
+            False
         """
         if not display_value or display_type == unicode:
             return self.cellzero
@@ -146,13 +169,13 @@ class PartitionGridViewAdapter(GridViewAdapter):
             [6, 5, 3, 1]
             sage: PartitionGridViewAdapter.add_cell(p, (4, 0), 42)
             [6, 5, 2, 1, 1]
-            sage: PartitionGridViewAdapter.add_cell(p, (2, 0)) # doctest: +IGNORE_EXCEPTION_DETAIL
+            sage: PartitionGridViewAdapter.add_cell(p, (2, 0))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 0)' is not addable.
         """
         if not pos in cls.addable_cells(obj):
-            raise ValueError("Position '%s' is not addable." % str(pos))
+            raise ValueError("Cell position '%s' is not addable." % str(pos))
         try:
             return obj.add_cell(pos[0])
         except:
@@ -169,7 +192,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
             sage: p = Partition([6, 5, 2, 1])
             sage: PartitionGridViewAdapter.remove_cell(p, (2, 1))
             [6, 5, 1, 1]
-            sage: PartitionGridViewAdapter.remove_cell(p, (1, 1)) # doctest: +IGNORE_EXCEPTION_DETAIL
+            sage: PartitionGridViewAdapter.remove_cell(p, (1, 1))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(1, 1)' is not removable.
