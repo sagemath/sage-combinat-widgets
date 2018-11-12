@@ -134,10 +134,16 @@ class BlankButton(ToggleButton):
         self.add_class('blankbutton')
 
 def compute_tooltip(t):
-    r"""From a tuple (i,j),
+    r"""From a position (i,j),
     we just want the string 'i,j'
+    to use as a tooltip on buttons.
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import compute_tooltip
+        sage: compute_tooltip((42, 7))
+        '42, 7'
     """
-    return str(t)[-1:1]
+    return str(t)[1:-1]
 
 def get_model_id(w):
     r"""
@@ -301,6 +307,16 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
     def get_child(self, pos):
         r"""
         Get child widget corresponding to self.cells[pos]
+
+        TESTS::
+            sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
+            sage: t = StandardTableau([[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]])
+            sage: w1 = GridViewWidget(t)
+            sage: w1.get_child((1,2)).value
+            u'13'
+            sage: w2 = GridViewWidget(t, display_convention='fr')
+            sage: w1.get_child((1,2)).value == w2.get_child((1,2)).value
+            True
         """
         if self.display_convention == 'fr':
             try:
