@@ -68,8 +68,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         From the graph vertices,
         make a dictionary { coordinates pair : None }
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.families import AztecDiamondGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = AztecDiamondGraph(2)
@@ -98,8 +97,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         From a dictionary { coordinates pair : None }
         return a graph with one vertex for every coordinates pair
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.families import AztecDiamondGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: GraphGridViewAdapter.from_cells({(0, 0): None, (0, 1): None, (1, 0): None, (1, 1): None, (2, 0): None, (2, 1): None})
@@ -119,8 +117,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         No cell should be added in isolation
         except for linear graphs
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((2,3))
@@ -150,8 +147,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         No cell should be removed in isolation
         except for linear graphs
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((2,3))
@@ -178,8 +174,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         Add a cell to the graph.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((1,2))
@@ -198,8 +193,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         Remove a cell from the graph.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((1, 2))
@@ -216,8 +210,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         Add a row to the graph.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
@@ -236,8 +229,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         Remove a row from the graph
 
-        TESTS:
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
@@ -256,8 +248,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         Add a column to the graph.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
@@ -276,8 +267,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         Remove a column from the graph
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))

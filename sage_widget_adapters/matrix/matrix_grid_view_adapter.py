@@ -41,8 +41,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Init an adapter object, set attributes `celltype` and `traitclass` (where applicable)
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: from sage.matrix.constructor import Matrix
             sage: m = Matrix(QQ, 3, 3, range(9))/2
@@ -111,8 +110,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Edit matrix cell.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.matrix.constructor import Matrix
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: A = Matrix(QQ, 3, 3, range(9))/2
@@ -171,8 +169,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Insert a row to a matrix.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -202,8 +199,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Remove a row from a matrix.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
@@ -237,8 +233,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Insert a column to a matrix.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -273,8 +268,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Remove a column from a matrix.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter

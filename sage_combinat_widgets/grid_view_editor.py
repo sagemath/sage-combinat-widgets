@@ -2,9 +2,7 @@
 r"""
 An editable Grid View Editor for Sage objects
 
-EXAMPLES
-::
-
+EXAMPLES::
     sage: from sage_combinat_widgets import GridViewEditor
     sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
     sage: e = GridViewEditor(t)
@@ -31,8 +29,7 @@ def extract_coordinates(s):
     r"""
     Extract a coordinate pair from a string with tokens.
 
-    TESTS
-    ::
+    TESTS::
         sage: from sage_combinat_widgets.grid_view_editor import extract_coordinates
         sage: extract_coordinates('add_0_4')
         (0, 4)
@@ -52,8 +49,7 @@ def get_adapter(obj):
 
     OUTPUT: an adapter object
 
-    TESTS
-    ::
+    TESTS::
         sage: from sage_combinat_widgets.grid_view_editor import get_adapter
         sage: from sage.combinat.partition import Partition
         sage: p = Partition([3,2,1,1])
@@ -104,8 +100,7 @@ class cdlink(traitlets.link):
             - ``target`` -- a pair (target widget, trait name)
             - ``cast`` -- a cast function
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage_combinat_widgets.grid_view_editor import cdlink
             sage: from ipywidgets import Checkbox, Text
             sage: b = Checkbox()
@@ -154,9 +149,7 @@ class GridViewEditor(BindableEditorClass):
             - ``obj`` -- a Sage object
             - ``adapter`` -- an adapter object (optional)
 
-        TESTS
-        ::
-
+        TESTS::
             sage: from sage_combinat_widgets import GridViewEditor
             sage: from sage.all import matrix, graphs
             sage: from sage.graphs.generic_graph import GenericGraph

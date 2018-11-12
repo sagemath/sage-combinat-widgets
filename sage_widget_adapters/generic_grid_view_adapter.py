@@ -66,6 +66,13 @@ class GridViewAdapter(object):
         return its height i.e. number of rows.
         Needed for cartesian system display,
         i.e. "French-style" display.
+
+        TESTS::
+            sage: from sage.combinat.partition import Partition
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: p = Partition([3,3,2,1])
+            sage: GridViewAdapter.height(p)
+            4
         """
         if hasattr(obj, '__len__'):
             return len(obj)
@@ -84,7 +91,8 @@ class GridViewAdapter(object):
         r"""
         From an object `obj`,
         Try to build an object of type `cls`.
-        TESTS:
+
+        TESTS::
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: GridViewAdapter._validate(pi)
         """
@@ -116,8 +124,7 @@ class GridViewAdapter(object):
         return a new Sage object.
         with a modified cell at position `pos`.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.combinat.tableau import Tableau
             sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
