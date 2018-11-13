@@ -9,8 +9,7 @@ Grid View Adapter for matrices
     :widths: 30, 70
     :delim: |
 
-    :meth:`~GridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
-    :meth:`~GridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
+    :meth:`~MatrixGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
     :meth:`~MatrixGridViewAdapter.compute_cells` | Compute matrix cells as a dictionary { coordinate pair : label }
     :meth:`~MatrixGridViewAdapter.from_cells` | Create a new matrix from a cells dictionary
     :meth:`~MatrixGridViewAdapter.get_cell` | Get the matrix cell value

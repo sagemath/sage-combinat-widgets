@@ -11,21 +11,17 @@ Grid View Adapter for grid-representable graphs
 
     :meth:`~GraphGridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
     :meth:`~GraphGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
-    :meth:`~GraphGridViewAdapter.cell_to_bool` | Static method for typecasting cell content to boolean
-    :meth:`~GraphGridViewAdapter.bool_to_cell` | Static method for typecasting boolean to cell content
+    :meth:`~GraphGridViewAdapter.height` | Static method -- get objet number of rows
     :meth:`~GraphGridViewAdapter.compute_cells` | Compute graph cells as a dictionary { coordinate pair : label }
     :meth:`~GraphGridViewAdapter.from_cells` | Create a new graph from a cells dictionary
     :meth:`~GraphGridViewAdapter.get_cell` | Get the graph cell content (i.e. None)
-    :meth:`~GraphGridViewAdapter.set_cell` | Set the graph cell content (does nothing)
     :meth:`~GraphGridViewAdapter.addable_cells` | List addable cells
     :meth:`~GraphGridViewAdapter.removable_cells` | List removable cells
     :meth:`~GraphGridViewAdapter.add_cell` | Add a cell
     :meth:`~GraphGridViewAdapter.remove_cell` | Remove a cell
     :meth:`~GraphGridViewAdapter.append_row` | Append a row
-    :meth:`~GraphGridViewAdapter.insert_row` | Insert a row at given index
     :meth:`~GraphGridViewAdapter.remove_row` | Remove a row at given index
     :meth:`~GraphGridViewAdapter.append_column` | Append a column
-    :meth:`~GraphGridViewAdapter.insert_column` | Insert a column at given index
     :meth:`~GraphGridViewAdapter.remove_column` | Remove a column at given index
 
 AUTHORS: Odile Bénassy, Nicolas Thiéry
@@ -253,7 +249,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         return obj
 
     @classmethod
-    def add_row(cls, obj):
+    def append_row(cls, obj):
         r"""
         Add a row to the graph.
 
@@ -261,7 +257,7 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
-            sage: GraphGridViewAdapter.add_row(g)
+            sage: GraphGridViewAdapter.append_row(g)
             Grid Graph for [3, 2]: Graph on 8 vertices
         """
         row_max, col_max = 0, 0
@@ -291,7 +287,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         return obj
 
     @classmethod
-    def add_column(cls, obj):
+    def append_column(cls, obj):
         r"""
         Add a column to the graph.
 
@@ -299,7 +295,7 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
-            sage: GraphGridViewAdapter.add_column(g)
+            sage: GraphGridViewAdapter.append_column(g)
             Grid Graph for [3, 2]: Graph on 9 vertices
         """
         row_max, col_max = 0, 0

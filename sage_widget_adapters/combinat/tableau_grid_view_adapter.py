@@ -9,15 +9,13 @@ Grid View Adapter for tableaux
     :widths: 30, 70
     :delim: |
 
-    :meth:`~TableauGridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
-    :meth:`~TableauGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
     :meth:`~TableauGridViewAdapter.compute_cells` | Compute tableau cells as a dictionary { coordinate pair : Integer }
     :meth:`~TableauGridViewAdapter.from_cells` | Create a new tableau from a cells dictionary
     :meth:`~TableauGridViewAdapter.get_cell` | Get the tableau cell content
-    :meth:`~TableauGridViewAdapter.set_cell` | Set the tableau cell content
     :meth:`~TableauGridViewAdapter.addable_cells` | List addable cells
-    :meth:`~TableauGridViewAdapter.removable_cells` | List removable cells
     :meth:`~TableauGridViewAdapter.add_cell` | Add a cell
+    :meth:`~TableauGridViewAdapter.removable_cells` | List removable cells (Tableau)
+    :meth:`~StandardTableauGridViewAdapter.removable_cells` | List removable cells (StandardTableau)
     :meth:`~TableauGridViewAdapter.remove_cell` | Remove a cell
 
 AUTHORS: Odile Bénassy, Nicolas Thiéry
