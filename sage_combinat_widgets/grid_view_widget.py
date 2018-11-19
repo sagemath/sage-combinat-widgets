@@ -324,3 +324,9 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             except:
                 raise NotImplementedError
         return self.children[pos[0]].children[pos[1]]
+
+def PartitionGridViewWidget(obj):
+    r"""
+    A default widget for partitions.
+    """
+    return GridViewWidget(obj, cell_widget_classes=[ButtonCell], addable_widget_class=AddableButtonCell)
