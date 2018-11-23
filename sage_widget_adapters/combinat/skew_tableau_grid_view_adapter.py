@@ -11,10 +11,10 @@ Grid View Adapter for skew tableaux
 
     :meth:`~SkewTableauGridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
     :meth:`~SkewTableauGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
-    :meth:`~SkewTableauGridViewAdapter.compute_cells` | Compute tableau cells as a dictionary { coordinate pair : Integer }
-    :meth:`~SkewTableauGridViewAdapter.from_cells` | Create a new tableau from a cells dictionary
-    :meth:`~SkewTableauGridViewAdapter.get_cell` | Get the tableau cell content
-    :meth:`~SkewTableauGridViewAdapter.set_cell` | Set the tableau cell content
+    :meth:`~SkewTableauGridViewAdapter.compute_cells` | Compute skew tableau cells as a dictionary { coordinate pair : Integer }
+    :meth:`~SkewTableauGridViewAdapter.from_cells` | Create a new skew tableau from a cells dictionary
+    :meth:`~SkewTableauGridViewAdapter.get_cell` | Get the skew tableau cell content
+    :meth:`~SkewTableauGridViewAdapter.set_cell` | Set the skew tableau cell content
     :meth:`~SkewTableauGridViewAdapter.addable_cells` | List addable cells
     :meth:`~SkewTableauGridViewAdapter.removable_cells` | List removable cells
     :meth:`~SkewTableauGridViewAdapter.add_cell` | Add a cell
@@ -29,20 +29,28 @@ from sage.rings.integer import Integer
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
 class SkewTableauGridViewAdapter(GridViewAdapter):
+    r"""
+    Grid view adapter for skew tableaux.
+
+    ATTRIBUTES::
+        * ``objclass`` -- SkewTableau
+        * ``celltype`` -- Integer
+        * ``cellzero`` -- Integer(0)
+    """
     objclass = SkewTableau
     celltype = Integer # i.e. sage.rings.integer.Integer
-    cellzero = None
+    cellzero = Integer(0)
 
     @staticmethod
     def compute_cells(obj):
         r"""
-        From a tableau,
+        From a skew tableau,
         return a dictionary { coordinates pair : Integer }
         TESTS::
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
-            sage: s = SkewTableau([[None, None, 1, 2], [None, 1], [4]])
-            sage: SkewTableauGridViewAdapter.compute_cells(s)
+            sage: st = SkewTableau([[None, None, 1, 2], [None, 1], [4]])
+            sage: SkewTableauGridViewAdapter.compute_cells(st)
             {(0, 2): 1, (0, 3): 2, (1, 1): 1, (2, 0): 4}
         """
         return {(i,j):obj[i][j] for (i,j) in obj.cells()}
@@ -51,7 +59,7 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
     def from_cells(self, cells={}):
         r"""
         From a dictionary { coordinates pair : Integer }
-        return a corresponding tableau
+        return a corresponding skew tableau
         TESTS::
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
@@ -75,9 +83,9 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         TESTS::
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
-            sage: s = SkewTableau([[None,1,2],[3,4,5],[6]])
-            sage: SkewTableauGridViewAdapter.get_cell(s, (0,0))
-            sage: SkewTableauGridViewAdapter.get_cell(s, (1,1))
+            sage: st = SkewTableau([[None,1,2],[3,4,5],[6]])
+            sage: SkewTableauGridViewAdapter.get_cell(st, (0,0))
+            sage: SkewTableauGridViewAdapter.get_cell(st, (1,1))
             4
         """
         try:
@@ -92,8 +100,8 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         TESTS::
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
-            sage: s = SkewTableau([[None, None, None, 1], [None, None, 2], [None, 1], [4]])
-            sage: SkewTableauGridViewAdapter.addable_cells(s)
+            sage: st = SkewTableau([[None, None, None, 1], [None, None, 2], [None, 1], [4]])
+            sage: SkewTableauGridViewAdapter.addable_cells(st)
             [(0, 2), (1, 1), (2, 0), (0, 4), (1, 3), (2, 2), (3, 1), (4, 0)]
         """
         return obj.shape().inner().corners() + obj.shape().outer().outside_corners()
@@ -105,8 +113,8 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         TESTS::
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
-            sage: s = SkewTableau([[None, None, None, 1], [None, None, 2], [None, 1], [4]])
-            sage: SkewTableauGridViewAdapter.removable_cells(s)
+            sage: st = SkewTableau([[None, None, None, 1], [None, None, 2], [None, 1], [4]])
+            sage: SkewTableauGridViewAdapter.removable_cells(st)
             [(0, 3), (1, 2), (2, 1), (3, 0), (0, 3), (1, 2), (2, 1), (3, 0)]
         """
         return obj.shape().inner().outside_corners() + obj.shape().outer().corners()
@@ -118,12 +126,12 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         TESTS::
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
-            sage: s = SkewTableau([[None, None, None, 2], [None, 1, 1], [1], [4]])
-            sage: SkewTableauGridViewAdapter.add_cell(s, (0, 2), 1)
+            sage: st = SkewTableau([[None, None, None, 2], [None, 1, 1], [1], [4]])
+            sage: SkewTableauGridViewAdapter.add_cell(st, (0, 2), 1)
             [[None, None, 1, 2], [None, 1, 1], [1], [4]]
-            sage: SkewTableauGridViewAdapter.add_cell(s, (4, 0), 7)
+            sage: SkewTableauGridViewAdapter.add_cell(st, (4, 0), 7)
             [[None, None, None, 2], [None, 1, 1], [1], [4], [7]]
-            sage: SkewTableauGridViewAdapter.add_cell(s, (1, 1), 9)
+            sage: SkewTableauGridViewAdapter.add_cell(st, (1, 1), 9)
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(1, 1)' is not addable.
@@ -149,12 +157,12 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         TESTS::
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
-            sage: s = SkewTableau([[1, 2, 5, 6], [3, 7], [4]])
-            sage: SkewTableauGridViewAdapter.remove_cell(s, (0, 0))
+            sage: st = SkewTableau([[1, 2, 5, 6], [3, 7], [4]])
+            sage: SkewTableauGridViewAdapter.remove_cell(st, (0, 0))
             [[None, 2, 5, 6], [3, 7], [4]]
-            sage: SkewTableauGridViewAdapter.remove_cell(s, (1, 1))
+            sage: SkewTableauGridViewAdapter.remove_cell(st, (1, 1))
             [[1, 2, 5, 6], [3], [4]]
-            sage: SkewTableauGridViewAdapter.remove_cell(s, (2, 1)) # doctest: +IGNORE_EXCEPTION_DETAIL
+            sage: SkewTableauGridViewAdapter.remove_cell(st, (2, 1))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 1)' is not removable.
