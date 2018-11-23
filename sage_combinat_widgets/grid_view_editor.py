@@ -66,6 +66,10 @@ def get_adapter(obj):
     if issubclass(obj.__class__, Partition):
         from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
         return PartitionGridViewAdapter()
+    from sage.combinat.skew_partition import SkewPartition
+    if issubclass(obj.__class__, SkewPartition):
+        from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
+        return SkewPartitionGridViewAdapter()
     from sage.combinat.tableau import Tableau
     if issubclass(obj.__class__, Tableau):
         from sage.combinat.tableau import SemistandardTableau, StandardTableau
@@ -77,6 +81,10 @@ def get_adapter(obj):
             return SemistandardTableauGridViewAdapter()
         from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
         return TableauGridViewAdapter()
+    from sage.combinat.skew_tableau import SkewTableau
+    if issubclass(obj.__class__, SkewTableau):
+        from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
+        return SkewTableauGridViewAdapter()
     from sage.matrix.matrix2 import Matrix
     if issubclass(obj.__class__, Matrix):
         from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter

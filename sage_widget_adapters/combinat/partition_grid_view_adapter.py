@@ -120,13 +120,18 @@ class PartitionGridViewAdapter(GridViewAdapter):
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
-            sage: PartitionGridViewAdapter.get_cell(p, (1,1))
+            sage: PartitionGridViewAdapter.get_cell(p, (1, 1))
             False
+            sage: PartitionGridViewAdapter.get_cell(p, (1, 6))
+            Traceback (most recent call last):
+            ...
+            ValueError: Cell '(1, 6)' not in partition.
         """
         try:
-            return False
+            assert pos[0] < len(obj) and pos[1] < obj[pos[0]]
         except:
-            raise ValueError("Cell %s does not exist!" % str(pos))
+            raise ValueError("Cell '%s' not in partition." % str(pos))
+        return False
 
     @staticmethod
     def addable_cells(obj):
