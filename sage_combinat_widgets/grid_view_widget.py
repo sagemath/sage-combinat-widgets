@@ -46,7 +46,10 @@ class TextCell(Text):
     displaytype = unicode
 
     def __init__(self, content, position, layout=textcell_layout, **kws):
-        super(TextCell, self).__init__(content, layout=layout, continuous_update=False, **kws)
+        super(TextCell, self).__init__()
+        self.value = content
+        self.layout = layout
+        self.continuous_update = False
         self.position = position
         self.add_class('gridcell')
 
@@ -60,7 +63,10 @@ class WiderTextCell(Text):
     displaytype = unicode
 
     def __init__(self, content, position, layout=textcell_wider_layout, **kws):
-        super(WiderTextCell, self).__init__(content, layout=layout, continuous_update=False, **kws)
+        super(WiderTextCell, self).__init__()
+        self.value = content
+        self.layout = layout
+        self.continuous_update = False
         self.position = position
         self.add_class('gridcell')
 
@@ -74,7 +80,10 @@ class BlankCell(Text):
     displaytype = unicode
 
     def __init__(self, layout=textcell_layout):
-        super(BlankCell, self).__init__('', layout=layout, disabled=True)
+        super(BlankCell, self).__init__()
+        self.value = ''
+        self.layout = layout
+        self.disabled = True
         self.add_class('blankcell')
 
 class AddableTextCell(Text):
@@ -88,6 +97,9 @@ class AddableTextCell(Text):
 
     def __init__(self, position, layout=textcell_layout):
         super(AddableTextCell, self).__init__('', layout=layout, continuous_update=False)
+        self.value = ''
+        self.layout = layout
+        self.continuous_update = False
         self.position = position
         self.add_class('addablecell')
 
@@ -101,7 +113,10 @@ class ButtonCell(ToggleButton):
     displaytype = bool
 
     def __init__(self, content, position, layout=buttoncell_layout, **kws):
-        super(ButtonCell, self).__init__(content, layout=layout, disabled=True, **kws)
+        super(ButtonCell, self).__init__()
+        self.value = content
+        self.layout = layout
+        self.disabled = True
         self.position = position
         self.add_class('gridbutton')
 
@@ -115,7 +130,8 @@ class AddableButtonCell(ToggleButton):
     displaytype = bool
 
     def __init__(self, position, layout=buttoncell_layout, **kws):
-        super(AddableButtonCell, self).__init__(layout=layout, **kws)
+        super(AddableButtonCell, self).__init__()
+        self.layout = layout
         self.position = position
         self.add_class('addablebutton')
         self.description = '+'
@@ -130,7 +146,9 @@ class BlankButton(ToggleButton):
     displaytype = bool
 
     def __init__(self, layout=buttoncell_layout):
-        super(BlankButton, self).__init__(layout=layout, disabled=True)
+        super(BlankButton, self).__init__()
+        self.layout = layout
+        self.disabled=True
         self.add_class('blankbutton')
 
 def compute_tooltip(t):
