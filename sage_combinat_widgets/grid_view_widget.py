@@ -289,11 +289,13 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                             cell.add_class('removablecell')
                     hbox_children.append(cell)
                 elif (i,j) in addable_positions:
+                    # Inside the grid-represented object limits
                     hbox_children.append(self.addable_widget_class((i,j), self.cell_layout))
                 else:
                     hbox_children.append(self.blank_widget_class(self.cell_layout))
                 j+=1
-                if (i,j) in addable_positions:
+                if j > max([t[0][1] for t in rows[i]]) and (i,j) in addable_positions:
+                    # Outside of the grid-represented object limits
                     hbox_children.append(self.addable_widget_class((i,j), self.cell_layout))
             vbox_children.append(HBox(hbox_children))
         for row in addable_rows:
