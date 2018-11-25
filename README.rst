@@ -5,11 +5,10 @@ Sage Combinat Widgets
 .. image:: https://mybinder.org/badge.svg
    :target: https://mybinder.org/v2/gh/sagemath/sage-combinat-widgets/master
 
-Jupyter editable widgets for Sagemath objects:
+Jupyter editable widgets for Sagemath combinatorial objects:
 
-- Standard/Semi-standard/Generic Tableau
-- Partition
-- Skew Tableau
+- Partition & Skew Partition
+- Standard/Semi-standard/Generic Tableau & Skew Tableau
 
 Also : 
 

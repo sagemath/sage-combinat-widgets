@@ -1,0 +1,4 @@
+0.5.4:
+	* Display convention: also Francophone-style
+	* Added 2 adapters for Skew Partition and Skew Tableau
+	* Added a specialized class for partitions: PartitionGridViewWidget
