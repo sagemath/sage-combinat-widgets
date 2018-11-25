@@ -121,12 +121,12 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             sage: SkewPartitionGridViewAdapter.get_cell(sp, (1, 0))
             Traceback (most recent call last):
             ...
-            ValueError: Cell '(1, 0)' not in skew partition.
+            ValueError: Cell '(1, 0)' not in object.
         """
         try:
             assert pos[0] < len(obj) and pos[1] < obj.outer()[pos[0]] and pos[1] >= obj.inner()[pos[0]]
         except:
-            raise ValueError("Cell '%s' is not in skew partition." % str(pos))
+            raise ValueError("Cell '%s' is not in object." % str(pos))
         return False
 
     @staticmethod
@@ -186,11 +186,11 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             raise ValueError("Cell position '%s' is not addable." % str(pos))
         try:
             if pos in obj.outer().outside_corners():
-                return SkewPartition([obj.outer().add_cell(pos[0]), obj.inner()])
+                return cls.objclass([obj.outer().add_cell(pos[0]), obj.inner()])
             else:
-                return SkewPartition([obj.outer(), obj.inner().remove_cell(pos[0])])
+                return cls.objclass([obj.outer(), obj.inner().remove_cell(pos[0])])
         except:
-            raise ValueError("Error adding cell %s to skew partition %s" % (pos, obj))
+            raise ValueError("Error adding cell %s to %s" % (pos, cls.objclass))
 
     @classmethod
     def remove_cell(cls, obj, pos):
@@ -214,8 +214,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
         try:
             if pos in obj.outer().corners():
-                return SkewPartition([obj.outer().remove_cell(pos[0]), obj.inner()])
+                return cls.objclass([obj.outer().remove_cell(pos[0]), obj.inner()])
             else:
-                return SkewPartition([obj.outer(), obj.inner().add_cell(pos[0])])
+                return cls.objclass([obj.outer(), obj.inner().add_cell(pos[0])])
         except:
-            raise ValueError("Error removing cell %s from skew partition %s" % (pos, obj))
+            raise ValueError("Error removing cell %s from %s" % (pos, cls.objclass))
