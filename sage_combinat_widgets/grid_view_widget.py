@@ -176,7 +176,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
     r"""A widget for all grid-representable Sage objects
     """
 
-    def __init__(self, obj, display_convention='en', cell_layout=None, cell_widget_classes=[TextCell], \
+    def __init__(self, obj, adapter=None, display_convention='en', cell_layout=None, cell_widget_classes=[TextCell], \
                  blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
         r"""
         Grid View Widget initialization.
@@ -210,7 +210,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
 
         .. TODO:: provide a meaningful description?
         """
-        GridViewEditor.__init__(self, obj)
+        GridViewEditor.__init__(self, obj, adapter)
         VBox.__init__(self)
         self._model_id = get_model_id(self)
         self.display_convention = display_convention
