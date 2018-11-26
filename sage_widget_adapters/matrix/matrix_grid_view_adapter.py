@@ -124,13 +124,9 @@ class MatrixGridViewAdapter(GridViewAdapter):
             [  0 1/2   1]
             [3/2   2 5/2]
         """
-        nrows, ncols = 0, 0
-        width = 0
-        for pos in cells:
-            nrows = max(nrows, pos[0]+1)
-            ncols = max(ncols, pos[1]+1)
-        rows = [[cells[(i,j)] for j in range(ncols)] for i in range(nrows)]
-        return matrix(rows)
+        nrows = max([pos[0]+1 for pos in cells])
+        ncols = max([pos[1]+1 for pos in cells])
+        return matrix([[cells[(i,j)] for j in range(ncols)] for i in range(nrows)])
 
     @staticmethod
     def get_cell(obj, pos):
@@ -168,8 +164,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         """
         if not val in obj.base_ring():
             raise TypeError("Value '%s' is not compatible!" % val)
-        B = matrix(obj.base_ring(), 1, 1, val)
-        obj.set_block(pos[0], pos[1], B)
+        obj.set_block(pos[0], pos[1], matrix(obj.base_ring(), 1, 1, val))
         return obj
 
     @staticmethod
