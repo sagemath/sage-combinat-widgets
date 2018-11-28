@@ -146,7 +146,6 @@ class GridViewAdapter(object):
         From a Sage object, a position (pair of coordinates) `pos` and a value `val`,
         return a new Sage object.
         with a modified cell at position `pos`.
-
         TESTS::
             sage: from sage.combinat.tableau import Tableau
             sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
@@ -154,8 +153,11 @@ class GridViewAdapter(object):
             sage: TableauGridViewAdapter.set_cell(t, (1,1), 8)
             [[1, 2, 5, 6], [3, 8], [4]]
         """
-        l = obj.to_list()
-        l[pos[0]][pos[1]] = val
+        try:
+            l = obj.to_list()
+            l[pos[0]][pos[1]] = val
+        except:
+            raise NotImplementedError("Adapter class method 'set_cell(cls, obj, pos, val)' is not implemented.")
         try:
             return cls.objclass(l)
         except:
