@@ -147,6 +147,7 @@ class GridViewEditor(BindableEditorClass):
     that are refered to through object cells as a dictionary
     with coordinates (row_number, cell_number_in_row) as keys
     """
+    value = traitlets.Any()
 
     def __init__(self, obj, adapter=None):
         r"""
@@ -232,11 +233,7 @@ class GridViewEditor(BindableEditorClass):
             obj = self.value
         if not obj:
             return
-        try:
-            self.cells = self.adapter.compute_cells(obj)
-        except:
-            print("Cannot compute cells for this object")
-            self.cells = {}
+        self.cells = self.adapter.compute_cells(obj)
         celltype = self.adapter.celltype
         traitclass = self.adapter.traitclass
         default_value = self.adapter.cellzero
@@ -378,12 +375,16 @@ class GridViewEditor(BindableEditorClass):
         r"""
         List addable cells for editor value
         """
+        if not hasattr(self.adapter, 'addable_cells') or not callable(self.adapter.addable_cells):
+            return [] # Optional method
         return self.adapter.addable_cells(self.value)
 
     def removable_cells(self):
         r"""
         List removable cells for editor value
         """
+        if not hasattr(self.adapter, 'removable_cells') or not callable(self.adapter.removable_cells):
+            return [] # Optional method
         return self.adapter.removable_cells(self.value)
 
     @traitlets.observe(traitlets.All)
