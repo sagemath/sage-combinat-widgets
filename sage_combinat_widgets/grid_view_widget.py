@@ -201,19 +201,20 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             sage: isinstance(w, ValueWidget)
             True
             sage: w.description
+            "Grid view widget for Jupyter notebook with cell class '<class 'sage_combinat_widgets.grid_view_widget.ButtonCell'>', for object 'Subgraph of (2D Grid Graph for [8, 8])'"
 
         Basic compabitility test::
 
             sage: def f(x = w): return az.average_distance()
             sage: f = interact(f)
             <html>...</html>
-
-        .. TODO:: provide a meaningful description?
         """
         GridViewEditor.__init__(self, obj, adapter)
         VBox.__init__(self)
         self._model_id = get_model_id(self)
         self.display_convention = display_convention
+        self.description = "Grid view widget for Jupyter notebook with cell class '%s', for object '%s'" % (
+            cell_widget_classes[0], obj)
         if not cell_layout:
             if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
                 cell_layout = buttoncell_layout
@@ -225,7 +226,6 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         self.cast = lambda x:self.adapter.display_to_cell(x, self.displaytype)
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
-        self.description = None
         self.draw()
 
     def to_cell(self, val):
