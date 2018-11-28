@@ -58,7 +58,10 @@ class GraphGridViewAdapter(GridViewAdapter):
         """
         if display_type == unicode:
             return ''
-        return cell_content
+        elif cell_content:
+            return cell_content
+        elif display_type == bool:
+            return False
 
     def display_to_cell(self, display_value, display_type=bool):
         r"""
