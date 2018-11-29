@@ -227,6 +227,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
         self.draw()
+        self.initialization = False
 
     def to_cell(self, val):
         r"""

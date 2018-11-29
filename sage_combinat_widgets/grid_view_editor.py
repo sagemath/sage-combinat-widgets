@@ -177,10 +177,7 @@ class GridViewEditor(BindableEditorClass):
             ...
             TypeError: Is this object really grid-representable?
         """
-        try:
-            cells = list(obj)
-        except:
-            raise TypeError("Is this object really grid-representable?")
+        self.initialization = True
         super(GridViewEditor, self).__init__()
         self.value = obj
         if adapter:
@@ -189,6 +186,8 @@ class GridViewEditor(BindableEditorClass):
             self.adapter = get_adapter(obj)
         if not self.adapter:
             raise TypeError("Cannot find an Adapter for this object (%s)" % obj.__class__)
+        if not hasattr(self.adapter, 'compute_cells') or not callable(self.adapter.compute_cells):
+            raise NotImplementedError("Method `compute_cells` is required!")
         self.compute()
         self.links = []
 
@@ -353,6 +352,8 @@ class GridViewEditor(BindableEditorClass):
             sage: e.value
             [[1, 2, 7, 6], [3], [4]]
         """
+        if self.initialization:
+            return
         if not change.name.startswith('cell_'):
             return
         if change.new == change.old or not change.new:
