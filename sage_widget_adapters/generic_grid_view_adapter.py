@@ -65,7 +65,7 @@ class GridViewAdapter(object):
             return str(cell_content)
         return cell_content
 
-    def display_to_cell(self, display_value, display_type):
+    def display_to_cell(self, display_value, display_type=None):
         r"""
         From an unicode string `s`,
         return matching cell value.

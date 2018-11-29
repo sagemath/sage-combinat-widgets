@@ -414,7 +414,7 @@ class GridViewEditor(BindableEditorClass):
         if self.adapter.add_cell.__func__.__class__ is AbstractMethod:
             return # Method not implemented
         val = change.new
-        if val == True:
+        if val is True:
             val = False # if it's a button, reverse button toggling
         pos = extract_coordinates(change.name)
         obj = copy(self.value)

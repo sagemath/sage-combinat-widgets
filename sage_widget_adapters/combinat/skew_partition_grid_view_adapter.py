@@ -126,7 +126,7 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         try:
             assert pos[0] < len(obj) and pos[1] < obj.outer()[pos[0]] and pos[1] >= obj.inner()[pos[0]]
         except:
-            raise ValueError("Cell '%s' is not in object." % str(pos))
+            raise ValueError("Cell '%s' not in object." % str(pos))
         return False
 
     @staticmethod
