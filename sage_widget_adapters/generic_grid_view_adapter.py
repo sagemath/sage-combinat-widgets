@@ -34,6 +34,7 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 import traitlets, sage.all
 from sage.all import SageObject
 from sage.misc.abstract_method import abstract_method
+from six import text_type
 
 import __main__
 def eval_in_main(s):
@@ -75,12 +76,12 @@ class GridViewAdapter(object):
 
         TESTS::
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
-            sage: GridViewAdapter.cell_to_display(1, unicode)
+            sage: GridViewAdapter.cell_to_display(1, text_type)
             '1'
             sage: GridViewAdapter.cell_to_display(True, bool)
             True
         """
-        if display_type == unicode:
+        if display_type == text_type:
             return str(cell_content)
         return cell_content
 
@@ -92,7 +93,7 @@ class GridViewAdapter(object):
         TESTS::
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: a = GridViewAdapter()
-            sage: a.display_to_cell('1', unicode)
+            sage: a.display_to_cell('1', text_type)
             Traceback (most recent call last):
             ...
             AttributeError: 'GridViewAdapter' object has no attribute 'celltype'

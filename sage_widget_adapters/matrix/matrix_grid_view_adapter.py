@@ -32,6 +32,7 @@ from itertools import product
 from sage.sets.finite_enumerated_set import FiniteEnumeratedSet
 from sage.modules.free_module_element import vector
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+from six import text_type
 
 class MatrixGridViewAdapter(GridViewAdapter):
     r"""
@@ -70,7 +71,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
                 raise TypeError("Cannot determine matrix base ring elements class.")
         self.cellzero = self.ring.zero()
 
-    def display_to_cell(self, display_value, display_type=unicode):
+    def display_to_cell(self, display_value, display_type=text_type):
         r"""
         From a widget display value `display_value`,
         return matching cell value.

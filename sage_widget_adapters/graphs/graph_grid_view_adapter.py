@@ -29,6 +29,7 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from sage.graphs.graph import Graph
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+from six import text_type
 
 class GraphGridViewAdapter(GridViewAdapter):
     r"""
@@ -53,10 +54,10 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: GraphGridViewAdapter.cell_to_display(True)
             True
-            sage: GraphGridViewAdapter.cell_to_display("my string", unicode)
+            sage: GraphGridViewAdapter.cell_to_display("my string", text_type)
             ''
         """
-        if display_type == unicode:
+        if display_type == text_type:
             return ''
         elif cell_content:
             return cell_content
@@ -76,7 +77,7 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: ga.display_to_cell('')
             False
         """
-        if not display_value or display_type == unicode:
+        if not display_value or display_type == text_type:
             return self.cellzero
         return display_value
 

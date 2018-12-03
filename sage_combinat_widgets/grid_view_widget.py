@@ -9,6 +9,7 @@ from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, ToggleButton, ValueWidget
 from sage.misc.misc import uniq
 from traitlets import observe
+from six import text_type
 
 textcell_layout = Layout(width='3em',height='2em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em',height='3em', margin='0', padding='0')
@@ -43,7 +44,7 @@ class TextCell(Text):
         sage: from sage_combinat_widgets.grid_view_widget import TextCell
         sage: b = TextCell('my text', (1,2))
     """
-    displaytype = unicode
+    displaytype = text_type
 
     def __init__(self, content, position, layout=textcell_layout, **kws):
         super(TextCell, self).__init__()
@@ -60,7 +61,7 @@ class WiderTextCell(Text):
         sage: from sage_combinat_widgets.grid_view_widget import WiderTextCell
         sage: b = WiderTextCell('my text', (1,2))
     """
-    displaytype = unicode
+    displaytype = text_type
 
     def __init__(self, content, position, layout=textcell_wider_layout, **kws):
         super(WiderTextCell, self).__init__()
@@ -77,7 +78,7 @@ class BlankCell(Text):
         sage: from sage_combinat_widgets.grid_view_widget import BlankCell
         sage: b = BlankCell()
     """
-    displaytype = unicode
+    displaytype = text_type
 
     def __init__(self, layout=textcell_layout):
         super(BlankCell, self).__init__()
@@ -93,7 +94,7 @@ class AddableTextCell(Text):
         sage: from sage_combinat_widgets.grid_view_widget import AddableTextCell
         sage: a = AddableTextCell((3,4))
     """
-    displaytype = unicode
+    displaytype = text_type
 
     def __init__(self, position, layout=textcell_layout):
         super(AddableTextCell, self).__init__('', layout=layout, continuous_update=False)
