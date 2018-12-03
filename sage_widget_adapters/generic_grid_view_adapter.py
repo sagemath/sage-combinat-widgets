@@ -63,6 +63,7 @@ class GridViewAdapter(object):
         * ``cellzero`` -- cell content zero (to be defined in subclasses)
     """
     objclass = SageObject
+    constructorname = None
     traitclass = traitlets.Instance
     constructorname = None
 
@@ -137,6 +138,11 @@ class GridViewAdapter(object):
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: GridViewAdapter._validate(pi)
         """
+        if cls.constructorname:
+            try:
+                new_value = eval_in_main(cls.constructorname)(l)
+            except:
+                pass
         try:
             new_value = cls.objclass(obj)
         except:
@@ -224,7 +230,7 @@ class GridViewAdapter(object):
             return eval_in_main(constructorname)(l)
         if cls.constructorname:
             return eval_in_main(cls.constructorname)(l)
-        return cls.objclass(l)
+        return obj
 
     @staticmethod
     @abstract_method(optional = True)
