@@ -11,7 +11,6 @@ Grid View Adapter for tableaux
 
     :meth:`~TableauGridViewAdapter.compute_cells` | Compute tableau cells as a dictionary { coordinate pair : Integer }
     :meth:`~TableauGridViewAdapter.from_cells` | Create a new tableau from a cells dictionary
-    :meth:`~TableauGridViewAdapter.get_cell` | Get the tableau cell content
     :meth:`~TableauGridViewAdapter.addable_cells` | List addable cells
     :meth:`~TableauGridViewAdapter.add_cell` | Add a cell
     :meth:`~TableauGridViewAdapter.removable_cells` | List removable cells (Tableau)
@@ -180,12 +179,14 @@ class SemistandardTableauGridViewAdapter(TableauGridViewAdapter):
     Value will validate as semistandard tableau.
     """
     objclass = SemistandardTableau
+    constructorname = 'SemistandardTableau'
 
 class StandardTableauGridViewAdapter(SemistandardTableauGridViewAdapter):
     r"""
     Value will validate as standard tableau.
     """
     objclass = StandardTableau
+    constructorname = 'StandardTableau'
 
     @staticmethod
     def removable_cells(obj):

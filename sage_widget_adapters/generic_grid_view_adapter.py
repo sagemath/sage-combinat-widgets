@@ -177,7 +177,7 @@ class GridViewAdapter(object):
             sage: GridViewAdapter.get_cell(t, (1,6))
             Traceback (most recent call last):
             ...
-            ValueError: Cell '(1, 6)' does not exist!            
+            ValueError: Cell '(1, 6)' does not exist!
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: st = SkewTableau([[None,1,2],[3,4,5],[6]])
             sage: GridViewAdapter.get_cell(st, (0,0))

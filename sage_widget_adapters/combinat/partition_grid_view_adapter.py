@@ -36,6 +36,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
         * ``cellzero`` -- False
     """
     objclass = Partition
+    constructorname = 'Partition'
     celltype = bool
     cellzero = False
 

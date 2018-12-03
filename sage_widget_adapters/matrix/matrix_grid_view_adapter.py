@@ -12,8 +12,6 @@ Grid View Adapter for matrices
     :meth:`~MatrixGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
     :meth:`~MatrixGridViewAdapter.compute_cells` | Compute matrix cells as a dictionary { coordinate pair : label }
     :meth:`~MatrixGridViewAdapter.from_cells` | Create a new matrix from a cells dictionary
-    :meth:`~MatrixGridViewAdapter.get_cell` | Get the matrix cell value
-    :meth:`~MatrixGridViewAdapter.set_cell` | Set the matrix cell value
     :meth:`~MatrixGridViewAdapter.addable_cells` | List addable cells
     :meth:`~MatrixGridViewAdapter.removable_cells` | List removable cells
     :meth:`~MatrixGridViewAdapter.append_row` | Append a row

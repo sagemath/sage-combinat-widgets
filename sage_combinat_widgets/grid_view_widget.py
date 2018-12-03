@@ -183,7 +183,6 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         Grid View Widget initialization.
 
         INPUT:
-
             - ``cell_widget_classes``: a list of classes for building cell widgets
             - ``blank_widget_class``: a widget class for building blank cells
             - ``addable_widget_class``: a widget class for building blank cells
