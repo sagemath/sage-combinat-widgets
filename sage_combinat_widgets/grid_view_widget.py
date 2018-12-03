@@ -40,8 +40,7 @@ except:
 class TextCell(Text):
     r"""A regular text grid cell
 
-    TESTS
-    ::
+    TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import TextCell
         sage: b = TextCell('my text', (1,2))
     """
@@ -75,8 +74,7 @@ class WiderTextCell(Text):
 class BlankCell(Text):
     r"""A blank placeholder cell
 
-    TESTS
-    ::
+    TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import BlankCell
         sage: b = BlankCell()
     """
@@ -91,12 +89,6 @@ class BlankCell(Text):
 
 class AddableTextCell(Text):
     r"""An addable placeholder for adding a cell to the widget
-
-
-    def __init__(self, position, layout=textcell_layout):
-        super(AddableTextCell, self).__init__('', layout=layout, continuous_update=False)
-        self.position = position
-        self.add_class('addablecell')
 
     TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import AddableTextCell
