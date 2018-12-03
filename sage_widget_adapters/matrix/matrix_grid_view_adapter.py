@@ -38,6 +38,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
     Grid view adapter for matrices.
     """
     objclass = Matrix
+    constructorname = 'matrix'
 
     def __init__(self, obj):
         r"""
@@ -127,45 +128,6 @@ class MatrixGridViewAdapter(GridViewAdapter):
         nrows = max([pos[0]+1 for pos in cells])
         ncols = max([pos[1]+1 for pos in cells])
         return matrix([[cells[(i,j)] for j in range(ncols)] for i in range(nrows)])
-
-    @staticmethod
-    def get_cell(obj, pos):
-        r"""
-        Get cell content
-
-        TESTS::
-            sage: from sage.matrix.constructor import Matrix
-            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-            sage: m = Matrix(QQ, 3, 3, range(9))/2
-            sage: MatrixGridViewAdapter.get_cell(m, (1,2))
-            5/2
-        """
-        if pos[0] >= obj.nrows() or pos[1] >= obj.ncols():
-            raise ValueError("Entry '%s' does not exist!" % pos)
-        return obj[pos[0]][pos[1]]
-
-    @classmethod
-    def set_cell(cls, obj, pos, val):
-        r"""
-        Edit matrix cell.
-
-        TESTS::
-            sage: from sage.matrix.constructor import Matrix
-            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-            sage: m = Matrix(QQ, 3, 3, range(9))/2
-            sage: MatrixGridViewAdapter.set_cell(m, (0,1), 2/3)
-            [  0 2/3   1]
-            [3/2   2 5/2]
-            [  3 7/2   4]
-            sage: MatrixGridViewAdapter.set_cell(m, (2,2), pi)
-            Traceback (most recent call last):
-            ...
-            TypeError: Value 'pi' is not compatible!
-        """
-        if not val in obj.base_ring():
-            raise TypeError("Value '%s' is not compatible!" % val)
-        obj.set_block(pos[0], pos[1], matrix(obj.base_ring(), 1, 1, val))
-        return obj
 
     @staticmethod
     def addable_cells(obj):

@@ -78,23 +78,6 @@ class TableauGridViewAdapter(GridViewAdapter):
             raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
 
     @staticmethod
-    def get_cell(obj, pos):
-        r"""
-        Get cell value
-
-        TESTS::
-            sage: from sage.combinat.tableau import Tableau
-            sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
-            sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
-            sage: TableauGridViewAdapter.get_cell(t, (1,1))
-            7
-        """
-        try:
-            return obj[pos[0]][pos[1]]
-        except:
-            raise ValueError("Cell %s does not exist!" % str(pos))
-
-    @staticmethod
     def addable_cells(obj, borders=False):
         r"""
         List object addable cells

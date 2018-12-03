@@ -77,23 +77,6 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
             raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
 
     @staticmethod
-    def get_cell(obj, pos):
-        r"""
-        Get cell value
-        TESTS::
-            sage: from sage.combinat.skew_tableau import SkewTableau
-            sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
-            sage: st = SkewTableau([[None,1,2],[3,4,5],[6]])
-            sage: SkewTableauGridViewAdapter.get_cell(st, (0,0))
-            sage: SkewTableauGridViewAdapter.get_cell(st, (1,1))
-            4
-        """
-        try:
-            return obj[pos[0]][pos[1]]
-        except:
-            raise ValueError("Cell %s does not exist!" % str(pos))
-
-    @staticmethod
     def addable_cells(obj):
         r"""
         List object addable cells

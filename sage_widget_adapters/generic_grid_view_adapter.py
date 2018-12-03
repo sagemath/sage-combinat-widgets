@@ -31,9 +31,25 @@ Generic Grid View Adapter
 AUTHORS: Odile Bénassy, Nicolas Thiéry
 
 """
+import traitlets, sage.all
 from sage.all import SageObject
-import traitlets
 from sage.misc.abstract_method import abstract_method
+
+import __main__
+def eval_in_main(s):
+    """
+    Evaluate the expression `s` in the global scope
+
+    TESTS::
+        sage: from sage_widget_adapters.generic_grid_view_adapter import eval_in_main
+        sage: from sage.combinat.tableau import Tableaux
+        sage: eval_in_main("Tableaux")
+        <class 'sage.combinat.tableau.Tableaux'>
+    """
+    try:
+        return eval(s, sage.all.__dict__)
+    except:
+        return eval(s, __main__.__dict__)
 
 class GridViewAdapter(object):
     r"""
@@ -41,12 +57,14 @@ class GridViewAdapter(object):
 
     ATTRIBUTES::
         * ``objclass`` -- object class for this adapter
+        * ``constructorname`` -- name of the constructor that builds a math object from a list
         * ``traitclass`` -- cells trait class
         * ``celltype`` -- cell content object type (to be defined in subclasses)
         * ``cellzero`` -- cell content zero (to be defined in subclasses)
     """
     objclass = SageObject
     traitclass = traitlets.Instance
+    constructorname = None
 
     @staticmethod
     def cell_to_display(cell_content, display_type):
@@ -133,36 +151,80 @@ class GridViewAdapter(object):
         """
 
     @staticmethod
-    @abstract_method
     def get_cell(obj, pos):
         r"""
         From an object and a tuple `pos`,
         return the object cell value at position `pos`.
+        TESTS::
+            sage: from sage.matrix.constructor import Matrix
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: m = Matrix(QQ, 3, 3, range(9))/2
+            sage: GridViewAdapter.get_cell(m, (1,2))
+            5/2
+            sage: from sage.combinat.tableau import Tableau
+            sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
+            sage: GridViewAdapter.get_cell(t, (1,1))
+            7
+            sage: GridViewAdapter.get_cell(t, (1,6))
+            Traceback (most recent call last):
+            ...
+            ValueError: Cell '(1, 6)' does not exist!            
+            sage: from sage.combinat.skew_tableau import SkewTableau
+            sage: st = SkewTableau([[None,1,2],[3,4,5],[6]])
+            sage: GridViewAdapter.get_cell(st, (0,0))
+            sage: GridViewAdapter.get_cell(st, (1,1))
+            4
         """
+        try:
+            return obj[pos[0]][pos[1]]
+        except:
+            pass
+        try:
+            l = [list(x) for x in obj]
+        except:
+            raise NotImplementedError("Adapter class method 'get_cell(obj, pos)' is not implemented.")
+        try:
+            return l[pos[0]][pos[1]]
+        except:
+            raise ValueError("Cell '%s' does not exist!" % str(pos))
 
     @classmethod
-    def set_cell(cls, obj, pos, val):
+    def set_cell(cls, obj, pos, val, constructorname=''):
         r"""
         From a Sage object, a position (pair of coordinates) `pos` and a value `val`,
         return a new Sage object.
         with a modified cell at position `pos`.
+
         TESTS::
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: from sage.combinat.tableau import Tableau
-            sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
-            sage: TableauGridViewAdapter.set_cell(t, (1,1), 8)
+            sage: GridViewAdapter.set_cell(t, (1,1), 8, constructorname='Tableau')
             [[1, 2, 5, 6], [3, 8], [4]]
+            sage: from sage.matrix.constructor import Matrix, matrix
+            sage: m = Matrix(QQ, 3, 3, range(9))/2
+            sage: GridViewAdapter.set_cell(m, (0,1), 2/3, constructorname='matrix')
+            [  0 2/3   1]
+            [3/2   2 5/2]
+            [  3 7/2   4]
+            sage: GridViewAdapter.set_cell(m, (4,2), pi, constructorname='matrix')
+            Traceback (most recent call last):
+            ...
+            TypeError: Value 'pi' is not compatible or position '(4, 2)' does not exist.
         """
         try:
-            l = obj.to_list()
-            l[pos[0]][pos[1]] = val
+            l = [list(x) for x in obj]
         except:
             raise NotImplementedError("Adapter class method 'set_cell(cls, obj, pos, val)' is not implemented.")
         try:
-            return cls.objclass(l)
+            l[pos[0]][pos[1]] = val
         except:
-            print("Value '%s' is not compatible!" % val)
-            return obj
+            raise TypeError("Value '%s' is not compatible or position '%s' does not exist." % (val, pos))
+        if constructorname:
+            return eval_in_main(constructorname)(l)
+        if cls.constructorname:
+            return eval_in_main(cls.constructorname)(l)
+        return cls.objclass(l)
 
     @staticmethod
     @abstract_method(optional = True)
