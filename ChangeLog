@@ -1,3 +1,6 @@
+0.5.5:
+	* Adapter tutorial
+	* Default implementations for accessors in generic adapter
 0.5.4:
 	* Display convention: also Francophone-style
 	* Added 2 adapters for Skew Partition and Skew Tableau
