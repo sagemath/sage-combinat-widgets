@@ -76,6 +76,7 @@ class GridViewAdapter(object):
 
         TESTS::
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: from six import text_type
             sage: GridViewAdapter.cell_to_display(1, text_type)
             '1'
             sage: GridViewAdapter.cell_to_display(True, bool)
@@ -93,6 +94,7 @@ class GridViewAdapter(object):
         TESTS::
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: a = GridViewAdapter()
+            sage: from six import text_type
             sage: a.display_to_cell('1', text_type)
             Traceback (most recent call last):
             ...

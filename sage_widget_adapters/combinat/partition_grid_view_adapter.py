@@ -24,6 +24,7 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from sage.combinat.partition import *
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+from six import text_type
 
 class PartitionGridViewAdapter(GridViewAdapter):
     r"""
@@ -48,10 +49,11 @@ class PartitionGridViewAdapter(GridViewAdapter):
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: PartitionGridViewAdapter.cell_to_display(True)
             True
-            sage: PartitionGridViewAdapter.cell_to_display("my string", unicode)
+            sage: from six import text_type
+            sage: PartitionGridViewAdapter.cell_to_display("my string", text_type)
             ''
         """
-        if display_type == unicode:
+        if display_type == text_type:
             return ''
         return cell_content
 
@@ -68,7 +70,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
             sage: pa.display_to_cell('')
             False
         """
-        if not display_value or display_type == unicode:
+        if not display_value or display_type == text_type:
             return self.cellzero
         return display_value
 

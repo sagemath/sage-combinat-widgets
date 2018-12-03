@@ -38,6 +38,7 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         * ``cellzero`` -- Integer(0)
     """
     objclass = SkewTableau
+    constructorname = 'SkewTableau'
     celltype = Integer # i.e. sage.rings.integer.Integer
     cellzero = Integer(0)
 

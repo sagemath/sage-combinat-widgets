@@ -54,6 +54,7 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: GraphGridViewAdapter.cell_to_display(True)
             True
+            sage: from six import text_type
             sage: GraphGridViewAdapter.cell_to_display("my string", text_type)
             ''
         """

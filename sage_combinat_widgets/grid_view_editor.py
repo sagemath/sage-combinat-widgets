@@ -175,7 +175,7 @@ class GridViewEditor(BindableEditorClass):
             sage: e = GridViewEditor(f)
             Traceback (most recent call last):
             ...
-            TypeError: Is this object really grid-representable?
+            TypeError: Cannot find an Adapter for this object (<class 'sage.symbolic.expression.Expression'>)
         """
         self.initialization = True
         super(GridViewEditor, self).__init__()
@@ -346,6 +346,7 @@ class GridViewEditor(BindableEditorClass):
             sage: from sage_combinat_widgets import GridViewEditor
             sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
             sage: e = GridViewEditor(t)
+            sage: e.initialization = False # This class is not meant to work by itself without a widget.
             sage: from traitlets import Bunch
             sage: change = Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'})
             sage: e.set_cell(change)

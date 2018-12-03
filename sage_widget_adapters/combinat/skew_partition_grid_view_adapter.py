@@ -24,6 +24,7 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from sage.combinat.skew_partition import *
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+from six import text_type
 
 class SkewPartitionGridViewAdapter(GridViewAdapter):
     r"""
@@ -48,10 +49,11 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: SkewPartitionGridViewAdapter.cell_to_display(True)
             True
-            sage: SkewPartitionGridViewAdapter.cell_to_display("my string", unicode)
+            sage: from six import text_type
+            sage: SkewPartitionGridViewAdapter.cell_to_display("my string", text_type)
             ''
         """
-        if display_type == unicode:
+        if display_type == text_type:
             return ''
         return cell_content
 
@@ -68,7 +70,7 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             sage: pa.display_to_cell('')
             False
         """
-        if not display_value or display_type == unicode:
+        if not display_value or display_type == text_type:
             return self.cellzero
         return display_value
 

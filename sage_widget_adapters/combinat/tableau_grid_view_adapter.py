@@ -35,6 +35,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         * ``cellzero`` -- Integer(0)
     """
     objclass = Tableau
+    constructorname = 'Tableau'
     celltype = Integer # i.e. sage.rings.integer.Integer
     cellzero = Integer(0)
 
