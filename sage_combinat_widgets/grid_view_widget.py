@@ -6,9 +6,10 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from .grid_view_editor import *
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, ToggleButton
+from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, ToggleButton, ValueWidget
 from sage.misc.misc import uniq
 from traitlets import observe
+from six import text_type
 
 textcell_layout = Layout(width='3em',height='2em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em',height='3em', margin='0', padding='0')
@@ -44,25 +45,30 @@ class TextCell(Text):
         sage: from sage_combinat_widgets.grid_view_widget import TextCell
         sage: b = TextCell('my text', (1,2))
     """
-    displaytype = unicode
+    displaytype = text_type
 
     def __init__(self, content, position, layout=textcell_layout, **kws):
-        super(TextCell, self).__init__(content, layout=layout, continuous_update=False, **kws)
+        super(TextCell, self).__init__()
+        self.value = content
+        self.layout = layout
+        self.continuous_update = False
         self.position = position
         self.add_class('gridcell')
 
 class WiderTextCell(Text):
     r"""A regular text grid cell
 
-    TESTS
-    ::
+    TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import WiderTextCell
         sage: b = WiderTextCell('my text', (1,2))
     """
-    displaytype = unicode
+    displaytype = text_type
 
     def __init__(self, content, position, layout=textcell_wider_layout, **kws):
-        super(WiderTextCell, self).__init__(content, layout=layout, continuous_update=False, **kws)
+        super(WiderTextCell, self).__init__()
+        self.value = content
+        self.layout = layout
+        self.continuous_update = False
         self.position = position
         self.add_class('gridcell')
 
@@ -74,54 +80,67 @@ class BlankCell(Text):
         sage: from sage_combinat_widgets.grid_view_widget import BlankCell
         sage: b = BlankCell()
     """
-    displaytype = unicode
+    displaytype = text_type
 
     def __init__(self, layout=textcell_layout):
-        super(BlankCell, self).__init__('', layout=layout, disabled=True)
+        super(BlankCell, self).__init__()
+        self.value = ''
+        self.layout = layout
+        self.disabled = True
         self.add_class('blankcell')
 
 class AddableTextCell(Text):
     r"""An addable placeholder for adding a cell to the widget
 
-    TESTS
-    ::
-        sage: from sage_combinat_widgets.grid_view_widget import AddableTextCell
-        sage: a = AddableTextCell((3,4))
-    """
-    displaytype = unicode
 
     def __init__(self, position, layout=textcell_layout):
         super(AddableTextCell, self).__init__('', layout=layout, continuous_update=False)
         self.position = position
         self.add_class('addablecell')
 
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import AddableTextCell
+        sage: a = AddableTextCell((3,4))
+    """
+    displaytype = text_type
+
+    def __init__(self, position, layout=textcell_layout):
+        super(AddableTextCell, self).__init__('', layout=layout, continuous_update=False)
+        self.value = ''
+        self.layout = layout
+        self.continuous_update = False
+        self.position = position
+        self.add_class('addablecell')
+
 class ButtonCell(ToggleButton):
     r"""A button grid cell
 
-    TESTS
-    ::
+    TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
         sage: b = ButtonCell(True, (1,2))
     """
     displaytype = bool
 
     def __init__(self, content, position, layout=buttoncell_layout, **kws):
-        super(ButtonCell, self).__init__(content, layout=layout, disabled=True, **kws)
+        super(ButtonCell, self).__init__()
+        self.value = content
+        self.layout = layout
+        self.disabled = True
         self.position = position
         self.add_class('gridbutton')
 
 class AddableButtonCell(ToggleButton):
     r"""An addable placeholder for adding a button cell to the widget
 
-    TESTS
-    ::
+    TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import AddableButtonCell
         sage: a = AddableButtonCell((3,4))
     """
     displaytype = bool
 
     def __init__(self, position, layout=buttoncell_layout, **kws):
-        super(AddableButtonCell, self).__init__(layout=layout, **kws)
+        super(AddableButtonCell, self).__init__()
+        self.layout = layout
         self.position = position
         self.add_class('addablebutton')
         self.description = '+'
@@ -129,22 +148,29 @@ class AddableButtonCell(ToggleButton):
 class BlankButton(ToggleButton):
     r"""A blank placeholder button
 
-    TESTS
-    ::
+    TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import BlankButton
         sage: b = BlankButton()
     """
     displaytype = bool
 
     def __init__(self, layout=buttoncell_layout):
-        super(BlankButton, self).__init__(layout=layout, disabled=True)
+        super(BlankButton, self).__init__()
+        self.layout = layout
+        self.disabled=True
         self.add_class('blankbutton')
 
 def compute_tooltip(t):
-    r"""From a tuple (i,j),
+    r"""From a position (i,j),
     we just want the string 'i,j'
+    to use as a tooltip on buttons.
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import compute_tooltip
+        sage: compute_tooltip((42, 7))
+        '42, 7'
     """
-    return str(t)[-1:1]
+    return str(t)[1:-1]
 
 def get_model_id(w):
     r"""
@@ -155,33 +181,48 @@ def get_model_id(w):
         if w.widgets[u] == w:
             return u
 
-class GridViewWidget(GridViewEditor, VBox):
+class GridViewWidget(GridViewEditor, VBox, ValueWidget):
     r"""A widget for all grid-representable Sage objects
     """
 
-    def __init__(self, obj, cell_layout=None, cell_widget_classes=[TextCell], blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
+    def __init__(self, obj, adapter=None, display_convention='en', cell_layout=None, cell_widget_classes=[TextCell], \
+                 blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
         r"""
         Grid View Widget initialization.
 
         INPUT:
-
             - ``cell_widget_classes``: a list of classes for building cell widgets
             - ``blank_widget_class``: a widget class for building blank cells
             - ``addable_widget_class``: a widget class for building blank cells
 
-        TESTS
-        ::
-
+        TESTS::
             sage: from sage_combinat_widgets.grid_view_widget import *
             sage: t = StandardTableaux(15).random_element()
             sage: w = GridViewWidget(t)
             sage: from sage.graphs.generators.families import AztecDiamondGraph
             sage: az = AztecDiamondGraph(4)
             sage: w = GridViewWidget(az, cell_widget_classes=[ButtonCell], blank_widget_class=BlankButton)
+
+        Compatibility with `@interact`: the widget should be a
+        :class:`ipywidgets.ValueWidget` and have a description field::
+
+            sage: isinstance(w, ValueWidget)
+            True
+            sage: w.description
+            "Grid view widget for Jupyter notebook with cell class '<class 'sage_combinat_widgets.grid_view_widget.ButtonCell'>', for object 'Subgraph of (2D Grid Graph for [8, 8])'"
+
+        Basic compabitility test::
+
+            sage: def f(x = w): return az.average_distance()
+            sage: f = interact(f)
+            <html>...</html>
         """
-        GridViewEditor.__init__(self, obj)
+        GridViewEditor.__init__(self, obj, adapter)
         VBox.__init__(self)
         self._model_id = get_model_id(self)
+        self.display_convention = display_convention
+        self.description = "Grid view widget for Jupyter notebook with cell class '%s', for object '%s'" % (
+            cell_widget_classes[0], obj)
         if not cell_layout:
             if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
                 cell_layout = buttoncell_layout
@@ -194,18 +235,19 @@ class GridViewWidget(GridViewEditor, VBox):
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
         self.draw()
+        self.initialization = False
 
     def to_cell(self, val):
         r"""
         From a widget cell value `val`,
         return a valid editor cell value.
-        TESTS
-        ::
-        sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
-        sage: t = StandardTableaux(5).random_element()
-        sage: w = GridViewWidget(t)
-        sage: w.to_cell('3')
-        3
+
+        TESTS::
+            sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
+            sage: t = StandardTableaux(5).random_element()
+            sage: w = GridViewWidget(t)
+            sage: w.to_cell('3')
+            3
         """
         return self.cast(val)
 
@@ -217,7 +259,7 @@ class GridViewWidget(GridViewEditor, VBox):
         for pos in self.cells.keys():
             traitname = 'cell_%d_%d' % (pos)
             try:
-                child = self.children[pos[0]].children[pos[1]]
+                child = self.get_child(pos)
             except:
                 child = None
             if child and hasattr(child, 'value') and traitname in self.traits():
@@ -226,7 +268,7 @@ class GridViewWidget(GridViewEditor, VBox):
             # A directional link to trait 'add_i_j'
             traitname = 'add_%d_%d' % (pos)
             try:
-                child = self.children[pos[0]].children[pos[1]]
+                child = self.get_child(pos)
                 if child and hasattr(child, 'value') and traitname in self.traits():
                     self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
             except:
@@ -274,15 +316,46 @@ class GridViewWidget(GridViewEditor, VBox):
                             cell.add_class('removablecell')
                     hbox_children.append(cell)
                 elif (i,j) in addable_positions:
+                    # Inside the grid-represented object limits
                     hbox_children.append(self.addable_widget_class((i,j), self.cell_layout))
                 else:
                     hbox_children.append(self.blank_widget_class(self.cell_layout))
                 j+=1
-                if (i,j) in addable_positions:
+                if j > max([t[0][1] for t in rows[i]]) and (i,j) in addable_positions:
+                    # Outside of the grid-represented object limits
                     hbox_children.append(self.addable_widget_class((i,j), self.cell_layout))
             vbox_children.append(HBox(hbox_children))
         for row in addable_rows:
             if row[0] > i:
                 vbox_children.append(HBox([self.addable_widget_class((i,j), self.cell_layout) for c in row[1]]))
+        if self.display_convention == 'fr':
+            vbox_children.reverse()
         self.children = vbox_children
         self.add_links()
+
+    def get_child(self, pos):
+        r"""
+        Get child widget corresponding to self.cells[pos]
+
+        TESTS::
+            sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
+            sage: t = StandardTableau([[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]])
+            sage: w1 = GridViewWidget(t)
+            sage: w1.get_child((1,2)).value
+            u'13'
+            sage: w2 = GridViewWidget(t, display_convention='fr')
+            sage: w1.get_child((1,2)).value == w2.get_child((1,2)).value
+            True
+        """
+        if self.display_convention == 'fr':
+            try:
+                return self.children[self.adapter.height(self.value) - pos[0]].children[pos[1]]
+            except:
+                raise NotImplementedError
+        return self.children[pos[0]].children[pos[1]]
+
+def PartitionGridViewWidget(obj):
+    r"""
+    A default widget for partitions.
+    """
+    return GridViewWidget(obj, cell_widget_classes=[ButtonCell], addable_widget_class=AddableButtonCell)

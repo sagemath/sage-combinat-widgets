@@ -3,3 +3,9 @@
 images/
 sage_combinat_widgets.egg-info/
 docs/build/
+TODO*
+test*.ipynb
+build/
+dist/
+Untitled*.ipynb
+DEBUG

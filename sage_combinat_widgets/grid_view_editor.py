@@ -2,9 +2,7 @@
 r"""
 An editable Grid View Editor for Sage objects
 
-EXAMPLES
-::
-
+EXAMPLES::
     sage: from sage_combinat_widgets import GridViewEditor
     sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
     sage: e = GridViewEditor(t)
@@ -31,8 +29,7 @@ def extract_coordinates(s):
     r"""
     Extract a coordinate pair from a string with tokens.
 
-    TESTS
-    ::
+    TESTS::
         sage: from sage_combinat_widgets.grid_view_editor import extract_coordinates
         sage: extract_coordinates('add_0_4')
         (0, 4)
@@ -52,8 +49,7 @@ def get_adapter(obj):
 
     OUTPUT: an adapter object
 
-    TESTS
-    ::
+    TESTS::
         sage: from sage_combinat_widgets.grid_view_editor import get_adapter
         sage: from sage.combinat.partition import Partition
         sage: p = Partition([3,2,1,1])
@@ -70,6 +66,10 @@ def get_adapter(obj):
     if issubclass(obj.__class__, Partition):
         from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
         return PartitionGridViewAdapter()
+    from sage.combinat.skew_partition import SkewPartition
+    if issubclass(obj.__class__, SkewPartition):
+        from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
+        return SkewPartitionGridViewAdapter()
     from sage.combinat.tableau import Tableau
     if issubclass(obj.__class__, Tableau):
         from sage.combinat.tableau import SemistandardTableau, StandardTableau
@@ -81,6 +81,10 @@ def get_adapter(obj):
             return SemistandardTableauGridViewAdapter()
         from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
         return TableauGridViewAdapter()
+    from sage.combinat.skew_tableau import SkewTableau
+    if issubclass(obj.__class__, SkewTableau):
+        from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
+        return SkewTableauGridViewAdapter()
     from sage.matrix.matrix2 import Matrix
     if issubclass(obj.__class__, Matrix):
         from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
@@ -104,8 +108,7 @@ class cdlink(traitlets.link):
             - ``target`` -- a pair (target widget, trait name)
             - ``cast`` -- a cast function
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage_combinat_widgets.grid_view_editor import cdlink
             sage: from ipywidgets import Checkbox, Text
             sage: b = Checkbox()
@@ -144,6 +147,7 @@ class GridViewEditor(BindableEditorClass):
     that are refered to through object cells as a dictionary
     with coordinates (row_number, cell_number_in_row) as keys
     """
+    value = traitlets.Any()
 
     def __init__(self, obj, adapter=None):
         r"""
@@ -154,9 +158,7 @@ class GridViewEditor(BindableEditorClass):
             - ``obj`` -- a Sage object
             - ``adapter`` -- an adapter object (optional)
 
-        TESTS
-        ::
-
+        TESTS::
             sage: from sage_combinat_widgets import GridViewEditor
             sage: from sage.all import matrix, graphs
             sage: from sage.graphs.generic_graph import GenericGraph
@@ -173,12 +175,9 @@ class GridViewEditor(BindableEditorClass):
             sage: e = GridViewEditor(f)
             Traceback (most recent call last):
             ...
-            TypeError: Is this object really grid-representable?
+            TypeError: Cannot find an Adapter for this object (<class 'sage.symbolic.expression.Expression'>)
         """
-        try:
-            cells = list(obj)
-        except:
-            raise TypeError("Is this object really grid-representable?")
+        self.initialization = True
         super(GridViewEditor, self).__init__()
         self.value = obj
         if adapter:
@@ -187,6 +186,8 @@ class GridViewEditor(BindableEditorClass):
             self.adapter = get_adapter(obj)
         if not self.adapter:
             raise TypeError("Cannot find an Adapter for this object (%s)" % obj.__class__)
+        if not hasattr(self.adapter, 'compute_cells') or not callable(self.adapter.compute_cells):
+            raise NotImplementedError("Method `compute_cells` is required!")
         self.compute()
         self.links = []
 
@@ -200,7 +201,7 @@ class GridViewEditor(BindableEditorClass):
 
     def validate(self, obj, value=None, obj_class=None):
         r"""
-        Validate the object type
+        Validate object type.
         """
         if obj_class:
             return issubclass(obj.__class__, obj_class)
@@ -226,17 +227,12 @@ class GridViewEditor(BindableEditorClass):
         r"""We have an object value
         but we want to compute cells
         as a dictionary (row_number, cell_number_in_row) -> trait
-        The cell traitclass will depend on the object
         """
         if not obj:
             obj = self.value
         if not obj:
             return
-        try:
-            self.cells = self.adapter.compute_cells(obj)
-        except:
-            print("Cannot compute cells for this object")
-            self.cells = {}
+        self.cells = self.adapter.compute_cells(obj)
         celltype = self.adapter.celltype
         traitclass = self.adapter.traitclass
         default_value = self.adapter.cellzero
@@ -273,6 +269,10 @@ class GridViewEditor(BindableEditorClass):
         self.modified_add_traits(**traits_to_add)
 
     def reset_links(self):
+        r"""
+        Reset all potentially existing links
+        between widget cells and corresponding traits.
+        """
         for lnk in self.links:
             lnk.unlink()
         self.links = []
@@ -285,9 +285,16 @@ class GridViewEditor(BindableEditorClass):
         pass
 
     def get_value(self):
+        r"""
+        Return editor value.
+        """
         return self.value
 
     def set_value(self, obj, compute=False):
+        r"""
+        Check compatibility, then set editor value.
+        If compute=True, call methods compute() and draw().
+        """
         if not self.validate(obj, self.value.__class__):
             raise ValueError("Object %s is not compatible." % str(obj))
         self.value = obj
@@ -296,6 +303,9 @@ class GridViewEditor(BindableEditorClass):
             self.draw()
 
     def get_cells(self):
+        r"""
+        Return grid editor cells.
+        """
         return self.cells
 
     def set_value_from_cells(self, obj_class=None, cells={}):
@@ -332,16 +342,19 @@ class GridViewEditor(BindableEditorClass):
     @traitlets.observe(traitlets.All)
     def set_cell(self, change):
         r"""
-        TESTS:
-        sage: from sage_combinat_widgets import GridViewEditor
-        sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
-        sage: e = GridViewEditor(t)
-        sage: from traitlets import Bunch
-        sage: change = Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'})
-        sage: e.set_cell(change)
-        sage: e.value
-        [[1, 2, 7, 6], [3], [4]]
+        TESTS::
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: e.initialization = False # This class is not meant to work by itself without a widget.
+            sage: from traitlets import Bunch
+            sage: change = Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'})
+            sage: e.set_cell(change)
+            sage: e.value
+            [[1, 2, 7, 6], [3], [4]]
         """
+        if self.initialization:
+            return
         if not change.name.startswith('cell_'):
             return
         if change.new == change.old or not change.new:
@@ -364,32 +377,36 @@ class GridViewEditor(BindableEditorClass):
         r"""
         List addable cells for editor value
         """
+        if not hasattr(self.adapter, 'addable_cells') or not callable(self.adapter.addable_cells):
+            return [] # Optional method
         return self.adapter.addable_cells(self.value)
 
     def removable_cells(self):
         r"""
         List removable cells for editor value
         """
+        if not hasattr(self.adapter, 'removable_cells') or not callable(self.adapter.removable_cells):
+            return [] # Optional method
         return self.adapter.removable_cells(self.value)
 
     @traitlets.observe(traitlets.All)
     def add_cell(self, change):
         r"""
         TESTS:
-        sage: from sage_combinat_widgets import GridViewEditor
-        sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
-        sage: e = GridViewEditor(t)
-        sage: from traitlets import Bunch
-        sage: change = Bunch({'name': 'add_1_1', 'old': 0, 'new': 8, 'owner': e, 'type': 'change'})
-        sage: e.add_cell(change)
-        sage: e.value
-        [[1, 2, 5, 6], [3, 8], [4]]
-        sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
-        sage: e = GridViewEditor(t)
-        sage: e.add_cell(change)
-        Cell (1, 1) with value '8' cannot be added to this object!
-        sage: e.value
-        [[1, 2, 5, 6], [3], [4]]
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: from traitlets import Bunch
+            sage: change = Bunch({'name': 'add_1_1', 'old': 0, 'new': 8, 'owner': e, 'type': 'change'})
+            sage: e.add_cell(change)
+            sage: e.value
+            [[1, 2, 5, 6], [3, 8], [4]]
+            sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: e.add_cell(change)
+            Cell (1, 1) with value '8' cannot be added to this object!
+            sage: e.value
+            [[1, 2, 5, 6], [3], [4]]
         """
         if not change.name.startswith('add_') \
            or self.to_cell(change.new) == self.adapter.cellzero:
@@ -399,7 +416,7 @@ class GridViewEditor(BindableEditorClass):
         if self.adapter.add_cell.__func__.__class__ is AbstractMethod:
             return # Method not implemented
         val = change.new
-        if val == True:
+        if val is True:
             val = False # if it's a button, reverse button toggling
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
@@ -438,17 +455,17 @@ class GridViewEditor(BindableEditorClass):
     @traitlets.observe(traitlets.All)
     def remove_cell(self, change):
         r"""
-        TESTS:
-        sage: from sage_combinat_widgets import GridViewEditor
-        sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
-        sage: e = GridViewEditor(t)
-        sage: from traitlets import Bunch
-        sage: e.remove_cell(Bunch({'name': 'cell_0_3', 'old': 6, 'new': 0, 'owner': e, 'type': 'change'}))
-        sage: e.value
-        [[1, 2, 5], [3], [4]]
-        sage: e.remove_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 0, 'owner': e, 'type': 'change'}))
-        sage: e.value
-        [[1, 2, 5], [3]]
+        TESTS::
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: from traitlets import Bunch
+            sage: e.remove_cell(Bunch({'name': 'cell_0_3', 'old': 6, 'new': 0, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            [[1, 2, 5], [3], [4]]
+            sage: e.remove_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 0, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            [[1, 2, 5], [3]]
         """
         if not change.name.startswith('cell_'):
             return
@@ -479,6 +496,36 @@ class GridViewEditor(BindableEditorClass):
         self.draw()
 
     def append_row(self, r=None):
+        r"""
+        Append a row to editor value.
+
+        TESTS::
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: e = GridViewEditor(m)
+            sage: e.value
+            [ 1  7  1]
+            [ 0  0  3]
+            [ 0 -1  2]
+            [ 1  0 -3]
+            sage: e.append_row((1,2,3))
+            sage: e.value
+            [ 1  7  1]
+            [ 0  0  3]
+            [ 0 -1  2]
+            [ 1  0 -3]
+            [ 1  2  3]
+            sage: from sage.combinat.tableau import Tableau
+            sage: e = GridViewEditor(Tableau([[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]]))
+            sage: e.value
+            [[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]]
+            sage: e.append_row((1,2,3))
+            Traceback (most recent call last):
+            ...
+            TypeError: 'NotImplementedType' object is not callable
+        """
         if not hasattr(self.adapter, 'append_row'):
             raise TypeError("Cannot append row to this object.")
         obj = copy(self.value)
@@ -486,6 +533,9 @@ class GridViewEditor(BindableEditorClass):
         self.set_value(obj, True) # Will take care of everything
 
     def insert_row(self, index, r=None):
+        r"""
+        Insert a row into editor value.
+        """
         if not hasattr(self.adapter, 'insert_row'):
             raise TypeError("Cannot insert row to this object.")
         obj = copy(self.value)
@@ -493,6 +543,9 @@ class GridViewEditor(BindableEditorClass):
         self.set_value(obj, True) # Will take care of everything
 
     def remove_row(self, index=None):
+        r"""
+        Remove a row from editor value.
+        """
         if not hasattr(self.adapter, 'remove_row'):
             raise TypeError("Cannot remove row from this object.")
         obj = copy(self.value)
@@ -500,6 +553,35 @@ class GridViewEditor(BindableEditorClass):
         self.set_value(obj, True) # Will take care of everything
 
     def append_column(self, c=None):
+        r"""
+        Append a column to editor value.
+
+        TESTS::
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: e = GridViewEditor(m)
+            sage: e.value
+            [ 1  7  1]
+            [ 0  0  3]
+            [ 0 -1  2]
+            [ 1  0 -3]
+            sage: e.append_column((1,2,3))
+            sage: e.value
+            [ 1  7  1  1]
+            [ 0  0  3  2]
+            [ 0 -1  2  3]
+            [ 1  0 -3  0]
+            sage: from sage.combinat.tableau import Tableau
+            sage: e = GridViewEditor(Tableau([[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]]))
+            sage: e.value
+            [[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]]
+            sage: e.append_column((1,2,3))
+            Traceback (most recent call last):
+            ...
+            TypeError: 'NotImplementedType' object is not callable
+        """
         if not hasattr(self.adapter, 'append_column'):
             raise TypeError("Cannot append column to this object.")
         obj = copy(self.value)
@@ -507,6 +589,9 @@ class GridViewEditor(BindableEditorClass):
         self.set_value(obj, True) # Will take care of everything
 
     def insert_column(self, index, c=None):
+        r"""
+        Insert a column into editor value.
+        """
         if not hasattr(self.adapter, 'insert_column'):
             raise TypeError("Cannot insert column to this object.")
         obj = copy(self.value)
@@ -514,6 +599,9 @@ class GridViewEditor(BindableEditorClass):
         self.set_value(obj, True) # Will take care of everything
 
     def remove_column(self, index=None):
+        r"""
+        Remove a column from editor value.
+        """
         if not hasattr(self.adapter, 'remove_column'):
             raise TypeError("Cannot remove column from this object.")
         obj = copy(self.value)

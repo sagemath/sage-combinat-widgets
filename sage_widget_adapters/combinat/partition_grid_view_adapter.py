@@ -24,9 +24,19 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from sage.combinat.partition import *
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+from six import text_type
 
 class PartitionGridViewAdapter(GridViewAdapter):
+    r"""
+    Grid view adapter for partitions.
+
+    ATTRIBUTES::
+        * ``objclass`` -- Partition
+        * ``celltype`` -- bool
+        * ``cellzero`` -- False
+    """
     objclass = Partition
+    constructorname = 'Partition'
     celltype = bool
     cellzero = False
 
@@ -34,9 +44,17 @@ class PartitionGridViewAdapter(GridViewAdapter):
     def cell_to_display(cell_content, display_type=bool):
         r"""
         From object cell content
-        to widget display value
+        to widget display value.
+
+        TESTS::
+            sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
+            sage: PartitionGridViewAdapter.cell_to_display(True)
+            True
+            sage: from six import text_type
+            sage: PartitionGridViewAdapter.cell_to_display("my string", text_type)
+            ''
         """
-        if display_type == unicode:
+        if display_type == text_type:
             return ''
         return cell_content
 
@@ -44,8 +62,16 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         From widget cell value
         to object display content
+
+        TESTS::
+            sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
+            sage: pa = PartitionGridViewAdapter()
+            sage: pa.display_to_cell(True)
+            True
+            sage: pa.display_to_cell('')
+            False
         """
-        if not display_value or display_type == unicode:
+        if not display_value or display_type == text_type:
             return self.cellzero
         return display_value
 
@@ -55,8 +81,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
         From a partition,
         return a dictionary { coordinates pair : Integer }
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([3, 2, 1, 1])
@@ -77,8 +102,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
         From a dictionary { coordinates pair : Integer }
         return a corresponding partition
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: PartitionGridViewAdapter.from_cells({(0, 0): False, (0, 1): False, (0, 2): True, (0, 3): False, (1, 0): False, (2, 0): True})
@@ -95,26 +119,29 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         Get cell value
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
-            sage: PartitionGridViewAdapter.get_cell(p, (1,1))
+            sage: PartitionGridViewAdapter.get_cell(p, (1, 1))
             False
+            sage: PartitionGridViewAdapter.get_cell(p, (1, 6))
+            Traceback (most recent call last):
+            ...
+            ValueError: Cell '(1, 6)' not in partition.
         """
         try:
-            return False
+            assert pos[0] < len(obj) and pos[1] < obj[pos[0]]
         except:
-            raise ValueError("Cell %s does not exist!" % str(pos))
+            raise ValueError("Cell '%s' not in partition." % str(pos))
+        return False
 
     @staticmethod
     def addable_cells(obj):
         r"""
         List object addable cells
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
@@ -128,8 +155,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         List object removable cells
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
@@ -143,8 +169,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         Add cell
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
@@ -152,13 +177,13 @@ class PartitionGridViewAdapter(GridViewAdapter):
             [6, 5, 3, 1]
             sage: PartitionGridViewAdapter.add_cell(p, (4, 0), 42)
             [6, 5, 2, 1, 1]
-            sage: PartitionGridViewAdapter.add_cell(p, (2, 0)) # doctest: +IGNORE_EXCEPTION_DETAIL
+            sage: PartitionGridViewAdapter.add_cell(p, (2, 0))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 0)' is not addable.
         """
         if not pos in cls.addable_cells(obj):
-            raise ValueError("Position '%s' is not addable." % str(pos))
+            raise ValueError("Cell position '%s' is not addable." % str(pos))
         try:
             return obj.add_cell(pos[0])
         except:
@@ -169,14 +194,13 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         Remove cell
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
             sage: PartitionGridViewAdapter.remove_cell(p, (2, 1))
             [6, 5, 1, 1]
-            sage: PartitionGridViewAdapter.remove_cell(p, (1, 1)) # doctest: +IGNORE_EXCEPTION_DETAIL
+            sage: PartitionGridViewAdapter.remove_cell(p, (1, 1))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(1, 1)' is not removable.

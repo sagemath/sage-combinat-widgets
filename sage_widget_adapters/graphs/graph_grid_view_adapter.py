@@ -11,21 +11,17 @@ Grid View Adapter for grid-representable graphs
 
     :meth:`~GraphGridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
     :meth:`~GraphGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
-    :meth:`~GraphGridViewAdapter.cell_to_bool` | Static method for typecasting cell content to boolean
-    :meth:`~GraphGridViewAdapter.bool_to_cell` | Static method for typecasting boolean to cell content
+    :meth:`~GraphGridViewAdapter.height` | Static method -- get objet number of rows
     :meth:`~GraphGridViewAdapter.compute_cells` | Compute graph cells as a dictionary { coordinate pair : label }
     :meth:`~GraphGridViewAdapter.from_cells` | Create a new graph from a cells dictionary
     :meth:`~GraphGridViewAdapter.get_cell` | Get the graph cell content (i.e. None)
-    :meth:`~GraphGridViewAdapter.set_cell` | Set the graph cell content (does nothing)
     :meth:`~GraphGridViewAdapter.addable_cells` | List addable cells
     :meth:`~GraphGridViewAdapter.removable_cells` | List removable cells
     :meth:`~GraphGridViewAdapter.add_cell` | Add a cell
     :meth:`~GraphGridViewAdapter.remove_cell` | Remove a cell
     :meth:`~GraphGridViewAdapter.append_row` | Append a row
-    :meth:`~GraphGridViewAdapter.insert_row` | Insert a row at given index
     :meth:`~GraphGridViewAdapter.remove_row` | Remove a row at given index
     :meth:`~GraphGridViewAdapter.append_column` | Append a column
-    :meth:`~GraphGridViewAdapter.insert_column` | Insert a column at given index
     :meth:`~GraphGridViewAdapter.remove_column` | Remove a column at given index
 
 AUTHORS: Odile Bénassy, Nicolas Thiéry
@@ -33,8 +29,17 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from sage.graphs.graph import Graph
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+from six import text_type
 
 class GraphGridViewAdapter(GridViewAdapter):
+    r"""
+    Grid view adapter for grid-representable graphs.
+
+    ATTRIBUTES::
+        * ``objclass`` -- Graph
+        * ``celltype`` -- bool
+        * ``cellzero`` -- False
+    """
     objclass = Graph
     celltype = bool
     cellzero = False
@@ -43,20 +48,56 @@ class GraphGridViewAdapter(GridViewAdapter):
     def cell_to_display(cell_content, display_type=bool):
         r"""
         From object cell content
-        to widget display value
+        to widget display value.
+
+        TESTS::
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: GraphGridViewAdapter.cell_to_display(True)
+            True
+            sage: from six import text_type
+            sage: GraphGridViewAdapter.cell_to_display("my string", text_type)
+            ''
         """
-        if display_type == unicode:
+        if display_type == text_type:
             return ''
-        return cell_content
+        elif cell_content:
+            return cell_content
+        elif display_type == bool:
+            return False
 
     def display_to_cell(self, display_value, display_type=bool):
         r"""
         From widget cell value
         to object display content
+
+        TESTS::
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: ga = GraphGridViewAdapter()
+            sage: ga.display_to_cell(True)
+            True
+            sage: ga.display_to_cell('')
+            False
         """
-        if not display_value or display_type == unicode:
+        if not display_value or display_type == text_type:
             return self.cellzero
         return display_value
+
+    @staticmethod
+    def height(obj):
+        r"""
+        From a grid-representable graph `obj`,
+        return its height i.e. number of rows.
+        Needed for cartesian system display,
+        i.e. "French-style" display.
+
+        TESTS::
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = AztecDiamondGraph(2)
+            sage: GraphGridViewAdapter.height(g)
+            4
+        """
+        return max(v[0] for v in obj.vertices()) + 1
 
     @staticmethod
     def compute_cells(obj):
@@ -64,8 +105,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         From the graph vertices,
         make a dictionary { coordinates pair : None }
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.families import AztecDiamondGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = AztecDiamondGraph(2)
@@ -94,8 +134,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         From a dictionary { coordinates pair : None }
         return a graph with one vertex for every coordinates pair
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.families import AztecDiamondGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: GraphGridViewAdapter.from_cells({(0, 0): None, (0, 1): None, (1, 0): None, (1, 1): None, (2, 0): None, (2, 1): None})
@@ -107,6 +146,17 @@ class GraphGridViewAdapter(GridViewAdapter):
 
     @staticmethod
     def get_cell(obj, pos):
+        r"""
+        From a graph `graph` and a tuple `pos`,
+        return the object cell value at position `pos`.
+
+        TESTS::
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+            sage: g = AztecDiamondGraph(2)
+            sage: GraphGridViewAdapter.get_cell(g, (1,3)) is None
+            True
+        """
         return None
 
     @staticmethod
@@ -115,8 +165,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         No cell should be added in isolation
         except for linear graphs
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((2,3))
@@ -146,8 +195,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         No cell should be removed in isolation
         except for linear graphs
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((2,3))
@@ -174,8 +222,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         Add a cell to the graph.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((1,2))
@@ -194,8 +241,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         Remove a cell from the graph.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((1, 2))
@@ -208,16 +254,15 @@ class GraphGridViewAdapter(GridViewAdapter):
         return obj
 
     @classmethod
-    def add_row(cls, obj):
+    def append_row(cls, obj):
         r"""
         Add a row to the graph.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
-            sage: GraphGridViewAdapter.add_row(g)
+            sage: GraphGridViewAdapter.append_row(g)
             Grid Graph for [3, 2]: Graph on 8 vertices
         """
         row_max, col_max = 0, 0
@@ -232,8 +277,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         Remove a row from the graph
 
-        TESTS:
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
@@ -248,16 +292,15 @@ class GraphGridViewAdapter(GridViewAdapter):
         return obj
 
     @classmethod
-    def add_column(cls, obj):
+    def append_column(cls, obj):
         r"""
         Add a column to the graph.
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
-            sage: GraphGridViewAdapter.add_column(g)
+            sage: GraphGridViewAdapter.append_column(g)
             Grid Graph for [3, 2]: Graph on 9 vertices
         """
         row_max, col_max = 0, 0
@@ -272,8 +315,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         r"""
         Remove a column from the graph
 
-        TESTS
-        ::
+        TESTS::
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
