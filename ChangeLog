@@ -1,3 +1,6 @@
+0.5.6:
+	* Tutorial completed
+        * Small fixes, tests
 0.5.5:
 	* Adapter tutorial
 	* Default implementations for accessors in generic adapter
