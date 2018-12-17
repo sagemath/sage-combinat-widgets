@@ -68,7 +68,7 @@ class GridViewAdapter(object):
     constructorname = None
 
     @staticmethod
-    def cell_to_display(cell_content, display_type):
+    def cell_to_display(cell_content, display_type=text_type):
         r"""
         From a cell value `cell_content`,
         return widget display value.
@@ -85,7 +85,7 @@ class GridViewAdapter(object):
             return str(cell_content)
         return cell_content
 
-    def display_to_cell(self, display_value, display_type=None):
+    def display_to_cell(self, display_value, display_type=text_type):
         r"""
         From an unicode string `s`,
         return matching cell value.
