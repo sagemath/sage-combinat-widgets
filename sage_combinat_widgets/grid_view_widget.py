@@ -249,6 +249,33 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         r"""
         Link each individual widget cell
         to its corresponding trait in the editor
+
+        TESTS::
+            sage: from sage.combinat.tableau import StandardTableaux
+            sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
+            sage: t = StandardTableaux(15).random_element()
+            sage: w1 = GridViewWidget(t)
+            sage: w2 = GridViewWidget(t, display_convention='fr')
+            sage: len(w1.links)
+            20
+            sage: assert len(w1.links) == len(w2.links)
+            sage: def test0(w): return (w.links[0].source[0].__class__, w.links[0].source[0].value, w.links[0].target[1])
+            sage: def test10(w): return (w.links[10].source[0].__class__, w.links[10].source[0].value, w.links[10].target[1])
+            sage: def test17(w): return (w.links[17].source[0].__class__, w.links[17].source[0].value, w.links[17].target[1])
+            sage: assert test0(w1) == test0(w2)
+            sage: assert test10(w1) == test10(w2)
+            sage: assert test17(w1) == test17(w2)
+            sage: from sage.combinat.skew_tableau import SkewTableau
+            sage: s = SkewTableau([[None, None, 1, 2], [None, 1], [4]])
+            sage: w1 = GridViewWidget(s)
+            sage: w2 = GridViewWidget(s, display_convention='fr')
+            sage: len(w1.links)
+            10
+            sage: assert len(w1.links) == len(w2.links)
+            sage: def test0(w): return (w.links[0].source[0].__class__, w.links[0].source[0].value, w.links[0].target[1])
+            sage: def test4(w): return (w.links[4].source[0].__class__, w.links[4].source[0].value, w.links[4].target[1])
+            sage: assert test0(w1) == test0(w2)
+            sage: assert test4(w1) == test4(w2)
         """
         for pos in self.cells.keys():
             traitname = 'cell_%d_%d' % (pos)
