@@ -124,6 +124,12 @@ class cdlink(traitlets.link):
             source[0].observe(self._update_target, names=source[1])
             target[0].observe(self._update_source, names=target[1])
 
+    def __repr__(self):
+        r"""
+        Try to get a useful repr for our link class.
+        """
+        return "A typecasting directional link from source=(%s, %s) to target='%s'" % (self.source[0].__class__, self.source[0].value, self.target[1])
+
     def _update_target(self, change):
         if self.updating:
             return
@@ -428,6 +434,13 @@ class GridViewEditor(BindableEditorClass):
             Cell (1, 1) with value '8' cannot be added to this object!
             sage: e.value
             [[1, 2, 5, 6], [3], [4]]
+            sage: e = GridViewEditor(SkewTableau([[None, None, 1, 2], [None, 1], [4]]))
+            sage: e.add_cell(Bunch({'name': 'add_0_4', 'old': 0, 'new': 3, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            [[None, None, 1, 2, 3], [None, 1], [4]]
+            sage: e.add_cell(Bunch({'name': 'add_1_0', 'old': 0, 'new': 1, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            [[None, None, 1, 2, 3], [1, 1], [4]]
         """
         if not change.name.startswith('add_') \
            or self.to_cell(change.new) == self.adapter.cellzero:
@@ -487,6 +500,10 @@ class GridViewEditor(BindableEditorClass):
             sage: e.remove_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 0, 'owner': e, 'type': 'change'}))
             sage: e.value
             [[1, 2, 5], [3]]
+            sage: e = GridViewEditor(SkewTableau([[None, None, 1, 2, 3], [None, 1], [4]]))
+            sage: e.remove_cell(Bunch({'name': 'cell_0_4', 'old': 3, 'new': 0, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            [[None, None, 1, 2], [None, 1], [4]]
         """
         if not change.name.startswith('cell_'):
             return

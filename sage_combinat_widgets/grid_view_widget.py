@@ -276,6 +276,18 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             sage: def test4(w): return (w.links[4].source[0].__class__, w.links[4].source[0].value, w.links[4].target[1])
             sage: assert test0(w1) == test0(w2)
             sage: assert test4(w1) == test4(w2)
+            sage: w2.links[2]
+            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.TextCell'>, 1) to target='cell_0_2'
+            sage: w2.links[6]
+            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>, ) to target='add_0_4'
+            sage: from traitlets import Bunch
+            sage: w2.add_cell(Bunch({'name': 'add_0_4', 'old': 0, 'new': 3, 'owner': w2, 'type': 'change'}))
+            sage: w2.value
+            [[None, None, 1, 2, 3], [None, 1], [4]]
+            sage: w2.links[2]
+            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.TextCell'>, 3) to target='cell_0_4'
+            sage: w2.links[7]
+            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>, ) to target='add_0_5'
         """
         for pos in self.cells.keys():
             traitname = 'cell_%d_%d' % (pos)
@@ -372,8 +384,15 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             return self.children[self.height - pos[0]].children[pos[1]]
         return self.children[pos[0]].children[pos[1]]
 
-def PartitionGridViewWidget(obj):
+def PartitionGridViewWidget(obj, display_convention='en'):
     r"""
     A default widget for partitions.
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import PartitionGridViewWidget
+        sage: sp = SkewPartition([[7, 4, 2, 1],[2, 1, 1]])
+        sage: w = PartitionGridViewWidget(sp,  display_convention='fr')
+        sage: len(w.links)
+        17
     """
-    return GridViewWidget(obj, cell_widget_classes=[ButtonCell], addable_widget_class=AddableButtonCell)
+    return GridViewWidget(obj, cell_widget_classes=[ButtonCell], addable_widget_class=AddableButtonCell, display_convention=display_convention)
