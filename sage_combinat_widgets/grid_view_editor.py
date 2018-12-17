@@ -160,22 +160,22 @@ class GridViewEditor(BindableEditorClass):
 
         TESTS::
             sage: from sage_combinat_widgets import GridViewEditor
-            sage: from sage.all import matrix, graphs
             sage: from sage.graphs.generic_graph import GenericGraph
-            sage: g = graphs.AztecDiamondGraph(3)
-            sage: e = GridViewEditor(g)
-            sage: t = StandardTableaux(5).random_element()
-            sage: e = GridViewEditor(t)
-            sage: f = x^5
-            sage: v = vector((1,2,3))
-            sage: e = GridViewEditor(v)
+            sage: e = GridViewEditor(graphs.AztecDiamondGraph(2))
+            sage: e.cells
+            {(0, 1): None, (0, 2): None, (1, 0): None, (1, 1): None, (1, 2): None, (1, 3): None, (2, 0): None,
+            (2, 1): None, (2, 2): None, (2, 3): None, (3, 1): None, (3, 2): None}
+            sage: e = GridViewEditor(StandardTableaux(5).random_element())
+            sage: e.cells
+            {(0, 0): 1, (1, 0): 2, (2, 0): 3, (3, 0): 4, (4, 0): 5}
+            sage: e = GridViewEditor(vector((1,2,3)))
             Traceback (most recent call last):
             ...
             TypeError: Cannot find an Adapter for this object (<type 'sage.modules.vector_integer_dense.Vector_integer_dense'>)
-            sage: e = GridViewEditor(f)
+            sage: e = GridViewEditor(x^5)
             Traceback (most recent call last):
             ...
-            TypeError: Cannot find an Adapter for this object (<class 'sage.symbolic.expression.Expression'>)
+            TypeError: Cannot find an Adapter for this object (<type 'sage.symbolic.expression.Expression'>)
         """
         self.initialization = True
         super(GridViewEditor, self).__init__()
@@ -267,6 +267,27 @@ class GridViewEditor(BindableEditorClass):
                 traits_to_add[traitname] = trait
         self.traitclass = traitclass
         self.modified_add_traits(**traits_to_add)
+
+    def compute_height(self):
+        r"""
+        Compute value height.
+
+        TESTS::
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: from sage.combinat.partition import Partition
+            sage: e = GridViewEditor(Partition([3,3,2,1]))
+            sage: e.compute_height()
+            sage: e.height
+            4
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: e = GridViewEditor(AztecDiamondGraph(2))
+            sage: e.compute_height()
+            sage: e.height
+            4
+        """
+        if not hasattr(self, 'cells'):
+            self.compute()
+        self.height = max(pos[0] for pos in self.cells) + 1
 
     def reset_links(self):
         r"""

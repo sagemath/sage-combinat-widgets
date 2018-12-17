@@ -212,6 +212,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         GridViewEditor.__init__(self, obj, adapter)
         VBox.__init__(self)
         self._model_id = get_model_id(self)
+        if display_convention == 'fr':
+            self.compute_height()
         self.display_convention = display_convention
         self.description = "Grid view widget for Jupyter notebook with cell class '%s', for object '%s'" % (
             cell_widget_classes[0], obj)
@@ -340,10 +342,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             True
         """
         if self.display_convention == 'fr':
-            try:
-                return self.children[self.adapter.height(self.value) - pos[0]].children[pos[1]]
-            except:
-                raise NotImplementedError
+            return self.children[self.height - pos[0]].children[pos[1]]
         return self.children[pos[0]].children[pos[1]]
 
 def PartitionGridViewWidget(obj):

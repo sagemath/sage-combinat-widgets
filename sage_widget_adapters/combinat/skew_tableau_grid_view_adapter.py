@@ -9,12 +9,8 @@ Grid View Adapter for skew tableaux
     :widths: 30, 70
     :delim: |
 
-    :meth:`~SkewTableauGridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
-    :meth:`~SkewTableauGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
     :meth:`~SkewTableauGridViewAdapter.compute_cells` | Compute skew tableau cells as a dictionary { coordinate pair : Integer }
     :meth:`~SkewTableauGridViewAdapter.from_cells` | Create a new skew tableau from a cells dictionary
-    :meth:`~SkewTableauGridViewAdapter.get_cell` | Get the skew tableau cell content
-    :meth:`~SkewTableauGridViewAdapter.set_cell` | Set the skew tableau cell content
     :meth:`~SkewTableauGridViewAdapter.addable_cells` | List addable cells
     :meth:`~SkewTableauGridViewAdapter.removable_cells` | List removable cells
     :meth:`~SkewTableauGridViewAdapter.add_cell` | Add a cell
