@@ -212,8 +212,6 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         GridViewEditor.__init__(self, obj, adapter)
         VBox.__init__(self)
         self._model_id = get_model_id(self)
-        if display_convention == 'fr':
-            self.compute_height()
         self.display_convention = display_convention
         self.description = "Grid view widget for Jupyter notebook with cell class '%s', for object '%s'" % (
             cell_widget_classes[0], obj)
@@ -357,6 +355,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                 vbox_children.append(HBox([self.addable_widget_class((i,j), self.cell_layout) for c in row[1]]))
         if self.display_convention == 'fr':
             vbox_children.reverse()
+            self.compute_height()
         self.children = vbox_children
         self.add_links()
 
