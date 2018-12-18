@@ -321,7 +321,7 @@ class GridViewEditor(BindableEditorClass):
         """
         return self.value
 
-    def set_value(self, obj, compute=False):
+    def set_value(self, obj, compute=True):
         r"""
         Check compatibility, then set editor value.
         If compute=True, call methods compute() and draw().
@@ -368,7 +368,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Unable to cast the given cells into a grid-like object.")
         if not self.validate(obj, None, obj_class):
             raise ValueError("Could not make a compatible ('%s')  object from given cells" % str(obj_class))
-        self.set_value(obj)
+        self.set_value(obj, False)
 
     @traitlets.observe(traitlets.All)
     def set_cell(self, change):
@@ -397,7 +397,7 @@ class GridViewEditor(BindableEditorClass):
         if new_obj == obj:
             # FIXME reverse the display change
             return
-        self.set_value(new_obj)
+        self.set_value(new_obj, False)
         # Edit the cell dictionary
         self.cells[pos] = val
         # Edit the trait
@@ -462,33 +462,9 @@ class GridViewEditor(BindableEditorClass):
         if not self.validate(new_obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
         if new_obj == obj: # The proposed change was invalid -> stop here
-            # FIXME reverse the display change
+            self.draw() # Reverse the display change
             return
-        self.value = new_obj
-        self.cells[pos] = val
-        # Adding a new trait and more addable cell(s)
-        traits_to_add = {}
-        traitname = 'cell_%d_%d' % pos
-        traitvalue = val
-        if self.has_trait(traitname):
-            self.set_trait(traitname, traitvalue)
-        else:
-            trait = self.traitclass(self.adapter.celltype)
-            trait.value = traitvalue
-            traits_to_add[traitname] = trait
-        previous_addable_traitname = 'add_%d_%d' % pos
-        if self.has_trait(previous_addable_traitname):
-            del(self.traits()[previous_addable_traitname])
-            #del self._trait_values[addable_traitname]
-        for pos in self.addable_cells():
-            emptytraitname = 'add_%d_%d' % pos
-            if not self.has_trait(emptytraitname):
-                emptytrait = self.traitclass(self.adapter.celltype)
-                emptytrait.name = emptytraitname
-                emptytrait.value = self.adapter.cellzero
-                traits_to_add[emptytraitname] = emptytrait
-        self.modified_add_traits(**traits_to_add)
-        self.draw()
+        self.set_value(new_obj) # Calls compute() and draw() by default
 
     @traitlets.observe(traitlets.All)
     def remove_cell(self, change):
@@ -527,14 +503,13 @@ class GridViewEditor(BindableEditorClass):
         if not self.validate(new_obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
         if new_obj == obj: # The proposed change was invalid -> stop here
-            # FIXME reverse the display change
+            self.draw() # Reverse the display change
             return
         del(self.cells[pos])
         traitname = 'cell_%d_%d' % pos
         if self.has_trait(traitname):
             del(self.traits()[traitname])
-            #del(self._trait_values[traitname])
-        self.value = new_obj
+        self.value = new_obj # Avoid calling compute() unless it becomes really necessary
         self.draw()
 
     def append_row(self, r=None):
@@ -572,7 +547,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot append row to this object.")
         obj = copy(self.value)
         obj = self.adapter.append_row(obj, r)
-        self.set_value(obj, True) # Will take care of everything
+        self.set_value(obj) # Will take care of everything
 
     def insert_row(self, index, r=None):
         r"""
@@ -582,7 +557,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot insert row to this object.")
         obj = copy(self.value)
         obj = self.adapter.insert_row(obj, index, r)
-        self.set_value(obj, True) # Will take care of everything
+        self.set_value(obj) # Will take care of everything
 
     def remove_row(self, index=None):
         r"""
@@ -592,7 +567,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot remove row from this object.")
         obj = copy(self.value)
         obj = self.adapter.remove_row(obj, index)
-        self.set_value(obj, True) # Will take care of everything
+        self.set_value(obj) # Will take care of everything
 
     def append_column(self, c=None):
         r"""
@@ -628,7 +603,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot append column to this object.")
         obj = copy(self.value)
         obj = self.adapter.append_column(obj, c)
-        self.set_value(obj, True) # Will take care of everything
+        self.set_value(obj) # Will take care of everything
 
     def insert_column(self, index, c=None):
         r"""
@@ -638,7 +613,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot insert column to this object.")
         obj = copy(self.value)
         obj = self.adapter.insert_column(obj, index, c)
-        self.set_value(obj, True) # Will take care of everything
+        self.set_value(obj) # Will take care of everything
 
     def remove_column(self, index=None):
         r"""
