@@ -276,7 +276,7 @@ class GridViewEditor(BindableEditorClass):
 
     def compute_height(self):
         r"""
-        Compute value height.
+        Compute grid height, addable cells included.
 
         TESTS::
             sage: from sage_combinat_widgets import GridViewEditor
@@ -284,7 +284,7 @@ class GridViewEditor(BindableEditorClass):
             sage: e = GridViewEditor(Partition([3,3,2,1]))
             sage: e.compute_height()
             sage: e.height
-            4
+            5
             sage: from sage.graphs.generators.families import AztecDiamondGraph
             sage: e = GridViewEditor(AztecDiamondGraph(2))
             sage: e.compute_height()
@@ -293,7 +293,11 @@ class GridViewEditor(BindableEditorClass):
         """
         if not hasattr(self, 'cells'):
             self.compute()
-        self.height = max(pos[0] for pos in self.cells) + 1
+        maxpos = max(pos[0] for pos in self.cells)
+        for pos in self.addable_cells():
+            if pos[0] > maxpos:
+                maxpos = pos[0]
+        self.height = maxpos + 1
 
     def reset_links(self):
         r"""

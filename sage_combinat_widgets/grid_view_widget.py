@@ -291,21 +291,15 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         """
         for pos in self.cells.keys():
             traitname = 'cell_%d_%d' % (pos)
-            try:
-                child = self.get_child(pos)
-            except:
-                child = None
+            child = self.get_child(pos)
             if child and hasattr(child, 'value') and traitname in self.traits():
                 self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
         for pos in self.addable_cells():
             # A directional link to trait 'add_i_j'
             traitname = 'add_%d_%d' % (pos)
-            try:
-                child = self.get_child(pos)
-                if child and hasattr(child, 'value') and traitname in self.traits():
-                    self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
-            except:
-                pass
+            child = self.get_child(pos)
+            if child and hasattr(child, 'value') and traitname in self.traits():
+                self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
 
     def draw(self):
         r"""
@@ -381,7 +375,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             True
         """
         if self.display_convention == 'fr':
-            return self.children[self.height - pos[0]].children[pos[1]]
+            return self.children[self.height - pos[0] - 1].children[pos[1]]
         return self.children[pos[0]].children[pos[1]]
 
 def PartitionGridViewWidget(obj, display_convention='en'):
