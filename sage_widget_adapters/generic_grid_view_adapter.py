@@ -61,11 +61,15 @@ class GridViewAdapter(object):
         * ``traitclass`` -- cells trait class
         * ``celltype`` -- cell content object type (to be defined in subclasses)
         * ``cellzero`` -- cell content zero (to be defined in subclasses)
+        * ``addablecelltype`` -- addable cell content zero (to be defined in subclasses) -- by default = celltype
+        * ``addablecellzero`` -- addable cell content zero (to be defined in subclasses) -- by default == cellzero
     """
     objclass = SageObject
     constructorname = None
     traitclass = traitlets.Instance
     constructorname = None
+    addablecelltype = None
+    addablecellzero = None
 
     @staticmethod
     def cell_to_display(cell_content, display_type=text_type):

@@ -283,7 +283,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             sage: w2.value
             [[None, None, 1, 2, 3], [None, 1], [4]]
             sage: w2.links[2]
-            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.TextCell'>, 3) to target='cell_0_4'
+            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.TextCell'>, 4) to target='cell_2_0'
             sage: w2.links[7]
             A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>, ) to target='add_0_5'
         """

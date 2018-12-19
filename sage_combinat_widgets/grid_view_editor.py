@@ -240,19 +240,21 @@ class GridViewEditor(BindableEditorClass):
             return
         self.cells = self.adapter.compute_cells(obj)
         celltype = self.adapter.celltype
+        cellzero = self.adapter.cellzero
+        addablecelltype = self.adapter.addablecelltype or celltype
+        addablecellzero = self.adapter.addablecellzero or cellzero
         traitclass = self.adapter.traitclass
-        default_value = self.adapter.cellzero
         traits_to_add = {}
         for pos in self.addable_cells():
             # Empty traits for addable cells
             emptytraitname = 'add_%d_%d' % pos
             try:
-                emptytrait = traitclass(default_value)
+                emptytrait = traitclass(addablecellzero)
             except:
                 try:
-                    emptytrait = traitclass(celltype)
+                    emptytrait = traitclass(addablecelltype)
                 except:
-                    raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, celltype, default_value))
+                    raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, addablecelltype, addablecellzero))
             emptytrait.name = emptytraitname
             traits_to_add[emptytraitname] = emptytrait
         for pos, val in self.cells.items():
@@ -268,7 +270,7 @@ class GridViewEditor(BindableEditorClass):
                         trait = traitclass(celltype)
                         trait.value = traitvalue
                     except:
-                        raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, celltype, default_value))
+                        raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, celltype, cellzero))
                 trait.name = traitname
                 traits_to_add[traitname] = trait
         self.traitclass = traitclass
@@ -497,6 +499,8 @@ class GridViewEditor(BindableEditorClass):
             change.new = False
         if change.new != self.adapter.cellzero: # non empty cells are not to be removed
             return
+        if change.new == self.adapter.addablecellzero:
+            return # never remove addable cells ; will do sth only if adapter addablecellzero is specified (therefore not eq to cellzero)
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
         new_obj = self.adapter.remove_cell(obj, pos)
