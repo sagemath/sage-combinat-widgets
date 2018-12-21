@@ -104,6 +104,17 @@ class AddableTextCell(Text):
         self.position = position
         self.add_class('addablecell')
 
+class DisabledTextCell(TextCell):
+    r"""A disabled text grid cell
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import DisabledTextCell
+        sage: b = DisabledTextCell('my text', (1,2))
+    """
+    def __init__(self, content, position, layout=textcell_layout, **kws):
+        super(DisabledTextCell, self).__init__(content, position, layout=layout, **kws)
+        self.disabled = True
+
 class ButtonCell(ToggleButton):
     r"""A button grid cell
 
