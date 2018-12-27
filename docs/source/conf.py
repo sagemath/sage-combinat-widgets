@@ -14,9 +14,9 @@
 
 # General information about the project.
 project = u"Jupyter Widgets for Sage Combinat."
-copyright = u'2018, Odile Bénassy'
-package_name = 'sage_sample'
-package_folder = "../../sage_sample"
+copyright = u'2018, Odile Bénassy & Nicolas Thiéry'
+package_name = 'sage_combinat_widgets'
+package_folder = "../../sage_combinat_widgets"
 authors = u"Odile Bénassy, Nicolas M. Thiéry"
 
 import sys

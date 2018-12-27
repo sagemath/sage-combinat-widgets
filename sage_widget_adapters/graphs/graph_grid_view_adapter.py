@@ -11,7 +11,6 @@ Grid View Adapter for grid-representable graphs
 
     :meth:`~GraphGridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
     :meth:`~GraphGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
-    :meth:`~GraphGridViewAdapter.height` | Static method -- get objet number of rows
     :meth:`~GraphGridViewAdapter.compute_cells` | Compute graph cells as a dictionary { coordinate pair : label }
     :meth:`~GraphGridViewAdapter.from_cells` | Create a new graph from a cells dictionary
     :meth:`~GraphGridViewAdapter.get_cell` | Get the graph cell content (i.e. None)
@@ -81,23 +80,6 @@ class GraphGridViewAdapter(GridViewAdapter):
         if not display_value or display_type == text_type:
             return self.cellzero
         return display_value
-
-    @staticmethod
-    def height(obj):
-        r"""
-        From a grid-representable graph `obj`,
-        return its height i.e. number of rows.
-        Needed for cartesian system display,
-        i.e. "French-style" display.
-
-        TESTS::
-            sage: from sage.graphs.generators.families import AztecDiamondGraph
-            sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-            sage: g = AztecDiamondGraph(2)
-            sage: GraphGridViewAdapter.height(g)
-            4
-        """
-        return max(v[0] for v in obj.vertices()) + 1
 
     @staticmethod
     def compute_cells(obj):

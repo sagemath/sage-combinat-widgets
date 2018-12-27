@@ -1,3 +1,14 @@
+0.6.0:
+	* Flexibility options in widget redraw
+	* Flexibility options: addable cells can be of a different class
+	* Flexibility in computing distribution of cell classes
+	* Reverting graphical edit when not valid
+	* Computing height directly in the widget (for French-style display)
+	* More tests, esp. for add_links ; couple of bugfixes
+	* A first example worksheet (Flocon)
+0.5.6:
+	* Tutorial completed
+        * Small fixes, tests
 0.5.5:
 	* Adapter tutorial
 	* Default implementations for accessors in generic adapter

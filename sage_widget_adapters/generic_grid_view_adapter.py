@@ -61,14 +61,18 @@ class GridViewAdapter(object):
         * ``traitclass`` -- cells trait class
         * ``celltype`` -- cell content object type (to be defined in subclasses)
         * ``cellzero`` -- cell content zero (to be defined in subclasses)
+        * ``addablecelltype`` -- addable cell content zero (to be defined in subclasses) -- by default = celltype
+        * ``addablecellzero`` -- addable cell content zero (to be defined in subclasses) -- by default == cellzero
     """
     objclass = SageObject
     constructorname = None
     traitclass = traitlets.Instance
     constructorname = None
+    addablecelltype = None
+    addablecellzero = None
 
     @staticmethod
-    def cell_to_display(cell_content, display_type):
+    def cell_to_display(cell_content, display_type=text_type):
         r"""
         From a cell value `cell_content`,
         return widget display value.
@@ -85,7 +89,7 @@ class GridViewAdapter(object):
             return str(cell_content)
         return cell_content
 
-    def display_to_cell(self, display_value, display_type=None):
+    def display_to_cell(self, display_value, display_type=text_type):
         r"""
         From an unicode string `s`,
         return matching cell value.
@@ -102,25 +106,6 @@ class GridViewAdapter(object):
         if display_value:
             return self.celltype(display_value)
         return self.cellzero
-
-    @staticmethod
-    def height(obj):
-        r"""
-        From a grid-representable object `obj`,
-        return its height i.e. number of rows.
-        Needed for cartesian system display,
-        i.e. "French-style" display.
-
-        TESTS::
-            sage: from sage.combinat.partition import Partition
-            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
-            sage: p = Partition([3,3,2,1])
-            sage: GridViewAdapter.height(p)
-            4
-        """
-        if hasattr(obj, '__len__'):
-            return len(obj)
-        raise NotImplementedError
 
     @staticmethod
     @abstract_method
@@ -255,7 +240,7 @@ class GridViewAdapter(object):
     @abstract_method(optional = True)
     def add_cell(self, obj, pos, val):
         r"""
-        If possible, add a cell to object `obj`
+        This method should try to add a cell to object `obj`
         at position `pos` and with value `val`.
         """
 
@@ -263,50 +248,168 @@ class GridViewAdapter(object):
     @abstract_method(optional = True)
     def remove_cell(cls, obj, pos):
         r"""
-        If possible, remove a cell from object `obj`
+        This method should try to remove a cell from object `obj`
         at position `pos`.
         """
 
     @abstract_method(optional = True)
     def append_row(self, obj, r=None):
         r"""
-        If possible, append a row to object `obj`
+        This method should try to append a row to object `obj`
         with values from list `r`.
+
+        TESTS::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: a = GridViewAdapter()
+            sage: a.append_row(S, (1,2,3))
+            Traceback (most recent call last):
+            ...
+            TypeError: 'NotImplementedType' object is not callable
         """
 
     @abstract_method(optional = True)
     def insert_row(self, obj, index, r=None):
         r"""
-        If possible, insert a row to object `obj`
+        This method should try to insert a row to object `obj`
         at index `index`, with values from list `r`.
+
+        TESTS::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: a = GridViewAdapter()
+            sage: a.insert_row(S, 1, (1,2,3))
+            Traceback (most recent call last):
+            ...
+            TypeError: 'NotImplementedType' object is not callable
         """
+
+    def add_row(self, obj, index=None, r=None):
+        r"""
+        An alias for appending/inserting a row.
+
+        TESTS::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: a = GridViewAdapter()
+            sage: a.add_row(S, 1, (1,2,3,4))
+            Traceback (most recent call last):
+            ...
+            NotImplementedError: Method 'insert_row' is not implemented.
+        """
+        if index:
+            try:
+                return self.insert_row(obj, index, r)
+            except:
+                raise NotImplementedError("Method 'insert_row' is not implemented.")
+        else:
+            try:
+                return self.append_row(obj, r)
+            except:
+                raise NotImplementedError("Method 'append_row' is not implemented.")
 
     @classmethod
     @abstract_method(optional = True)
     def remove_row(cls, obj, index=None):
         r"""
-        If possible, remove a row from object `obj`
+        This method should try to remove a row from object `obj`
         at index `index`.
+
+        TESTS::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: a = GridViewAdapter()
+            sage: a.remove_row(S, 1)
+            Traceback (most recent call last):
+            ...
+            TypeError: 'AbstractMethod' object is not callable
         """
 
     @abstract_method(optional = True)
     def append_column(self, obj, r=None):
         r"""
-        If possible, append a column to object `obj`
+        This method should try to append a column to object `obj`
         with values from list `r`.
+
+        TESTS::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: a = GridViewAdapter()
+            sage: a.append_column(S, (1,2,3,4))
+            Traceback (most recent call last):
+            ...
+            TypeError: 'NotImplementedType' object is not callable
         """
 
     @abstract_method(optional = True)
     def insert_column(self, obj, index, r=None):
         r"""
-        If possible, insert a column to object `obj`
+        This method should try to insert a column to object `obj`
         at index `index`, with values from list `r`.
+
+        TESTS::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: a = GridViewAdapter()
+            sage: a.insert_column(S, 1, (1,2,3,4))
+            Traceback (most recent call last):
+            ...
+            TypeError: 'NotImplementedType' object is not callable
         """
 
     @classmethod
     @abstract_method(optional = True)
     def remove_column(cls, obj, index=None):
         r"""
-        If possible, remove a column from object `obj`
+        This method should try to remove a column from object `obj`
         at index `index`.
+
+        TESTS::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: a = GridViewAdapter()
+            sage: a.remove_column(S, 2)
+            Traceback (most recent call last):
+            ...
+            TypeError: 'AbstractMethod' object is not callable
         """
+
+    def add_column(self, obj, index=None, r=None):
+        r"""
+        An alias for appending/inserting a column.
+
+        TESTS::
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: a = GridViewAdapter()
+            sage: a.add_column(S, 1, (1,2,3))
+            Traceback (most recent call last):
+            ...
+            NotImplementedError: Method 'insert_column' is not implemented.
+        """
+        if index:
+            try:
+                return self.insert_column(obj, index, r)
+            except:
+                raise NotImplementedError("Method 'insert_column' is not implemented.")
+        else:
+            try:
+                return self.append_column(obj, r)
+            except:
+                raise NotImplementedError("Method 'append_column' is not implemented.")

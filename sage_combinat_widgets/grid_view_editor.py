@@ -124,6 +124,12 @@ class cdlink(traitlets.link):
             source[0].observe(self._update_target, names=source[1])
             target[0].observe(self._update_source, names=target[1])
 
+    def __repr__(self):
+        r"""
+        Try to get a useful repr for our link class.
+        """
+        return "A typecasting directional link from source=(%s, %s) to target='%s'" % (self.source[0].__class__, self.source[0].value, self.target[1])
+
     def _update_target(self, change):
         if self.updating:
             return
@@ -160,22 +166,22 @@ class GridViewEditor(BindableEditorClass):
 
         TESTS::
             sage: from sage_combinat_widgets import GridViewEditor
-            sage: from sage.all import matrix, graphs
             sage: from sage.graphs.generic_graph import GenericGraph
-            sage: g = graphs.AztecDiamondGraph(3)
-            sage: e = GridViewEditor(g)
-            sage: t = StandardTableaux(5).random_element()
-            sage: e = GridViewEditor(t)
-            sage: f = x^5
-            sage: v = vector((1,2,3))
-            sage: e = GridViewEditor(v)
+            sage: e = GridViewEditor(graphs.AztecDiamondGraph(2))
+            sage: e.cells
+            {(0, 1): None, (0, 2): None, (1, 0): None, (1, 1): None, (1, 2): None, (1, 3): None, (2, 0): None,
+            (2, 1): None, (2, 2): None, (2, 3): None, (3, 1): None, (3, 2): None}
+            sage: e = GridViewEditor(StandardTableaux(5).random_element())
+            sage: e.cells
+            {(0, 0): 1, (1, 0): 2, (2, 0): 3, (3, 0): 4, (4, 0): 5}
+            sage: e = GridViewEditor(vector((1,2,3)))
             Traceback (most recent call last):
             ...
             TypeError: Cannot find an Adapter for this object (<type 'sage.modules.vector_integer_dense.Vector_integer_dense'>)
-            sage: e = GridViewEditor(f)
+            sage: e = GridViewEditor(x^5)
             Traceback (most recent call last):
             ...
-            TypeError: Cannot find an Adapter for this object (<class 'sage.symbolic.expression.Expression'>)
+            TypeError: Cannot find an Adapter for this object (<type 'sage.symbolic.expression.Expression'>)
         """
         self.initialization = True
         super(GridViewEditor, self).__init__()
@@ -234,19 +240,21 @@ class GridViewEditor(BindableEditorClass):
             return
         self.cells = self.adapter.compute_cells(obj)
         celltype = self.adapter.celltype
+        cellzero = self.adapter.cellzero
+        addablecelltype = self.adapter.addablecelltype or celltype
+        addablecellzero = self.adapter.addablecellzero or cellzero
         traitclass = self.adapter.traitclass
-        default_value = self.adapter.cellzero
         traits_to_add = {}
         for pos in self.addable_cells():
             # Empty traits for addable cells
             emptytraitname = 'add_%d_%d' % pos
             try:
-                emptytrait = traitclass(default_value)
+                emptytrait = traitclass(addablecellzero)
             except:
                 try:
-                    emptytrait = traitclass(celltype)
+                    emptytrait = traitclass(addablecelltype)
                 except:
-                    raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, celltype, default_value))
+                    raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, addablecelltype, addablecellzero))
             emptytrait.name = emptytraitname
             traits_to_add[emptytraitname] = emptytrait
         for pos, val in self.cells.items():
@@ -262,11 +270,36 @@ class GridViewEditor(BindableEditorClass):
                         trait = traitclass(celltype)
                         trait.value = traitvalue
                     except:
-                        raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, celltype, default_value))
+                        raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, celltype, cellzero))
                 trait.name = traitname
                 traits_to_add[traitname] = trait
         self.traitclass = traitclass
         self.modified_add_traits(**traits_to_add)
+
+    def compute_height(self):
+        r"""
+        Compute grid height, addable cells included.
+
+        TESTS::
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: from sage.combinat.partition import Partition
+            sage: e = GridViewEditor(Partition([3,3,2,1]))
+            sage: e.compute_height()
+            sage: e.height
+            5
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: e = GridViewEditor(AztecDiamondGraph(2))
+            sage: e.compute_height()
+            sage: e.height
+            4
+        """
+        if not hasattr(self, 'cells'):
+            self.compute()
+        maxpos = max(pos[0] for pos in self.cells)
+        for pos in self.addable_cells():
+            if pos[0] > maxpos:
+                maxpos = pos[0]
+        self.height = maxpos + 1
 
     def reset_links(self):
         r"""
@@ -290,7 +323,7 @@ class GridViewEditor(BindableEditorClass):
         """
         return self.value
 
-    def set_value(self, obj, compute=False):
+    def set_value(self, obj, compute=True):
         r"""
         Check compatibility, then set editor value.
         If compute=True, call methods compute() and draw().
@@ -337,7 +370,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Unable to cast the given cells into a grid-like object.")
         if not self.validate(obj, None, obj_class):
             raise ValueError("Could not make a compatible ('%s')  object from given cells" % str(obj_class))
-        self.set_value(obj)
+        self.set_value(obj, False)
 
     @traitlets.observe(traitlets.All)
     def set_cell(self, change):
@@ -366,7 +399,7 @@ class GridViewEditor(BindableEditorClass):
         if new_obj == obj:
             # FIXME reverse the display change
             return
-        self.set_value(new_obj)
+        self.set_value(new_obj, False)
         # Edit the cell dictionary
         self.cells[pos] = val
         # Edit the trait
@@ -407,6 +440,13 @@ class GridViewEditor(BindableEditorClass):
             Cell (1, 1) with value '8' cannot be added to this object!
             sage: e.value
             [[1, 2, 5, 6], [3], [4]]
+            sage: e = GridViewEditor(SkewTableau([[None, None, 1, 2], [None, 1], [4]]))
+            sage: e.add_cell(Bunch({'name': 'add_0_4', 'old': 0, 'new': 3, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            [[None, None, 1, 2, 3], [None, 1], [4]]
+            sage: e.add_cell(Bunch({'name': 'add_1_0', 'old': 0, 'new': 1, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            [[None, None, 1, 2, 3], [1, 1], [4]]
         """
         if not change.name.startswith('add_') \
            or self.to_cell(change.new) == self.adapter.cellzero:
@@ -424,33 +464,9 @@ class GridViewEditor(BindableEditorClass):
         if not self.validate(new_obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
         if new_obj == obj: # The proposed change was invalid -> stop here
-            # FIXME reverse the display change
+            self.draw() # Reverse the display change
             return
-        self.value = new_obj
-        self.cells[pos] = val
-        # Adding a new trait and more addable cell(s)
-        traits_to_add = {}
-        traitname = 'cell_%d_%d' % pos
-        traitvalue = val
-        if self.has_trait(traitname):
-            self.set_trait(traitname, traitvalue)
-        else:
-            trait = self.traitclass(self.adapter.celltype)
-            trait.value = traitvalue
-            traits_to_add[traitname] = trait
-        previous_addable_traitname = 'add_%d_%d' % pos
-        if self.has_trait(previous_addable_traitname):
-            del(self.traits()[previous_addable_traitname])
-            #del self._trait_values[addable_traitname]
-        for pos in self.addable_cells():
-            emptytraitname = 'add_%d_%d' % pos
-            if not self.has_trait(emptytraitname):
-                emptytrait = self.traitclass(self.adapter.celltype)
-                emptytrait.name = emptytraitname
-                emptytrait.value = self.adapter.cellzero
-                traits_to_add[emptytraitname] = emptytrait
-        self.modified_add_traits(**traits_to_add)
-        self.draw()
+        self.set_value(new_obj) # Calls compute() and draw() by default
 
     @traitlets.observe(traitlets.All)
     def remove_cell(self, change):
@@ -466,6 +482,10 @@ class GridViewEditor(BindableEditorClass):
             sage: e.remove_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 0, 'owner': e, 'type': 'change'}))
             sage: e.value
             [[1, 2, 5], [3]]
+            sage: e = GridViewEditor(SkewTableau([[None, None, 1, 2, 3], [None, 1], [4]]))
+            sage: e.remove_cell(Bunch({'name': 'cell_0_4', 'old': 3, 'new': 0, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            [[None, None, 1, 2], [None, 1], [4]]
         """
         if not change.name.startswith('cell_'):
             return
@@ -479,20 +499,21 @@ class GridViewEditor(BindableEditorClass):
             change.new = False
         if change.new != self.adapter.cellzero: # non empty cells are not to be removed
             return
+        if change.new == self.adapter.addablecellzero:
+            return # never remove addable cells ; will do sth only if adapter addablecellzero is specified (therefore not eq to cellzero)
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
         new_obj = self.adapter.remove_cell(obj, pos)
         if not self.validate(new_obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
         if new_obj == obj: # The proposed change was invalid -> stop here
-            # FIXME reverse the display change
+            self.draw() # Reverse the display change
             return
         del(self.cells[pos])
         traitname = 'cell_%d_%d' % pos
         if self.has_trait(traitname):
             del(self.traits()[traitname])
-            #del(self._trait_values[traitname])
-        self.value = new_obj
+        self.value = new_obj # Avoid calling compute() unless it becomes really necessary
         self.draw()
 
     def append_row(self, r=None):
@@ -530,7 +551,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot append row to this object.")
         obj = copy(self.value)
         obj = self.adapter.append_row(obj, r)
-        self.set_value(obj, True) # Will take care of everything
+        self.set_value(obj) # Will take care of everything
 
     def insert_row(self, index, r=None):
         r"""
@@ -540,7 +561,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot insert row to this object.")
         obj = copy(self.value)
         obj = self.adapter.insert_row(obj, index, r)
-        self.set_value(obj, True) # Will take care of everything
+        self.set_value(obj) # Will take care of everything
 
     def remove_row(self, index=None):
         r"""
@@ -550,7 +571,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot remove row from this object.")
         obj = copy(self.value)
         obj = self.adapter.remove_row(obj, index)
-        self.set_value(obj, True) # Will take care of everything
+        self.set_value(obj) # Will take care of everything
 
     def append_column(self, c=None):
         r"""
@@ -586,7 +607,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot append column to this object.")
         obj = copy(self.value)
         obj = self.adapter.append_column(obj, c)
-        self.set_value(obj, True) # Will take care of everything
+        self.set_value(obj) # Will take care of everything
 
     def insert_column(self, index, c=None):
         r"""
@@ -596,7 +617,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot insert column to this object.")
         obj = copy(self.value)
         obj = self.adapter.insert_column(obj, index, c)
-        self.set_value(obj, True) # Will take care of everything
+        self.set_value(obj) # Will take care of everything
 
     def remove_column(self, index=None):
         r"""

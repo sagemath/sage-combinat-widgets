@@ -9,12 +9,8 @@ Grid View Adapter for skew tableaux
     :widths: 30, 70
     :delim: |
 
-    :meth:`~SkewTableauGridViewAdapter.cell_to_display` | Static method for typecasting cell content to widget display value
-    :meth:`~SkewTableauGridViewAdapter.display_to_cell` | Instance method for typecasting widget display value to cell content
     :meth:`~SkewTableauGridViewAdapter.compute_cells` | Compute skew tableau cells as a dictionary { coordinate pair : Integer }
     :meth:`~SkewTableauGridViewAdapter.from_cells` | Create a new skew tableau from a cells dictionary
-    :meth:`~SkewTableauGridViewAdapter.get_cell` | Get the skew tableau cell content
-    :meth:`~SkewTableauGridViewAdapter.set_cell` | Set the skew tableau cell content
     :meth:`~SkewTableauGridViewAdapter.addable_cells` | List addable cells
     :meth:`~SkewTableauGridViewAdapter.removable_cells` | List removable cells
     :meth:`~SkewTableauGridViewAdapter.add_cell` | Add a cell
@@ -153,14 +149,17 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
             sage: SkewTableauGridViewAdapter.remove_cell(st, (0, 3))
             [[None, None, None, None, 2, 6], [None, None, 3, 4], [None, 1], [5]]
             sage: SkewTableauGridViewAdapter.remove_cell(st, (2, 1))
-            [[None, None, None, 1, 2, 6], [None, None, 3, 4], [None, None], [5]]
+            [[None, None, None, 1, 2, 6], [None, None, 3, 4], [None], [5]]
+            sage: st = SkewTableau([[None, None, 1, 2, 3], [None, 1], [4]])
+            sage: SkewTableauGridViewAdapter.remove_cell(st, (0, 4))
+            [[None, None, 1, 2], [None, 1], [4]]
         """
         if not pos in cls.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
         sl = obj.to_list()
         if len(sl[pos[0]]) == 1:
             del(sl[pos[0]])
-        elif pos in obj.shape().outer().outside_corners():
+        elif pos in obj.shape().outer().corners():
             sl[pos[0]].pop()
         else:
             sl[pos[0]][pos[1]] = None
