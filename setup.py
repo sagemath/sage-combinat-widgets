@@ -1,7 +1,7 @@
 ## -*- encoding: utf-8 -*-
 import os
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 from codecs import open # To open the README file with proper encoding
 from setuptools.command.test import test as TestCommand # for tests
 
@@ -26,6 +26,15 @@ setup(
     version = readfile("VERSION"),
     description='Jupyter widgets for SAGE Combinat',
     long_description = readfile("README.rst"),
+    include_package_data = True,
+    data_files = [
+        ('share/jupyter/nbextensions/sage-combinat-widgets', [
+            'sage-combinat-widgets/static/extension.js',
+            'sage-combinat-widgets/static/index.js',
+            'sage-combinat-widgets/static/index.js.map',
+        ],),
+        ('etc/jupyter/nbconfig/notebook.d/' ,['sage-combinat-widgets.json'])
+    ],
     url='https://github.com/sagemath/sage-combinat-widgets',
     author='Odile Bénassy, Nicolas M. Thiéry',
     author_email='odile.benassy@u-psud.fr',
@@ -41,8 +50,8 @@ setup(
       'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
       'Programming Language :: Python :: 2.7',
     ], # classifiers list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-    keywords = "SageMath widget combinatorics",
-    packages = ['sage_combinat_widgets', 'sage_widget_adapters', 'sage_widget_adapters.combinat', 'sage_widget_adapters.graphs', 'sage_widget_adapters.matrix'],
+    keywords = ['SageMath', 'jupyter', 'widget', 'combinatorics'],
+    packages = find_packages(),
     cmdclass = {'test': SageTest}, # adding a special setup command for tests
-    install_requires = ['ipywidgets']
+    install_requires = ['ipywidgets>=7.0.0']
 )
