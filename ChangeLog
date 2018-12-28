@@ -1,3 +1,6 @@
+0.6.1:
+	* Dirty editing
+	* ColorTableaux example
 0.6.0:
 	* Flexibility options in widget redraw
 	* Flexibility options: addable cells can be of a different class
