@@ -186,6 +186,7 @@ class GridViewEditor(BindableEditorClass):
         self.initialization = True
         super(GridViewEditor, self).__init__()
         self.value = obj
+        self.dirty = {}
         if adapter:
             self.adapter = adapter
         else:
@@ -397,9 +398,10 @@ class GridViewEditor(BindableEditorClass):
         pos = extract_coordinates(change.name)
         val = change.new
         obj = copy(self.value)
-        new_obj = self.adapter.set_cell(obj, pos, val)
+        new_obj = self.adapter.set_cell(obj, pos, val, dirty=self.dirty)
         if new_obj == obj:
-            # FIXME reverse the display change
+            self.dirty[pos] = val # Add an entry in self.dirty dictionary
+            self.draw() # Reverse the display change
             return
         self.set_value(new_obj, False)
         # Edit the cell dictionary
