@@ -513,12 +513,7 @@ class GridViewEditor(BindableEditorClass):
         if new_obj == obj: # The proposed change was invalid -> stop here
             self.draw() # Reverse the display change
             return
-        del(self.cells[pos])
-        traitname = 'cell_%d_%d' % pos
-        if self.has_trait(traitname):
-            del(self.traits()[traitname])
-        self.value = new_obj # Avoid calling compute() unless it becomes really necessary
-        self.draw()
+        self.set_value(new_obj) # Calls compute() and draw() by default
 
     def append_row(self, r=None):
         r"""
