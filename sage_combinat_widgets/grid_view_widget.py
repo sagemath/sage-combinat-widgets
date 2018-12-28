@@ -6,9 +6,8 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from .grid_view_editor import *
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, Text, Label, HTML, ToggleButton, ValueWidget
+from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, ValueWidget
 from sage.misc.misc import uniq
-from traitlets import observe
 from six import text_type
 
 textcell_layout = Layout(width='3em',height='2em', margin='0', padding='0')

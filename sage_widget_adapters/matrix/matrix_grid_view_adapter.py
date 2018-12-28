@@ -27,7 +27,6 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 from sage.matrix.matrix2 import Matrix
 from sage.matrix.constructor import matrix
 from itertools import product
-from sage.sets.finite_enumerated_set import FiniteEnumeratedSet
 from sage.modules.free_module_element import vector
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 from six import text_type

@@ -127,7 +127,7 @@ class GridViewAdapter(object):
         """
         if cls.constructorname:
             try:
-                new_value = eval_in_main(cls.constructorname)(l)
+                new_value = eval_in_main(cls.constructorname)(obj)
             except:
                 pass
         try:

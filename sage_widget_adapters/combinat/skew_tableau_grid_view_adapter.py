@@ -53,7 +53,7 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         return {(i,j):obj[i][j] for (i,j) in obj.cells()}
 
     @classmethod
-    def from_cells(self, cells={}):
+    def from_cells(cls, cells={}):
         r"""
         From a dictionary { coordinates pair : Integer }
         return a corresponding skew tableau
@@ -69,7 +69,7 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         for pos in cells:
             rows[pos[0]][pos[1]] = cells[pos]
         try:
-            return self.objclass(rows)
+            return cls.objclass(rows)
         except:
             raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
 

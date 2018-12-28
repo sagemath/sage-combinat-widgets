@@ -22,8 +22,8 @@ from six import add_metaclass
 from copy import copy
 from sage.misc.bindable_class import BindableClass
 from sage.all import SageObject
-from sage.structure.list_clone import ClonableList
 from sage.misc.abstract_method import AbstractMethod
+from sage.misc.misc import uniq
 
 def extract_coordinates(s):
     r"""
