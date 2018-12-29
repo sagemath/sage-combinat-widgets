@@ -390,6 +390,8 @@ class GridViewEditor(BindableEditorClass):
             return
         if not change.name.startswith('cell_'):
             return
+        if change.old == traitlets.Undefined: # Do nothing on a newly added cell
+            return
         if change.new == change.old or not change.new:
             return
         pos = extract_coordinates(change.name)
