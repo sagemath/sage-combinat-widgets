@@ -24,7 +24,7 @@ css_lines.append(".addablecell INPUT, .removablecell INPUT {background-position:
 css_lines.append(".addablecell INPUT {background-image: url('Plus.png')}")
 css_lines.append(".addablecell INPUT, .addablebutton INPUT {border:1px dashed #999 !important}")
 css_lines.append(".removablecell INPUT {background-image: url('Minus.png')}")
-css_lines.append(".dirty INPUT {background-color: pink}")
+css_lines.append(".dirty INPUT {background-color: pink !important}")
 css = HTML("<style>%s</style>" % '\n'.join(css_lines))
 
 try:
@@ -397,6 +397,15 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         if self.display_convention == 'fr':
             return self.children[self.height - pos[0] - 1].children[pos[1]]
         return self.children[pos[0]].children[pos[1]]
+
+    def set_dirty(self, pos, val):
+        self.get_child(pos).add_class('dirty')
+        self.dirty[pos] = val
+
+    def reset_dirty(self):
+        for p in self.dirty:
+            self.get_child(p).remove_class('dirty')
+        self.dirty = {}
 
 def PartitionGridViewWidget(obj, display_convention='en'):
     r"""

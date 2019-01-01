@@ -373,6 +373,12 @@ class GridViewEditor(BindableEditorClass):
             raise ValueError("Could not make a compatible ('%s')  object from given cells" % str(obj_class))
         self.set_value(obj, False)
 
+    def set_dirty(self, pos, val):
+        raise NotImplementedError
+
+    def reset_dirty(self):
+        raise NotImplementedError
+
     @traitlets.observe(traitlets.All)
     def set_cell(self, change):
         r"""
@@ -403,16 +409,13 @@ class GridViewEditor(BindableEditorClass):
         except:
             new_obj = obj
         if new_obj == obj:
-            if val == self.cells[pos]:
-                del self.dirty[pos] # Not dirty any more
-            else:
-                self.dirty[pos] = val # Add an entry in self.dirty dictionary
-            if self.dirty: # Highlight dirty cells
-                for pos in self.dirty:
-                    self.get_child(pos).add_class('dirty')
-            else: # Reverse the display change
-                self.draw()
+            if val == self.cells[pos]: # Rollback
+                self.reset_dirty()
+            else: # Add an entry in self.dirty dictionary
+                self.set_dirty(pos, val)
             return
+        else:
+            self.reset_dirty() # New value, no more dirty cells
         self.set_value(new_obj, False)
         # Edit the cell dictionary
         self.cells[pos] = val
