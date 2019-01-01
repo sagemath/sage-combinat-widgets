@@ -210,8 +210,8 @@ class GridViewAdapter(object):
         except:
             raise NotImplementedError("Adapter class method 'set_cell(cls, obj, pos, val)' is not implemented.")
         try:
-            for p, v in dirty:
-                l[p[0]][p[1]] = v
+            for p in dirty:
+                l[p[0]][p[1]] = dirty[p]
             l[pos[0]][pos[1]] = val
         except:
             raise TypeError("Value '%s' is not compatible or position '%s' does not exist." % (val, pos))

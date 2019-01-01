@@ -24,6 +24,7 @@ css_lines.append(".addablecell INPUT, .removablecell INPUT {background-position:
 css_lines.append(".addablecell INPUT {background-image: url('Plus.png')}")
 css_lines.append(".addablecell INPUT, .addablebutton INPUT {border:1px dashed #999 !important}")
 css_lines.append(".removablecell INPUT {background-image: url('Minus.png')}")
+css_lines.append(".dirty INPUT {background-color: pink}")
 css = HTML("<style>%s</style>" % '\n'.join(css_lines))
 
 try:

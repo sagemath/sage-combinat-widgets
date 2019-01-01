@@ -398,10 +398,20 @@ class GridViewEditor(BindableEditorClass):
         pos = extract_coordinates(change.name)
         val = change.new
         obj = copy(self.value)
-        new_obj = self.adapter.set_cell(obj, pos, val, dirty=self.dirty)
+        try:
+            new_obj = self.adapter.set_cell(obj, pos, val, dirty=self.dirty)
+        except:
+            new_obj = obj
         if new_obj == obj:
-            self.dirty[pos] = val # Add an entry in self.dirty dictionary
-            self.draw() # Reverse the display change
+            if val == self.cells[pos]:
+                del self.dirty[pos] # Not dirty any more
+            else:
+                self.dirty[pos] = val # Add an entry in self.dirty dictionary
+            if self.dirty: # Highlight dirty cells
+                for pos in self.dirty:
+                    self.get_child(pos).add_class('dirty')
+            else: # Reverse the display change
+                self.draw()
             return
         self.set_value(new_obj, False)
         # Edit the cell dictionary
