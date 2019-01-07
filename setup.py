@@ -28,12 +28,12 @@ setup(
     long_description = readfile("README.rst"),
     include_package_data = True,
     data_files = [
-        ('share/jupyter/nbextensions/sage-combinat-widgets', [
-            'sage-combinat-widgets/static/extension.js',
-            'sage-combinat-widgets/static/index.js',
-            'sage-combinat-widgets/static/index.js.map',
-        ],),
-        ('etc/jupyter/nbconfig/notebook.d/' ,['sage-combinat-widgets.json'])
+#        ('share/jupyter/nbextensions/sage-combinat-widgets', [
+#            'sage-combinat-widgets/static/extension.js',
+#            'sage-combinat-widgets/static/index.js',
+#            'sage-combinat-widgets/static/index.js.map',
+#        ],),
+#        ('etc/jupyter/nbconfig/notebook.d/' ,['sage-combinat-widgets.json'])
     ],
     url='https://github.com/sagemath/sage-combinat-widgets',
     author='Odile Bénassy, Nicolas M. Thiéry',
