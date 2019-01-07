@@ -187,6 +187,7 @@ class GridViewEditor(BindableEditorClass):
         super(GridViewEditor, self).__init__()
         self.value = obj
         self.dirty = {}
+        self.dirty_errors = {}
         if adapter:
             self.adapter = adapter
         else:
@@ -373,11 +374,19 @@ class GridViewEditor(BindableEditorClass):
             raise ValueError("Could not make a compatible ('%s')  object from given cells" % str(obj_class))
         self.set_value(obj, False)
 
-    def set_dirty(self, pos, val):
-        raise NotImplementedError
+    def set_dirty(self, pos, val, e=None):
+        self.dirty[pos] = val
+        if e:
+            self.dirty_errors[pos] = e
 
     def reset_dirty(self):
-        raise NotImplementedError
+        self.dirty = {}
+        self.dirty_errors = {}
+
+    def dirty_info(self, pos):
+        if pos in self.dirty_errors:
+            return str(e)
+        return ''
 
     @traitlets.observe(traitlets.All)
     def set_cell(self, change):
@@ -404,18 +413,16 @@ class GridViewEditor(BindableEditorClass):
         pos = extract_coordinates(change.name)
         val = change.new
         obj = copy(self.value)
-        try:
-            new_obj = self.adapter.set_cell(obj, pos, val, dirty=self.dirty)
-        except:
-            new_obj = obj
-        if new_obj == obj:
-            if val == self.cells[pos]: # Rollback
+        result = self.adapter.set_cell(obj, pos, val, dirty=self.dirty)
+        if issubclass(result.__class__, BaseException): # Setting cell was impossible
+            if val == self.cells[pos] and self.dirty.keys() == [pos]: # Rollback
                 self.reset_dirty()
+                new_obj = obj
             else: # Add an entry in self.dirty dictionary
                 self.set_dirty(pos, val)
             return
-        else:
-            self.reset_dirty() # New value, no more dirty cells
+        new_obj = result
+        self.reset_dirty() # New value, no more dirty cells
         self.set_value(new_obj, False)
         # Edit the cell dictionary
         self.cells[pos] = val
@@ -477,12 +484,15 @@ class GridViewEditor(BindableEditorClass):
             val = False # if it's a button, reverse button toggling
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
-        new_obj = self.adapter.add_cell(obj, pos, val)
-        if not self.validate(new_obj):
-            raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
-        if new_obj == obj: # The proposed change was invalid -> stop here
-            self.draw() # Reverse the display change
+        result = self.adapter.add_cell(obj, pos, val, dirty=self.dirty)
+        if issubclass(result.__class__, BaseException): # Adding cell was impossible
+            if pos in self.cells and val == self.cells[pos] and self.dirty.keys() == [pos]: # Rollback
+                self.reset_dirty()
+                new_obj = obj
+            else: # Keep temporary addition for later
+                self.set_dirty(pos, val)
             return
+        new_obj = result
         self.set_value(new_obj) # Calls compute() and draw() by default
 
     @traitlets.observe(traitlets.All)

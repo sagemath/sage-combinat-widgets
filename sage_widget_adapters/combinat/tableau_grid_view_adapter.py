@@ -116,7 +116,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         return obj.corners()
 
     @classmethod
-    def add_cell(cls, obj, pos, val):
+    def add_cell(cls, obj, pos, val, dirty={}):
         r"""
         Add cell
 
@@ -140,14 +140,10 @@ class TableauGridViewAdapter(GridViewAdapter):
             tl = tl + [[val]]
         else:
             tl[pos[0]].append(val)
-        try:
-            return cls.objclass(tl)
-        except:
-            print("Cell %s with value '%s' cannot be added to this object!" % (pos, val))
-            return obj
+        return cls._validate(tl)
 
     @classmethod
-    def remove_cell(cls, obj, pos):
+    def remove_cell(cls, obj, pos, dirty={}):
         r"""
         Remove cell
 
@@ -168,11 +164,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         tl[pos[0]].pop()
         if not tl[pos[0]]:
             tl.pop()
-        try:
-            return cls.objclass(tl)
-        except:
-            print("Cell (%s,%s) cannot be removed from this object!" % pos)
-            return obj
+        return cls._validate(tl)
 
 class SemistandardTableauGridViewAdapter(TableauGridViewAdapter):
     r"""

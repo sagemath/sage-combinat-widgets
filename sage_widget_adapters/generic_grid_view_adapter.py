@@ -116,7 +116,7 @@ class GridViewAdapter(object):
         """
 
     @classmethod
-    def _validate(cls, obj):
+    def _validate(cls, obj, constructorname=''):
         r"""
         From an object `obj`,
         Try to build an object of type `cls`.
@@ -125,15 +125,14 @@ class GridViewAdapter(object):
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: GridViewAdapter._validate(pi)
         """
-        if cls.constructorname:
-            try:
-                new_value = eval_in_main(cls.constructorname)(obj)
-            except:
-                pass
         try:
-            new_value = cls.objclass(obj)
-        except:
-            raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
+            if constructorname:
+                return eval_in_main(constructorname)(obj)
+            if cls.constructorname:
+                return eval_in_main(cls.constructorname)(obj)
+            return cls.objclass(obj)
+        except Exception, e:
+            return e
 
     @classmethod
     @abstract_method
@@ -215,11 +214,7 @@ class GridViewAdapter(object):
             l[pos[0]][pos[1]] = val
         except:
             raise TypeError("Value '%s' is not compatible or position '%s' does not exist." % (val, pos))
-        if constructorname:
-            return eval_in_main(constructorname)(l)
-        if cls.constructorname:
-            return eval_in_main(cls.constructorname)(l)
-        return obj
+        return cls._validate(l, constructorname)
 
     @staticmethod
     @abstract_method(optional = True)
@@ -240,7 +235,7 @@ class GridViewAdapter(object):
         """
 
     @abstract_method(optional = True)
-    def add_cell(self, obj, pos, val):
+    def add_cell(self, obj, pos, val, dirty={}):
         r"""
         This method should try to add a cell to object `obj`
         at position `pos` and with value `val`.
@@ -248,7 +243,7 @@ class GridViewAdapter(object):
 
     @classmethod
     @abstract_method(optional = True)
-    def remove_cell(cls, obj, pos):
+    def remove_cell(cls, obj, pos, dirty={}):
         r"""
         This method should try to remove a cell from object `obj`
         at position `pos`.

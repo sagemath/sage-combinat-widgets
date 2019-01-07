@@ -165,7 +165,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
         return obj.corners()
 
     @classmethod
-    def add_cell(cls, obj, pos, val=None):
+    def add_cell(cls, obj, pos, val=None, dirty={}):
         r"""
         Add cell
 
@@ -186,8 +186,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
             raise ValueError("Cell position '%s' is not addable." % str(pos))
         try:
             return obj.add_cell(pos[0])
-        except:
-            raise ValueError("Error adding cell %s to partition %s" % (pos, obj))
+        except Exception, e:
+            return e
 
     @classmethod
     def remove_cell(cls, obj, pos):
@@ -209,5 +209,5 @@ class PartitionGridViewAdapter(GridViewAdapter):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
         try:
             return obj.remove_cell(pos[0])
-        except:
-            raise ValueError("Error removing cell %s from partition %s" % (pos, obj))
+        except Exception, e:
+            return e

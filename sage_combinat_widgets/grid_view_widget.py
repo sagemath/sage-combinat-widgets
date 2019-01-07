@@ -37,39 +37,42 @@ try:
 except:
     pass # We are in the test environment
 
-class TextCell(Text):
+class BaseTextCell(Text):
+    r"""
+    Abstract class for all text cells except blank.
+    """
+    displaytype = text_type
+
+    def __init__(self, content, position, layout, **kws):
+        super(BaseTextCell, self).__init__()
+        self.value = content
+        self.layout = layout
+        self.continuous_update = False
+        self.position = position
+        self.add_class('gridcell')
+
+    def set_tooltip(self, s=None):
+        self.title = s
+
+class TextCell(BaseTextCell):
     r"""A regular text grid cell
 
     TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import TextCell
         sage: b = TextCell('my text', (1,2))
     """
-    displaytype = text_type
-
     def __init__(self, content, position, layout=textcell_layout, **kws):
-        super(TextCell, self).__init__()
-        self.value = content
-        self.layout = layout
-        self.continuous_update = False
-        self.position = position
-        self.add_class('gridcell')
+        super(TextCell, self).__init__(content, position, layout, **kws)
 
-class WiderTextCell(Text):
+class WiderTextCell(BaseTextCell):
     r"""A regular text grid cell
 
     TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import WiderTextCell
         sage: b = WiderTextCell('my text', (1,2))
     """
-    displaytype = text_type
-
     def __init__(self, content, position, layout=textcell_wider_layout, **kws):
-        super(WiderTextCell, self).__init__()
-        self.value = content
-        self.layout = layout
-        self.continuous_update = False
-        self.position = position
-        self.add_class('gridcell')
+        super(WiderTextCell, self).__init__(content, position, layout, **kws)
 
 class BlankCell(Text):
     r"""A blank placeholder cell
@@ -87,24 +90,18 @@ class BlankCell(Text):
         self.disabled = True
         self.add_class('blankcell')
 
-class AddableTextCell(Text):
+class AddableTextCell(BaseTextCell):
     r"""An addable placeholder for adding a cell to the widget
 
     TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import AddableTextCell
         sage: a = AddableTextCell((3,4))
     """
-    displaytype = text_type
-
     def __init__(self, position, layout=textcell_layout):
-        super(AddableTextCell, self).__init__('', layout=layout, continuous_update=False)
-        self.value = ''
-        self.layout = layout
-        self.continuous_update = False
-        self.position = position
+        super(AddableTextCell, self).__init__('', position, layout=layout, continuous_update=False)
         self.add_class('addablecell')
 
-class DisabledTextCell(TextCell):
+class DisabledTextCell(BaseTextCell):
     r"""A disabled text grid cell
 
     TESTS::
@@ -115,38 +112,66 @@ class DisabledTextCell(TextCell):
         super(DisabledTextCell, self).__init__(content, position, layout=layout, **kws)
         self.disabled = True
 
-class ButtonCell(ToggleButton):
+class BaseButtonCell(ToggleButton):
+    r"""A base class for button grid cells.
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import BaseButtonCell
+        sage: b = BaseButtonCell(True, (1,2))
+    """
+    displaytype = bool
+
+    def __init__(self, content, position, layout=buttoncell_layout, **kws):
+        super(BaseButtonCell, self).__init__()
+        self.value = content
+        self.layout = layout
+        self.position = position
+        self.add_class('gridbutton')
+        self.set_tooltip()
+
+    def set_tooltip(self, s=None):
+        r"""From a position (i,j),
+        we just want the string 'i,j'
+        to use as a tooltip on buttons.
+
+        TESTS::
+            sage: from sage_combinat_widgets.grid_view_widget import BaseButtonCell
+            sage: b = BaseButtonCell(True, (42, 7))
+            sage: b.set_tooltip()
+            sage: str(b.tooltip)
+            '42, 7'
+            sage: b.set_tooltip("My new tooltip")
+            sage: str(b.tooltip)
+            'My new tooltip'
+        """
+        if s:
+            self.tooltip = s
+        else:
+            self.tooltip = str(self.position)[1:-1]
+
+class ButtonCell(BaseButtonCell):
     r"""A button grid cell
 
     TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
         sage: b = ButtonCell(True, (1,2))
     """
-    displaytype = bool
-
     def __init__(self, content, position, layout=buttoncell_layout, **kws):
-        super(ButtonCell, self).__init__()
-        self.value = content
-        self.layout = layout
+        super(ButtonCell, self).__init__(content, position, layout, **kws)
         self.disabled = True
-        self.position = position
-        self.add_class('gridbutton')
 
-class AddableButtonCell(ToggleButton):
+class AddableButtonCell(BaseButtonCell):
     r"""An addable placeholder for adding a button cell to the widget
 
     TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import AddableButtonCell
         sage: a = AddableButtonCell((3,4))
     """
-    displaytype = bool
-
     def __init__(self, position, layout=buttoncell_layout, **kws):
-        super(AddableButtonCell, self).__init__()
-        self.layout = layout
-        self.position = position
+        super(AddableButtonCell, self).__init__(False, position, layout, **kws)
         self.add_class('addablebutton')
         self.description = '+'
+        self.tooltip = "Click to add a cell here"
 
 class BlankButton(ToggleButton):
     r"""A blank placeholder button
@@ -155,25 +180,10 @@ class BlankButton(ToggleButton):
         sage: from sage_combinat_widgets.grid_view_widget import BlankButton
         sage: b = BlankButton()
     """
-    displaytype = bool
-
     def __init__(self, layout=buttoncell_layout):
         super(BlankButton, self).__init__()
-        self.layout = layout
         self.disabled=True
         self.add_class('blankbutton')
-
-def compute_tooltip(t):
-    r"""From a position (i,j),
-    we just want the string 'i,j'
-    to use as a tooltip on buttons.
-
-    TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import compute_tooltip
-        sage: compute_tooltip((42, 7))
-        '42, 7'
-    """
-    return str(t)[1:-1]
 
 def get_model_id(w):
     r"""
@@ -351,9 +361,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                     cell = cell_widget_class(cell_string,
                                              (i,j),
                                              self.cell_layout,
-                                             placeholder=cell_string,
-                                             tooltip=compute_tooltip((i,j)) # For buttons, menus ..
-                    )
+                                             placeholder=cell_string)
                     if (i,j) in removable_positions:
                         if issubclass(cell_widget_class, ToggleButton):
                             cell.description = '-'
@@ -398,14 +406,18 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             return self.children[self.height - pos[0] - 1].children[pos[1]]
         return self.children[pos[0]].children[pos[1]]
 
-    def set_dirty(self, pos, val):
-        self.get_child(pos).add_class('dirty')
-        self.dirty[pos] = val
+    def set_dirty(self, pos, val, e=None):
+        super(GridViewWidget, self).set_dirty(pos, val, e)
+        child = self.get_child(pos)
+        child.add_class('dirty')
+        child.set_tooltip(self.dirty_info(pos))
 
     def reset_dirty(self):
+        super(GridViewWidget, self).reset_dirty()
         for p in self.dirty:
-            self.get_child(p).remove_class('dirty')
-        self.dirty = {}
+            child = self.get_child(p)
+            child.remove_class('dirty')
+            child.set_tooltip()
 
 def PartitionGridViewWidget(obj, display_convention='en'):
     r"""

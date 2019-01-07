@@ -129,10 +129,7 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
             sl[pos[0]].append(val)
         else:
             sl[pos[0]][pos[1]] = val
-        try:
-            return cls.objclass(sl)
-        except:
-            raise ValueError("Error adding cell %s to %s" % (pos, cls.objclass))
+        return cls._validate(sl)
 
     @classmethod
     def remove_cell(cls, obj, pos):
@@ -163,7 +160,4 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
             sl[pos[0]].pop()
         else:
             sl[pos[0]][pos[1]] = None
-        try:
-            return cls.objclass(sl)
-        except:
-            raise ValueError("Error removing cell %s from %s" % (pos, cls.objclass))
+        return cls._validate(sl)
