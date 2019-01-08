@@ -384,8 +384,11 @@ class GridViewEditor(BindableEditorClass):
         del self.dirty_errors[pos]
 
     def reset_dirty(self):
-        self.dirty = {}
-        self.dirty_errors = {}
+        if not self.dirty: # Prevent any interactive loops
+            return
+        for pos in self.dirty.keys():
+            self.unset_dirty(pos)
+        self.draw()
 
     def dirty_info(self, pos):
         if pos in self.dirty_errors:

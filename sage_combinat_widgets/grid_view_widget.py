@@ -418,13 +418,6 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         child.remove_class('dirty')
         child.set_tooltip()
 
-    def reset_dirty(self):
-        super(GridViewWidget, self).reset_dirty()
-        for p in self.dirty:
-            child = self.get_child(p)
-            child.remove_class('dirty')
-            child.set_tooltip()
-
 def PartitionGridViewWidget(obj, display_convention='en'):
     r"""
     A default widget for partitions.
