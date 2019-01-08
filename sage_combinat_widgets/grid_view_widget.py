@@ -412,6 +412,12 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         child.add_class('dirty')
         child.set_tooltip(self.dirty_info(pos))
 
+    def unset_dirty(self, pos):
+        super(GridViewWidget, self).unset_dirty(pos)
+        child = self.get_child(pos)
+        child.remove_class('dirty')
+        child.set_tooltip()
+
     def reset_dirty(self):
         super(GridViewWidget, self).reset_dirty()
         for p in self.dirty:

@@ -184,9 +184,9 @@ class GridViewEditor(BindableEditorClass):
             TypeError: Cannot find an Adapter for this object (<type 'sage.symbolic.expression.Expression'>)
         """
         self.initialization = True
+        self.dirty = {}
         super(GridViewEditor, self).__init__()
         self.value = obj
-        self.dirty = {}
         self.dirty_errors = {}
         if adapter:
             self.adapter = adapter
@@ -379,13 +379,17 @@ class GridViewEditor(BindableEditorClass):
         if e:
             self.dirty_errors[pos] = e
 
+    def unset_dirty(self, pos):
+        del self.dirty[pos]
+        del self.dirty_errors[pos]
+
     def reset_dirty(self):
         self.dirty = {}
         self.dirty_errors = {}
 
     def dirty_info(self, pos):
         if pos in self.dirty_errors:
-            return str(e)
+            return str(self.dirty_errors[pos])
         return ''
 
     @traitlets.observe(traitlets.All)
@@ -419,7 +423,7 @@ class GridViewEditor(BindableEditorClass):
                 self.reset_dirty()
                 new_obj = obj
             else: # Add an entry in self.dirty dictionary
-                self.set_dirty(pos, val)
+                self.set_dirty(pos, val, result)
             return
         new_obj = result
         self.reset_dirty() # New value, no more dirty cells
@@ -479,9 +483,11 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot add cell to this object.")
         if self.adapter.add_cell.__func__.__class__ is AbstractMethod:
             return # Method not implemented
+        if hasattr(self.adapter.remove_cell, '_optional') and self.adapter.remove_cell._optional: # Not implemented
+            raise Exception("Adding cells is not implemented for this object.")
         val = change.new
-        if val is True:
-            val = False # if it's a button, reverse button toggling
+        if val is True: # if it's a button, reverse button toggling
+            val = False
         pos = extract_coordinates(change.name)
         obj = copy(self.value)
         result = self.adapter.add_cell(obj, pos, val, dirty=self.dirty)
@@ -490,7 +496,7 @@ class GridViewEditor(BindableEditorClass):
                 self.reset_dirty()
                 new_obj = obj
             else: # Keep temporary addition for later
-                self.set_dirty(pos, val)
+                self.set_dirty(pos, val, result)
             return
         new_obj = result
         self.set_value(new_obj) # Calls compute() and draw() by default
@@ -514,23 +520,37 @@ class GridViewEditor(BindableEditorClass):
             sage: e.value
             [[None, None, 1, 2], [None, 1], [4]]
         """
-        if not change.name.startswith('cell_'):
+        val = change.new
+        pos = extract_coordinates(change.name)
+        # Dirty _addable_ cells can be removed
+        if pos in self.dirty and change.name.startswith('add_') and self.to_cell(val) == self.adapter.cellzero:
+            self.unset_dirty(pos)
+            return
+        # Don't remove non empty cells
+        # Don't remove addable cells ; this test will do something only if adapter addablecellzero is specified (therefore not eq to cellzero)
+        # Do nothing at widget initialization
+        elif not change.name.startswith('cell_') or self.to_cell(val) != self.adapter.cellzero \
+           or self.to_cell(val) == self.adapter.addablecellzero or change.old == traitlets.Undefined:
             return
         if not hasattr(self.adapter, 'remove_cell'):
             raise TypeError("Cannot remove cell from this object.")
+        if self.adapter.remove_cell.__func__.__class__ is AbstractMethod:
+            return # Method not implemented
         if hasattr(self.adapter.remove_cell, '_optional') and self.adapter.remove_cell._optional: # Not implemented
-            return
-        if change.old == traitlets.Undefined: # Do nothing at widget initializing
-            return
-        if change.new == True: # if it's a button, reverse button toggling
-            change.new = False
-        if change.new != self.adapter.cellzero: # non empty cells are not to be removed
-            return
-        if change.new == self.adapter.addablecellzero:
-            return # never remove addable cells ; will do sth only if adapter addablecellzero is specified (therefore not eq to cellzero)
-        pos = extract_coordinates(change.name)
+            raise Exception("Removing cells is not implemented for this object.")
+        if val == True: # if it's a button, reverse button toggling
+            val = False
         obj = copy(self.value)
-        new_obj = self.adapter.remove_cell(obj, pos)
+        result = self.adapter.remove_cell(obj, pos, dirty=self.dirty)
+        if issubclass(result.__class__, BaseException): # Removing cell was impossible
+            if pos in self.addable_cells() or (pos in self.cells and val == self.cells[pos]) and self.dirty.keys() == [pos]: # Rollback
+                self.reset_dirty()
+                new_obj = obj
+            else: # Keep temporary substraction for later
+                self.set_dirty(pos, val, result)
+            return
+        new_obj = result
+        self.set_value(new_obj) # Calls compute() and draw() by default
         if not self.validate(new_obj):
             raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
         if new_obj == obj: # The proposed change was invalid -> stop here
