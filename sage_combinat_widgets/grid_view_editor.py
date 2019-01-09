@@ -122,7 +122,6 @@ class cdlink(traitlets.link):
             setattr(target[0], target[1], cast(getattr(source[0], source[1])))
         finally:
             source[0].observe(self._update_target, names=source[1])
-            target[0].observe(self._update_source, names=target[1])
 
     def __repr__(self):
         r"""
