@@ -180,22 +180,23 @@ class GridViewAdapter(object):
         except:
             raise ValueError("Cell '%s' does not exist!" % str(pos))
 
-    @classmethod
-    def make_dirty(cls, l, dirty={}):
+    def make_dirty(self, l, dirty={}):
         for p in dirty:
             if len(l) > p[0]:
                 if len(l[p[0]]) > p[1]:
-                    l[p[0]][p[1]] = dirty[p]
-                elif len(l[p[0]]) == p[1]:
+                    if dirty[p] == self.cellzero:
+                        del l[p[0]][p[1]]
+                    else:
+                        l[p[0]][p[1]] = dirty[p]
+                elif len(l[p[0]]) == p[1] and dirty[p] != self.cellzero:
                     l[p[0]].append(dirty[p])
-            elif len(l) == p[0]:
+            elif len(l) == p[0] and dirty[p] == self.cellzero:
                 l.append([dirty[p]])
             else:
                 raise Exception("Value is out of range: " + str(p))
         return l
 
-    @classmethod
-    def set_cell(cls, obj, pos, val, dirty={}, constructorname=''):
+    def set_cell(self, obj, pos, val, dirty={}, constructorname=''):
         r"""
         From a Sage object, a position (pair of coordinates) `pos` and a value `val`,
         return a new Sage object.
@@ -221,10 +222,10 @@ class GridViewAdapter(object):
         try:
             l = [list(x) for x in obj]
         except:
-            raise NotImplementedError("Adapter class method 'set_cell(cls, obj, pos, val)' is not implemented.")
-        l = cls.make_dirty(l, dirty)
+            raise NotImplementedError("Adapter class method 'set_cell(obj, pos, val)' is not implemented.")
+        l = self.make_dirty(l, dirty)
         l[pos[0]][pos[1]] = val
-        return cls._validate(l, constructorname)
+        return self._validate(l, constructorname)
 
     @staticmethod
     @abstract_method(optional = True)
@@ -251,9 +252,8 @@ class GridViewAdapter(object):
         at position `pos` and with value `val`.
         """
 
-    @classmethod
     @abstract_method(optional = True)
-    def remove_cell(cls, obj, pos, dirty={}):
+    def remove_cell(self, obj, pos, dirty={}):
         r"""
         This method should try to remove a cell from object `obj`
         at position `pos`.
@@ -321,9 +321,8 @@ class GridViewAdapter(object):
             except:
                 raise NotImplementedError("Method 'append_row' is not implemented.")
 
-    @classmethod
     @abstract_method(optional = True)
-    def remove_row(cls, obj, index=None):
+    def remove_row(self, obj, index=None):
         r"""
         This method should try to remove a row from object `obj`
         at index `index`.
@@ -376,9 +375,8 @@ class GridViewAdapter(object):
             TypeError: 'NotImplementedType' object is not callable
         """
 
-    @classmethod
     @abstract_method(optional = True)
-    def remove_column(cls, obj, index=None):
+    def remove_column(self, obj, index=None):
         r"""
         This method should try to remove a column from object `obj`
         at index `index`.

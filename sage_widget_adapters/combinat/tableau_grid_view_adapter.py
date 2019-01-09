@@ -115,8 +115,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         """
         return obj.corners()
 
-    @classmethod
-    def add_cell(cls, obj, pos, val, dirty={}):
+    def add_cell(self, obj, pos, val, dirty={}):
         r"""
         Add cell
 
@@ -133,18 +132,17 @@ class TableauGridViewAdapter(GridViewAdapter):
             ...
             ValueError: Cell position '(2, 0)' is not addable.
         """
-        if not pos in cls.addable_cells(obj):
+        if not pos in self.addable_cells(obj):
             raise ValueError("Cell position '%s' is not addable." % str(pos))
         tl = obj.to_list()
-        tl = cls.make_dirty(tl, dirty)
+        tl = self.make_dirty(tl, dirty)
         if pos[0] >= len(tl):
             tl.append([val])
         else:
             tl[pos[0]].append(val)
-        return cls._validate(tl)
+        return self._validate(tl)
 
-    @classmethod
-    def remove_cell(cls, obj, pos, dirty={}):
+    def remove_cell(self, obj, pos, dirty={}):
         r"""
         Remove cell
 
@@ -159,14 +157,14 @@ class TableauGridViewAdapter(GridViewAdapter):
             ...
             ValueError: Cell position '(2, 1)' is not removable.
         """
-        if not pos in cls.removable_cells(obj):
+        if not pos in self.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
         tl = obj.to_list()
-        tl = cls.make_dirty(tl, dirty)
+        tl = self.make_dirty(tl, dirty)
         tl[pos[0]].pop()
         if not tl[pos[0]]:
             tl.pop()
-        return cls._validate(tl)
+        return self._validate(tl)
 
 class SemistandardTableauGridViewAdapter(TableauGridViewAdapter):
     r"""
