@@ -165,7 +165,7 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         return ret
 
     @classmethod
-    def add_cell(cls, obj, pos, val=None):
+    def add_cell(cls, obj, pos, val=None, dirty={}):
         r"""
         Add cell
 
@@ -195,7 +195,7 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             raise ValueError("Error adding cell %s to %s" % (pos, cls.objclass))
 
     @classmethod
-    def remove_cell(cls, obj, pos):
+    def remove_cell(cls, obj, pos, dirty={}):
         r"""
         Remove cell
 

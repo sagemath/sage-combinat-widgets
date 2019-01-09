@@ -104,7 +104,7 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         return ret
 
     @classmethod
-    def add_cell(cls, obj, pos, val):
+    def add_cell(cls, obj, pos, val, dirty={}):
         r"""
         Add cell
         TESTS::
@@ -132,7 +132,7 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         return cls._validate(sl)
 
     @classmethod
-    def remove_cell(cls, obj, pos):
+    def remove_cell(cls, obj, pos, dirty={}):
         r"""
         Remove cell
         TESTS::

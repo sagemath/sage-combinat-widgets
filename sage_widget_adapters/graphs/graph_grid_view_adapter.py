@@ -200,7 +200,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         return [(0,0)]
 
     @classmethod
-    def add_cell(cls, obj, pos, val=None):
+    def add_cell(cls, obj, pos, val=None, dirty={}):
         r"""
         Add a cell to the graph.
 
@@ -219,7 +219,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         return obj
 
     @classmethod
-    def remove_cell(cls, obj, pos):
+    def remove_cell(cls, obj, pos, dirty={}):
         r"""
         Remove a cell from the graph.
 

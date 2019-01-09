@@ -190,7 +190,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
             return e
 
     @classmethod
-    def remove_cell(cls, obj, pos):
+    def remove_cell(cls, obj, pos, dirty={}):
         r"""
         Remove cell
 
