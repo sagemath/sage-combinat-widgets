@@ -331,6 +331,7 @@ class GridViewEditor(BindableEditorClass):
         """
         if not self.validate(obj, self.value.__class__):
             raise ValueError("Object %s is not compatible." % str(obj))
+        self.reset_dirty()
         self.value = obj
         if compute:
             self.compute()
@@ -427,14 +428,18 @@ class GridViewEditor(BindableEditorClass):
             else: # Add an entry in self.dirty dictionary
                 self.set_dirty(pos, val, result)
             return
+        # Success
         new_obj = result
-        self.reset_dirty() # New value, no more dirty cells
-        self.set_value(new_obj, False)
-        # Edit the cell dictionary
-        self.cells[pos] = val
-        # Edit the trait
-        traitname = 'cell_%d_%d' % pos
-        self.set_trait(traitname, val)
+        if not self.dirty: # Do not draw for such a small change
+            self.value = new_obj
+            # Edit the cell dictionary
+            self.cells[pos] = val
+            # Edit the trait
+            traitname = 'cell_%d_%d' % pos
+            self.set_trait(traitname, val)
+            return
+        # More than one change, need to draw
+        self.set_value(new_obj)
 
     def addable_cells(self):
         r"""
@@ -552,12 +557,6 @@ class GridViewEditor(BindableEditorClass):
                 self.set_dirty(pos, val, result)
             return
         new_obj = result
-        self.set_value(new_obj) # Calls compute() and draw() by default
-        if not self.validate(new_obj):
-            raise ValueError("This new object is not compatible with editor object class (%s)" % self.value.__class__)
-        if new_obj == obj: # The proposed change was invalid -> stop here
-            self.draw() # Reverse the display change
-            return
         self.set_value(new_obj) # Calls compute() and draw() by default
 
     def append_row(self, r=None):

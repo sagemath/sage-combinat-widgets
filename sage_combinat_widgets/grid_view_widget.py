@@ -332,6 +332,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         Used classes can be passed as arguments
         to enable changing shapes, colors ..
         """
+        self.initialization = True # Suppress any interactivity while drawing the widget
         self.reset_links()
         positions = sorted(list(self.cells.keys()))
         rows = [[(pos, self.cells[pos]) for pos in positions if pos[0]==i] \
@@ -387,6 +388,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             self.compute_height()
         self.children = vbox_children
         self.add_links()
+        self.initialization = False
 
     def get_child(self, pos):
         r"""

@@ -136,8 +136,9 @@ class TableauGridViewAdapter(GridViewAdapter):
         if not pos in cls.addable_cells(obj):
             raise ValueError("Cell position '%s' is not addable." % str(pos))
         tl = obj.to_list()
+        tl = cls.make_dirty(tl, dirty)
         if pos[0] >= len(tl):
-            tl = tl + [[val]]
+            tl.append([[val]])
         else:
             tl[pos[0]].append(val)
         return cls._validate(tl)
@@ -161,6 +162,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         if not pos in cls.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
         tl = obj.to_list()
+        tl = cls.make_dirty(tl, dirty)
         tl[pos[0]].pop()
         if not tl[pos[0]]:
             tl.pop()

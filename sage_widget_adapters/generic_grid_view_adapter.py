@@ -181,6 +181,20 @@ class GridViewAdapter(object):
             raise ValueError("Cell '%s' does not exist!" % str(pos))
 
     @classmethod
+    def make_dirty(cls, l, dirty={}):
+        for p in dirty:
+            if len(l) > p[0]:
+                if len(l[p[0]]) > p[1]:
+                    l[p[0]][p[1]] = dirty[p]
+                elif len(l[p[0]]) == p[1]:
+                    l[p[0]].append(dirty[p])
+            elif len(l) == p[0]:
+                l.append([dirty[p]])
+            else:
+                raise Exception("Value is out of range: " + str(p))
+        return l
+
+    @classmethod
     def set_cell(cls, obj, pos, val, dirty={}, constructorname=''):
         r"""
         From a Sage object, a position (pair of coordinates) `pos` and a value `val`,
@@ -208,12 +222,8 @@ class GridViewAdapter(object):
             l = [list(x) for x in obj]
         except:
             raise NotImplementedError("Adapter class method 'set_cell(cls, obj, pos, val)' is not implemented.")
-        try:
-            for p in dirty:
-                l[p[0]][p[1]] = dirty[p]
-            l[pos[0]][pos[1]] = val
-        except:
-            raise TypeError("Value '%s' is not compatible or position '%s' does not exist." % (val, pos))
+        l = cls.make_dirty(l, dirty)
+        l[pos[0]][pos[1]] = val
         return cls._validate(l, constructorname)
 
     @staticmethod
