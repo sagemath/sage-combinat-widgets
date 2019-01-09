@@ -138,7 +138,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         tl = obj.to_list()
         tl = cls.make_dirty(tl, dirty)
         if pos[0] >= len(tl):
-            tl.append([[val]])
+            tl.append([val])
         else:
             tl[pos[0]].append(val)
         return cls._validate(tl)
@@ -181,18 +181,3 @@ class StandardTableauGridViewAdapter(SemistandardTableauGridViewAdapter):
     """
     objclass = StandardTableau
     constructorname = 'StandardTableau'
-
-    @staticmethod
-    def removable_cells(obj):
-        r"""
-        There is only one removable cell for a Standard Tableau.
-
-        TESTS::
-            sage: from sage.combinat.tableau import StandardTableau
-            sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import StandardTableauGridViewAdapter
-            sage: t = StandardTableau([[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]])
-            sage: StandardTableauGridViewAdapter.removable_cells(t)
-            [(3, 1)]
-        """
-        return [pos for pos in TableauGridViewAdapter.removable_cells(obj) \
-                    if obj[pos[0]][pos[1]]==obj.size()]
