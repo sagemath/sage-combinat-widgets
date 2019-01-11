@@ -164,8 +164,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
         """
         return obj.corners()
 
-    @classmethod
-    def add_cell(cls, obj, pos, val=None, dirty={}):
+    def add_cell(self, obj, pos, val=None, dirty={}):
         r"""
         Add cell
 
@@ -173,24 +172,24 @@ class PartitionGridViewAdapter(GridViewAdapter):
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
-            sage: PartitionGridViewAdapter.add_cell(p, (2, 2))
+            sage: pa = PartitionGridViewAdapter()
+            sage: pa.add_cell(p, (2, 2))
             [6, 5, 3, 1]
-            sage: PartitionGridViewAdapter.add_cell(p, (4, 0), 42)
+            sage: pa.add_cell(p, (4, 0), 42)
             [6, 5, 2, 1, 1]
-            sage: PartitionGridViewAdapter.add_cell(p, (2, 0))
+            sage: pa.add_cell(p, (2, 0))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 0)' is not addable.
         """
-        if not pos in cls.addable_cells(obj):
+        if not pos in self.addable_cells(obj):
             raise ValueError("Cell position '%s' is not addable." % str(pos))
         try:
             return obj.add_cell(pos[0])
-        except Exception, e:
+        except Exception as e:
             return e
 
-    @classmethod
-    def remove_cell(cls, obj, pos, dirty={}):
+    def remove_cell(self, obj, pos, dirty={}):
         r"""
         Remove cell
 
@@ -198,16 +197,17 @@ class PartitionGridViewAdapter(GridViewAdapter):
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
-            sage: PartitionGridViewAdapter.remove_cell(p, (2, 1))
+            sage: pa = PartitionGridViewAdapter()
+            sage: pa.remove_cell(p, (2, 1))
             [6, 5, 1, 1]
-            sage: PartitionGridViewAdapter.remove_cell(p, (1, 1))
+            sage: pa.remove_cell(p, (1, 1))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(1, 1)' is not removable.
         """
-        if not pos in cls.removable_cells(obj):
+        if not pos in self.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
         try:
             return obj.remove_cell(pos[0])
-        except Exception, e:
+        except Exception as e:
             return e

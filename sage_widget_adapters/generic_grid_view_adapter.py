@@ -123,7 +123,9 @@ class GridViewAdapter(object):
 
         TESTS::
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
-            sage: GridViewAdapter._validate(pi)
+            sage: assert issubclass(GridViewAdapter._validate(pi).__class__, SageObject)
+            sage: from sage.matrix.constructor import matrix
+            sage: assert issubclass(GridViewAdapter._validate(pi, constructorname='matrix').__class__, BaseException)
         """
         try:
             if constructorname:
@@ -131,7 +133,7 @@ class GridViewAdapter(object):
             if cls.constructorname:
                 return eval_in_main(cls.constructorname)(obj)
             return cls.objclass(obj)
-        except Exception, e:
+        except Exception as e:
             return e
 
     @classmethod
@@ -206,25 +208,29 @@ class GridViewAdapter(object):
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: from sage.combinat.tableau import Tableau
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
-            sage: GridViewAdapter.set_cell(t, (1,1), 8, constructorname='Tableau')
+            sage: ga = GridViewAdapter()
+            sage: ga.set_cell(t, (1,1), 8, constructorname='Tableau')
             [[1, 2, 5, 6], [3, 8], [4]]
             sage: from sage.matrix.constructor import Matrix, matrix
             sage: m = Matrix(QQ, 3, 3, range(9))/2
-            sage: GridViewAdapter.set_cell(m, (0,1), 2/3, constructorname='matrix')
+            sage: ga.set_cell(m, (0,1), 2/3, constructorname='matrix')
             [  0 2/3   1]
             [3/2   2 5/2]
             [  3 7/2   4]
-            sage: GridViewAdapter.set_cell(m, (4,2), pi, constructorname='matrix')
+            sage: ga.set_cell(m, (4,2), 1/2, constructorname='matrix')
             Traceback (most recent call last):
             ...
-            TypeError: Value 'pi' is not compatible or position '(4, 2)' does not exist.
+            ValueError: Position '(4, 2)' does not exist
         """
         try:
             l = [list(x) for x in obj]
         except:
             raise NotImplementedError("Adapter class method 'set_cell(obj, pos, val)' is not implemented.")
         l = self.make_dirty(l, dirty)
-        l[pos[0]][pos[1]] = val
+        try:
+            l[pos[0]][pos[1]] = val
+        except:
+            raise ValueError("Position '%s' does not exist" % str(pos))
         return self._validate(l, constructorname)
 
     @staticmethod
@@ -271,10 +277,10 @@ class GridViewAdapter(object):
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: a = GridViewAdapter()
-            sage: a.append_row(S, (1,2,3))
+            sage: a.append_row(S, (1,2,3)) #doctest: +IGNORE_EXCEPTION_DETAIL
             Traceback (most recent call last):
             ...
-            TypeError: 'NotImplementedType' object is not callable
+            TypeError: 'AbstractMethod' object is not callable
         """
 
     @abstract_method(optional = True)
@@ -289,10 +295,10 @@ class GridViewAdapter(object):
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: a = GridViewAdapter()
-            sage: a.insert_row(S, 1, (1,2,3))
+            sage: a.insert_row(S, 1, (1,2,3)) #doctest: +IGNORE_EXCEPTION_DETAIL
             Traceback (most recent call last):
             ...
-            TypeError: 'NotImplementedType' object is not callable
+            TypeError: 'AbstractMethod' object is not callable
         """
 
     def add_row(self, obj, index=None, r=None):
@@ -333,7 +339,7 @@ class GridViewAdapter(object):
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: a = GridViewAdapter()
-            sage: a.remove_row(S, 1)
+            sage: a.remove_row(S, 1) #doctest: +IGNORE_EXCEPTION_DETAIL
             Traceback (most recent call last):
             ...
             TypeError: 'AbstractMethod' object is not callable
@@ -351,10 +357,10 @@ class GridViewAdapter(object):
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: a = GridViewAdapter()
-            sage: a.append_column(S, (1,2,3,4))
+            sage: a.append_column(S, (1,2,3,4)) #doctest: +IGNORE_EXCEPTION_DETAIL
             Traceback (most recent call last):
             ...
-            TypeError: 'NotImplementedType' object is not callable
+            TypeError: 'AbstractMethod' object is not callable
         """
 
     @abstract_method(optional = True)
@@ -369,10 +375,10 @@ class GridViewAdapter(object):
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: a = GridViewAdapter()
-            sage: a.insert_column(S, 1, (1,2,3,4))
+            sage: a.insert_column(S, 1, (1,2,3,4)) #doctest: +IGNORE_EXCEPTION_DETAIL
             Traceback (most recent call last):
             ...
-            TypeError: 'NotImplementedType' object is not callable
+            TypeError: 'AbstractMethod' object is not callable
         """
 
     @abstract_method(optional = True)
@@ -387,7 +393,7 @@ class GridViewAdapter(object):
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: a = GridViewAdapter()
-            sage: a.remove_column(S, 2)
+            sage: a.remove_column(S, 2) #doctest: +IGNORE_EXCEPTION_DETAIL
             Traceback (most recent call last):
             ...
             TypeError: 'AbstractMethod' object is not callable

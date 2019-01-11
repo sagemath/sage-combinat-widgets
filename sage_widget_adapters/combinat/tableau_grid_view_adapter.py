@@ -123,11 +123,12 @@ class TableauGridViewAdapter(GridViewAdapter):
             sage: from sage.combinat.tableau import Tableau
             sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
-            sage: TableauGridViewAdapter.add_cell(t, (3, 0), 8)
+            sage: ta = TableauGridViewAdapter()
+            sage: ta.add_cell(t, (3, 0), 8)
             [[1, 2, 5, 6], [3, 7], [4], [8]]
-            sage: TableauGridViewAdapter.add_cell(t, (1, 2), 8)
+            sage: ta.add_cell(t, (1, 2), 8)
             [[1, 2, 5, 6], [3, 7, 8], [4]]
-            sage: TableauGridViewAdapter.add_cell(t, (2, 0), 9)
+            sage: ta.add_cell(t, (2, 0), 9)
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 0)' is not addable.
@@ -150,9 +151,10 @@ class TableauGridViewAdapter(GridViewAdapter):
             sage: from sage.combinat.tableau import Tableau
             sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
-            sage: TableauGridViewAdapter.remove_cell(t, (1, 1))
+            sage: ta = TableauGridViewAdapter()
+            sage: ta.remove_cell(t, (1, 1))
             [[1, 2, 5, 6], [3], [4]]
-            sage: TableauGridViewAdapter.remove_cell(t, (2, 1))
+            sage: ta.remove_cell(t, (2, 1))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 1)' is not removable.

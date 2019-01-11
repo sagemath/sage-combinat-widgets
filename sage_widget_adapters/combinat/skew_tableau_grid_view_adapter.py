@@ -103,61 +103,63 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
                 ret.append(c)
         return ret
 
-    @classmethod
-    def add_cell(cls, obj, pos, val, dirty={}):
+    def add_cell(self, obj, pos, val, dirty={}):
         r"""
         Add cell
         TESTS::
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
             sage: st = SkewTableau([[None, None, None, 2], [None, 1, 1], [1], [4]])
-            sage: SkewTableauGridViewAdapter.add_cell(st, (0, 2), 1)
+            sage: sta = SkewTableauGridViewAdapter()
+            sage: sta.add_cell(st, (0, 2), 1)
             [[None, None, 1, 2], [None, 1, 1], [1], [4]]
-            sage: SkewTableauGridViewAdapter.add_cell(st, (4, 0), 7)
+            sage: sta.add_cell(st, (4, 0), 7)
             [[None, None, None, 2], [None, 1, 1], [1], [4], [7]]
-            sage: SkewTableauGridViewAdapter.add_cell(st, (1, 1), 9)
+            sage: sta.add_cell(st, (1, 1), 9)
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(1, 1)' is not addable.
         """
-        if not pos in cls.addable_cells(obj):
+        if not pos in self.addable_cells(obj):
             raise ValueError("Cell position '%s' is not addable." % str(pos))
         sl = obj.to_list()
+        sl = self.make_dirty(sl, dirty)
         if pos[0] >= len(obj):
             sl.append([val])
         elif pos in obj.shape().outer().outside_corners():
             sl[pos[0]].append(val)
         else:
             sl[pos[0]][pos[1]] = val
-        return cls._validate(sl)
+        return self._validate(sl)
 
-    @classmethod
-    def remove_cell(cls, obj, pos, dirty={}):
+    def remove_cell(self, obj, pos, dirty={}):
         r"""
         Remove cell
         TESTS::
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
             sage: st = SkewTableau([[None, None, None, 1, 2, 6], [None, None, 3, 4], [None, 1], [5]])
-            sage: SkewTableauGridViewAdapter.remove_cell(st, (0, 0))
+            sage: sta = SkewTableauGridViewAdapter()
+            sage: sta.remove_cell(st, (0, 0))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(0, 0)' is not removable.
-            sage: SkewTableauGridViewAdapter.remove_cell(st, (0, 3))
+            sage: sta.remove_cell(st, (0, 3))
             [[None, None, None, None, 2, 6], [None, None, 3, 4], [None, 1], [5]]
-            sage: SkewTableauGridViewAdapter.remove_cell(st, (2, 1))
+            sage: sta.remove_cell(st, (2, 1))
             [[None, None, None, 1, 2, 6], [None, None, 3, 4], [None], [5]]
             sage: st = SkewTableau([[None, None, 1, 2, 3], [None, 1], [4]])
-            sage: SkewTableauGridViewAdapter.remove_cell(st, (0, 4))
+            sage: sta.remove_cell(st, (0, 4))
             [[None, None, 1, 2], [None, 1], [4]]
         """
-        if not pos in cls.removable_cells(obj):
+        if not pos in self.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
         sl = obj.to_list()
+        sl = self.make_dirty(sl, dirty)
         if len(sl[pos[0]]) == 1:
             del(sl[pos[0]])
         elif pos in obj.shape().outer().corners():
             sl[pos[0]].pop()
         else:
             sl[pos[0]][pos[1]] = None
-        return cls._validate(sl)
+        return self._validate(sl)
