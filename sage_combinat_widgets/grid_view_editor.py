@@ -297,10 +297,11 @@ class GridViewEditor(BindableEditorClass):
         if not hasattr(self, 'cells'):
             self.compute()
         maxpos = max(pos[0] for pos in self.cells)
+        self.height = maxpos + 1 # Number of rows in self.value
         for pos in self.addable_cells():
             if pos[0] > maxpos:
                 maxpos = pos[0]
-        self.height = maxpos + 1
+        self.total_height =  maxpos + 1 # Graphical height
 
     def reset_links(self):
         r"""

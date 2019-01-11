@@ -334,9 +334,10 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         """
         self.initialization = True # Suppress any interactivity while drawing the widget
         self.reset_links()
+        self.compute_height()
         positions = sorted(list(self.cells.keys()))
         rows = [[(pos, self.cells[pos]) for pos in positions if pos[0]==i] \
-                for i in uniq([t[0] for t in positions])]
+                for i in range(self.height)]
         vbox_children = []
         addable_positions = self.addable_cells()
         addable_rows = []
@@ -351,7 +352,14 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             addable_widget_class = self.addable_widget_class
         if not blank_widget_class:
             blank_widget_class = self.blank_widget_class
-        for i in range(len(rows)):
+        for i in range(self.height):
+            r = rows[i]
+            if not r: # Empty row!
+                if (i,0) in addable_positions:
+                    vbox_children.append(HBox((addable_widget_class((i,0), self.cell_layout),)))
+                else:
+                    vbox_children.append(HBox((blank_widget_class(self.cell_layout),)))
+                continue
             j = 0
             hbox_children = []
             while j<=max([t[0][1] for t in rows[i]]):
@@ -385,7 +393,6 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                 vbox_children.append(HBox([self.addable_widget_class((i,j), self.cell_layout) for c in row[1]]))
         if self.display_convention == 'fr':
             vbox_children.reverse()
-            self.compute_height()
         self.children = vbox_children
         self.add_links()
         self.initialization = False
@@ -405,7 +412,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             True
         """
         if self.display_convention == 'fr':
-            return self.children[self.height - pos[0] - 1].children[pos[1]]
+            return self.children[self.total_height - pos[0] - 1].children[pos[1]]
         return self.children[pos[0]].children[pos[1]]
 
     def set_dirty(self, pos, val, e=None):
