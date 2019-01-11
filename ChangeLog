@@ -1,5 +1,7 @@
-0.6.1:
+0.7.0:
 	* Dirty editing
+	* Signatures changed in the adapters
+0.6.1:
 	* ColorTableaux example
 0.6.0:
 	* Flexibility options in widget redraw

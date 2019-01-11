@@ -389,7 +389,6 @@ class GridViewEditor(BindableEditorClass):
             return
         for pos in self.dirty.keys():
             self.unset_dirty(pos)
-        self.draw()
 
     def dirty_info(self, pos):
         if pos in self.dirty_errors:
