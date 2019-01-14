@@ -199,8 +199,7 @@ class GraphGridViewAdapter(GridViewAdapter):
             return [(0, col_max)]
         return [(0,0)]
 
-    @classmethod
-    def add_cell(cls, obj, pos, val=None, dirty={}):
+    def add_cell(self, obj, pos, val=None, dirty={}):
         r"""
         Add a cell to the graph.
 
@@ -208,18 +207,18 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((1,2))
-            sage: GraphGridViewAdapter.add_cell(g, (0,2))
+            sage: ga = GraphGridViewAdapter()
+            sage: ga.add_cell(g, (0,2))
             Grid Graph for [1, 2]: Graph on 3 vertices
         """
-        if not pos in cls.addable_cells(obj):
+        if not pos in self.addable_cells(obj):
             raise ValueError("Position '%s' is not addable." % str(pos))
         if pos in obj.vertices():
             raise ValueError("This cell (position=%s) is already in the graph." % str(pos))
         obj.add_vertex(pos)
         return obj
 
-    @classmethod
-    def remove_cell(cls, obj, pos, dirty={}):
+    def remove_cell(self, obj, pos, dirty={}):
         r"""
         Remove a cell from the graph.
 
@@ -227,16 +226,16 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((1, 2))
-            sage: GraphGridViewAdapter.remove_cell(g, (0,1))
+            sage: ga = GraphGridViewAdapter()
+            sage: ga.remove_cell(g, (0,1))
             Grid Graph for [1, 2]: Graph on 1 vertex
         """
-        if not pos in cls.removable_cells(obj):
+        if not pos in self.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
         obj.delete_vertex(pos)
         return obj
 
-    @classmethod
-    def append_row(cls, obj):
+    def append_row(self, obj):
         r"""
         Add a row to the graph.
 
@@ -244,7 +243,8 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
-            sage: GraphGridViewAdapter.append_row(g)
+            sage: ga = GraphGridViewAdapter()
+            sage: ga.append_row(g)
             Grid Graph for [3, 2]: Graph on 8 vertices
         """
         row_max, col_max = 0, 0
@@ -254,8 +254,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         obj.add_vertices([(row_max + 1, j) for j in range(col_max + 1)])
         return obj
 
-    @classmethod
-    def remove_row(cls, obj, index=None):
+    def remove_row(self, obj, index=None):
         r"""
         Remove a row from the graph
 
@@ -263,7 +262,8 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
-            sage: GraphGridViewAdapter.remove_row(g)
+            sage: ga = GraphGridViewAdapter()
+            sage: ga.remove_row(g)
             Grid Graph for [3, 2]: Graph on 4 vertices
         """
         row_max, col_max = 0, 0
@@ -273,8 +273,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         obj.delete_vertices([(row_max, j) for j in range(col_max + 1)])
         return obj
 
-    @classmethod
-    def append_column(cls, obj):
+    def append_column(self, obj):
         r"""
         Add a column to the graph.
 
@@ -282,7 +281,8 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
-            sage: GraphGridViewAdapter.append_column(g)
+            sage: ga = GraphGridViewAdapter()
+            sage: ga.append_column(g)
             Grid Graph for [3, 2]: Graph on 9 vertices
         """
         row_max, col_max = 0, 0
@@ -292,8 +292,7 @@ class GraphGridViewAdapter(GridViewAdapter):
         obj.add_vertices([(i, col_max + 1) for i in range(row_max + 1)])
         return obj
 
-    @classmethod
-    def remove_column(cls, obj, index=None):
+    def remove_column(self, obj, index=None):
         r"""
         Remove a column from the graph
 
@@ -301,7 +300,8 @@ class GraphGridViewAdapter(GridViewAdapter):
             sage: from sage.graphs.generators.basic import GridGraph
             sage: from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
             sage: g = GridGraph((3,2))
-            sage: GraphGridViewAdapter.remove_column(g)
+            sage: ga = GraphGridViewAdapter()
+            sage: ga.remove_column(g)
             Grid Graph for [3, 2]: Graph on 3 vertices
         """
         row_max, col_max = 0, 0

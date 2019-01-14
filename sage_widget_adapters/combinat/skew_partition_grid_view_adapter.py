@@ -164,8 +164,7 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
                 ret.append(c)
         return ret
 
-    @classmethod
-    def add_cell(cls, obj, pos, val=None, dirty={}):
+    def add_cell(self, obj, pos, val=None, dirty={}):
         r"""
         Add cell
 
@@ -173,29 +172,29 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             sage: from sage.combinat.skew_partition import SkewPartition
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: sp = SkewPartition([[7, 4, 2, 1],[2, 1, 1]])
-            sage: SkewPartitionGridViewAdapter.add_cell(sp, (0, 7))
+            sage: spa = SkewPartitionGridViewAdapter()
+            sage: spa.add_cell(sp, (0, 7))
             [8, 4, 2, 1] / [2, 1, 1]
-            sage: SkewPartitionGridViewAdapter.add_cell(sp, (2, 0))
+            sage: spa.add_cell(sp, (2, 0))
             [7, 4, 2, 1] / [2, 1]
-            sage: SkewPartitionGridViewAdapter.add_cell(sp, (4, 0))
+            sage: spa.add_cell(sp, (4, 0))
             [7, 4, 2, 1, 1] / [2, 1, 1]
-            sage: SkewPartitionGridViewAdapter.add_cell(sp, (2, 3))
+            sage: spa.add_cell(sp, (2, 3))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 3)' is not addable.
         """
-        if not pos in cls.addable_cells(obj):
+        if not pos in self.addable_cells(obj):
             raise ValueError("Cell position '%s' is not addable." % str(pos))
         try:
             if pos in obj.outer().outside_corners():
-                return cls.objclass([obj.outer().add_cell(pos[0]), obj.inner()])
+                return self.objclass([obj.outer().add_cell(pos[0]), obj.inner()])
             else:
-                return cls.objclass([obj.outer(), obj.inner().remove_cell(pos[0])])
+                return self.objclass([obj.outer(), obj.inner().remove_cell(pos[0])])
         except:
-            raise ValueError("Error adding cell %s to %s" % (pos, cls.objclass))
+            raise ValueError("Error adding cell %s to %s" % (pos, self.objclass))
 
-    @classmethod
-    def remove_cell(cls, obj, pos, dirty={}):
+    def remove_cell(self, obj, pos, dirty={}):
         r"""
         Remove cell
 
@@ -203,11 +202,12 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             sage: from sage.combinat.skew_partition import SkewPartition
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: sp = SkewPartition([[7, 4, 2, 1],[2, 1, 1]])
-            sage: SkewPartitionGridViewAdapter.remove_cell(sp, (0, 6))
+            sage: spa = SkewPartitionGridViewAdapter()
+            sage: spa.remove_cell(sp, (0, 6))
             [6, 4, 2, 1] / [2, 1, 1]
-            sage: SkewPartitionGridViewAdapter.remove_cell(sp, (1, 1))
+            sage: spa.remove_cell(sp, (1, 1))
             [7, 4, 2, 1] / [2, 2, 1]
-            sage: SkewPartitionGridViewAdapter.remove_cell(sp, (1, 2))
+            sage: spa.remove_cell(sp, (1, 2))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(1, 2)' is not removable.

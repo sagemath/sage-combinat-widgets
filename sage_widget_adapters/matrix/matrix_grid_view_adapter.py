@@ -220,8 +220,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         bottom = obj.matrix_from_rows(range(index,obj.nrows()))
         return top.stack(vector([self.display_to_cell(x) for x in r])).stack(bottom)
 
-    @classmethod
-    def remove_row(cls, obj, index=None):
+    def remove_row(self, obj, index=None):
         r"""
         Remove a row from a matrix.
 
@@ -230,11 +229,12 @@ class MatrixGridViewAdapter(GridViewAdapter):
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: m = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
-            sage: MatrixGridViewAdapter.remove_row(m, 2)
+            sage: ma = MatrixGridViewAdapter(m)
+            sage: ma.remove_row(m, 2)
             [ 0  1  2]
             [ 3  4  5]
             [ 9 10 11]
-            sage: MatrixGridViewAdapter.remove_row(m)
+            sage: ma.remove_row(m)
             [0 1 2]
             [3 4 5]
             [6 7 8]
@@ -308,8 +308,7 @@ class MatrixGridViewAdapter(GridViewAdapter):
         right = obj.matrix_from_columns(range(index,obj.ncols()))
         return left.augment(vector([self.display_to_cell(x) for x in c])).augment(right)
 
-    @classmethod
-    def remove_column(cls, obj, index=None):
+    def remove_column(self, obj, index=None):
         r"""
         Remove a column from a matrix.
 
@@ -318,12 +317,13 @@ class MatrixGridViewAdapter(GridViewAdapter):
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: m = S.matrix([0,1,2,3,4,5,6,7,8,9,10,11])
-            sage: MatrixGridViewAdapter.remove_column(m, 1)
+            sage: ma = MatrixGridViewAdapter(m)
+            sage: ma.remove_column(m, 1)
             [ 0  2]
             [ 3  5]
             [ 6  8]
             [ 9 11]
-            sage: MatrixGridViewAdapter.remove_column(m)
+            sage: ma.remove_column(m)
             [ 0  1]
             [ 3  4]
             [ 6  7]
