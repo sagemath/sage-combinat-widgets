@@ -183,6 +183,7 @@ class BlankButton(ToggleButton):
     def __init__(self, layout=buttoncell_layout):
         super(BlankButton, self).__init__()
         self.disabled=True
+        self.layout = buttoncell_layout
         self.add_class('blankbutton')
 
 def get_model_id(w):
