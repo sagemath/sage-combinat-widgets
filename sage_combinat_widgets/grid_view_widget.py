@@ -6,9 +6,10 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from .grid_view_editor import *
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, ValueWidget
+from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, ValueWidget, register, DOMWidget
 from sage.misc.misc import uniq
 from six import text_type
+from traitlets import Unicode
 
 textcell_layout = Layout(width='3em',height='2em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em',height='3em', margin='0', padding='0')
@@ -36,6 +37,17 @@ try:
             break
 except:
     pass # We are in the test environment
+
+@register
+class TextWithTitle(Text):
+    """Input text with a help title (tooltip)."""
+    _view_name = Unicode('TextWithTitleView').tag(sync=True)
+    _model_name = Unicode('TextWithTitleModel').tag(sync=True)
+    _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
+    _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
+    _view_module_version = Unicode('^0.1.0').tag(sync=True)
+    _model_module_version = Unicode('^0.1.0').tag(sync=True)
+    value = Unicode('Input text with a tooltip').tag(sync=True)
 
 class BaseTextCell(Text):
     r"""
