@@ -379,10 +379,12 @@ class GridViewEditor(BindableEditorClass):
         self.dirty[pos] = val
         if e:
             self.dirty_errors[pos] = e
+            self.get_child(pos).set_tooltip(str(e))
 
     def unset_dirty(self, pos):
         del self.dirty[pos]
         del self.dirty_errors[pos]
+        self.get_child(pos).set_tooltip()
 
     def reset_dirty(self):
         if not self.dirty: # Prevent any interactive loops

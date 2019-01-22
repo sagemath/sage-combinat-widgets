@@ -41,18 +41,13 @@ except:
 @register
 class TextWithTooltip(Text):
     """Input text with a help title (tooltip)."""
-    _view_name = Unicode('TextWithTitleView').tag(sync=True)
-    _model_name = Unicode('TextWithTitleModel').tag(sync=True)
+    _view_name = Unicode('TextWithTooltipView').tag(sync=True)
+    _model_name = Unicode('TextWithTooltipModel').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _view_module_version = Unicode('^0.1.0').tag(sync=True)
-    _model_module_version = Unicode('^0.1.0').tag(sync=True)
-    #tooltip = Unicode('The tooltip').tag(sync=True)
-    value = Unicode('Input text with a tooltip').tag(sync=True)
-
-    def __init__(self, *args, **kwargs):
-        super(TextWithTooltip, self).__init__(*args, **kwargs)
-        self.set_tooltip()
+    _view_module_version = Unicode('^0.2.0').tag(sync=True)
+    _model_module_version = Unicode('^0.2.0').tag(sync=True)
+    tooltip = Unicode().tag(sync=True)
 
     def set_tooltip(self, s=''):
         self.tooltip = s
