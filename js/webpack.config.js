@@ -4,9 +4,9 @@ var version = require('./package.json').version;
 // Custom webpack rules are generally the same for all webpack bundles, hence
 // stored in a separate local variable.
 var rules = [
-    { test: /\.css$/, use: ['style-loader', 'css-loader']}
+    { test: /\.css$/, use: ['style-loader', 'css-loader']},
+    { test: /\.(jpg|png|gif)$/, use: ['url-loader']}
 ]
-
 
 module.exports = [
     {// Notebook extension
@@ -40,7 +40,7 @@ module.exports = [
         module: {
             rules: rules
         },
-        externals: ['@jupyter-widgets/base']
+        externals: ['@jupyter-widgets/base', '@jupyter-widgets/controls']
     },
     {// Embeddable sage-combinat-widgets bundle
      //
@@ -67,6 +67,6 @@ module.exports = [
         module: {
             rules: rules
         },
-        externals: ['@jupyter-widgets/base']
+        externals: ['@jupyter-widgets/base', '@jupyter-widgets/controls']
     }
 ];

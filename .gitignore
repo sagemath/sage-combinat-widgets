@@ -9,3 +9,8 @@ build/
 dist/
 Untitled*.ipynb
 DEBUG
+js/dist/
+js/node_modules/
+package-lock.json
+*.[1-9]
+*.print
