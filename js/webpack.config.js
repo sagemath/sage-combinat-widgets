@@ -7,6 +7,7 @@ var rules = [
     { test: /\.css$/, use: ['style-loader', 'css-loader']},
     { test: /\.(jpg|png|gif)$/, use: ['url-loader']}
 ]
+var externals = ['@jupyter-widgets/base', '@jupyter-widgets/controls']
 
 module.exports = [
     {// Notebook extension
@@ -40,7 +41,7 @@ module.exports = [
         module: {
             rules: rules
         },
-        externals: ['@jupyter-widgets/base', '@jupyter-widgets/controls']
+        externals: externals
     },
     {// Embeddable sage-combinat-widgets bundle
      //
@@ -67,6 +68,6 @@ module.exports = [
         module: {
             rules: rules
         },
-        externals: ['@jupyter-widgets/base', '@jupyter-widgets/controls']
+        externals: externals
     }
 ];
