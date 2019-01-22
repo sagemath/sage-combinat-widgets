@@ -39,7 +39,7 @@ except:
     pass # We are in the test environment
 
 @register
-class TextWithTitle(Text):
+class TextWithTooltip(Text):
     """Input text with a help title (tooltip)."""
     _view_name = Unicode('TextWithTitleView').tag(sync=True)
     _model_name = Unicode('TextWithTitleModel').tag(sync=True)
@@ -47,9 +47,17 @@ class TextWithTitle(Text):
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
     _view_module_version = Unicode('^0.1.0').tag(sync=True)
     _model_module_version = Unicode('^0.1.0').tag(sync=True)
+    #tooltip = Unicode('The tooltip').tag(sync=True)
     value = Unicode('Input text with a tooltip').tag(sync=True)
 
-class BaseTextCell(Text):
+    def __init__(self, *args, **kwargs):
+        super(TextWithTooltip, self).__init__(*args, **kwargs)
+        self.set_tooltip()
+
+    def set_tooltip(self, s=''):
+        self.tooltip = s
+
+class BaseTextCell(TextWithTooltip):
     r"""
     Abstract class for all text cells except blank.
     """
@@ -62,9 +70,6 @@ class BaseTextCell(Text):
         self.continuous_update = False
         self.position = position
         self.add_class('gridcell')
-
-    def set_tooltip(self, s=None):
-        self.title = s
 
 class TextCell(BaseTextCell):
     r"""A regular text grid cell
