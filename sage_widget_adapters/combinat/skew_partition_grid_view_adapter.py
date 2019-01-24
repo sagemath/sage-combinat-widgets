@@ -131,6 +131,26 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             raise ValueError("Cell '%s' not in object." % str(pos))
         return False
 
+    def set_cell(self, obj, pos, val, dirty={}, constructorname=''):
+        r"""
+        From a partition `obj`, a position (pair of coordinates) `pos` and a value `val`,
+        return a new partition with a modified cell at position `pos`.
+        Actually remove the cell if it's removable, otherwise return the same partition.
+
+        TESTS::
+            sage: from sage.combinat.skew_partition import SkewPartition
+            sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
+            sage: sp = SkewPartition([[7, 4, 2, 1],[2, 1, 1]])
+            sage: spa = SkewPartitionGridViewAdapter()
+            sage: spa.set_cell(sp, (1,6), True)
+            [7, 4, 2, 1] / [2, 1, 1]
+            sage: spa.set_cell(sp, (1,3), True)
+            [7, 3, 2, 1] / [2, 1, 1]
+        """
+        if pos in self.removable_cells(obj):
+            return self.remove_cell(obj, pos, dirty)
+        return obj
+
     @staticmethod
     def addable_cells(obj):
         r"""
@@ -212,12 +232,12 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             ...
             ValueError: Cell position '(1, 2)' is not removable.
         """
-        if not pos in cls.removable_cells(obj):
+        if not pos in self.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
         try:
             if pos in obj.outer().corners():
-                return cls.objclass([obj.outer().remove_cell(pos[0]), obj.inner()])
+                return self.objclass([obj.outer().remove_cell(pos[0]), obj.inner()])
             else:
-                return cls.objclass([obj.outer(), obj.inner().add_cell(pos[0])])
+                return self.objclass([obj.outer(), obj.inner().add_cell(pos[0])])
         except:
-            raise ValueError("Error removing cell %s from %s" % (pos, cls.objclass))
+            raise ValueError("Error removing cell %s from %s" % (pos, self.objclass))

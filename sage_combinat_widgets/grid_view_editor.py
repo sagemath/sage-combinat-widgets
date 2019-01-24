@@ -431,17 +431,7 @@ class GridViewEditor(BindableEditorClass):
                 self.set_dirty(pos, val, result)
             return
         # Success
-        new_obj = result
-        if not self.dirty: # Do not draw for such a small change
-            self.value = new_obj
-            # Edit the cell dictionary
-            self.cells[pos] = val
-            # Edit the trait
-            traitname = 'cell_%d_%d' % pos
-            self.set_trait(traitname, val)
-            return
-        # More than one change, need to draw
-        self.set_value(new_obj)
+        self.set_value(result)
 
     def addable_cells(self):
         r"""
