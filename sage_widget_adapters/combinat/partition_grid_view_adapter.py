@@ -136,6 +136,26 @@ class PartitionGridViewAdapter(GridViewAdapter):
             raise ValueError("Cell '%s' not in partition." % str(pos))
         return False
 
+    def set_cell(self, obj, pos, val, dirty={}, constructorname=''):
+        r"""
+        From a partition `obj`, a position (pair of coordinates) `pos` and a value `val`,
+        return a new partition with a modified cell at position `pos`.
+        Actually remove the cell if it's removable, otherwise return the same partition.
+
+        TESTS::
+            sage: from sage.combinat.partition import Partition
+            sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
+            sage: p = Partition([6, 5, 2, 1])
+            sage: pa = PartitionGridViewAdapter()
+            sage: pa.set_cell(p, (1,2), True)
+            [6, 5, 2, 1]
+            sage: pa.set_cell(p, (1,4), True)
+            [6, 4, 2, 1]
+        """
+        if pos in self.removable_cells(obj):
+            return self.remove_cell(obj, pos)
+        return obj
+
     @staticmethod
     def addable_cells(obj):
         r"""

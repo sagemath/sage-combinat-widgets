@@ -225,7 +225,7 @@ class GridViewAdapter(object):
         try:
             l = [list(x) for x in obj]
         except:
-            raise NotImplementedError("Adapter class method 'set_cell(obj, pos, val)' is not implemented.")
+            raise NotImplementedError("Adapter method 'set_cell(obj, pos, val)' is not implemented.")
         l = self.make_dirty(l, dirty)
         try:
             l[pos[0]][pos[1]] = val
