@@ -153,7 +153,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
             [6, 4, 2, 1]
         """
         if pos in self.removable_cells(obj):
-            return self.remove_cell(obj, pos)
+            return self.remove_cell(obj, pos, dirty)
         return obj
 
     @staticmethod
