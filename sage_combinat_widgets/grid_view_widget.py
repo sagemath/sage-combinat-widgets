@@ -6,7 +6,7 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from .grid_view_editor import *
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, ValueWidget, register, DOMWidget
+from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, ValueWidget, register
 from sage.misc.misc import uniq
 from six import text_type
 from traitlets import Unicode

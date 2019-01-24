@@ -421,12 +421,10 @@ class GridViewEditor(BindableEditorClass):
             return
         pos = extract_coordinates(change.name)
         val = change.new
-        obj = copy(self.value)
-        result = self.adapter.set_cell(obj, pos, val, dirty=self.dirty)
+        result = self.adapter.set_cell(self.value, pos, val, dirty=self.dirty)
         if issubclass(result.__class__, BaseException): # Setting cell was impossible
             if val == self.cells[pos] and self.dirty.keys() == [pos]: # Rollback
                 self.reset_dirty()
-                new_obj = obj
             else: # Add an entry in self.dirty dictionary
                 self.set_dirty(pos, val, result)
             return
