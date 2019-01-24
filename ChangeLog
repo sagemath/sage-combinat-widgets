@@ -1,3 +1,5 @@
+0.7.1:
+	* Show errors on the cells, with tooltips
 0.7.0:
 	* Dirty editing
 	* Signatures changed in the adapters
