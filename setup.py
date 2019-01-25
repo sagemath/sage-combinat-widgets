@@ -147,12 +147,12 @@ setup_args = {
     'long_description': readfile("README.rst"),
     'include_package_data': True,
     'data_files': [
-        ('share/jupyter/nbextensions/sage-combinat-widgets', [
-            'sage-combinat-widgets/static/extension.js',
-            'sage-combinat-widgets/static/index.js',
-            'sage-combinat-widgets/static/index.js.map',
-        ],),
-        ('etc/jupyter/nbconfig/notebook.d/' ,['sage-combinat-widgets.json'])
+        #('share/jupyter/nbextensions/sage-combinat-widgets', [
+        #    'sage-combinat-widgets/static/extension.js',
+        #    'sage-combinat-widgets/static/index.js',
+        #    'sage-combinat-widgets/static/index.js.map',
+        #],),
+        #('etc/jupyter/nbconfig/notebook.d/' ,['sage-combinat-widgets.json'])
     ],
     'url': 'https://github.com/sagemath/sage-combinat-widgets',
     'author': 'Odile Bénassy, Nicolas M. Thiéry',
@@ -174,10 +174,10 @@ setup_args = {
     'zip_safe': False,
     'cmdclass': {
         'test': SageTest, # adding a special setup command for tests
-        'build_py': js_prerelease(build_py),
-        'egg_info': js_prerelease(egg_info),
-        'sdist': js_prerelease(sdist, strict=True),
-        'jsdeps': NPM,
+        #'build_py': js_prerelease(build_py),
+        #'egg_info': js_prerelease(egg_info),
+        #'sdist': js_prerelease(sdist, strict=True),
+        #'jsdeps': NPM,
     },
     'install_requires': ['ipywidgets>=7.0.0']
 }
