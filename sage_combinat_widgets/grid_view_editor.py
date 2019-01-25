@@ -94,46 +94,10 @@ def get_adapter(obj):
         from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
         return GraphGridViewAdapter()
 
-class cdlink(traitlets.link):
-    r"""
-    A directional link (for a start) with type casting
-    """
-    def __init__(self, source, target, cast):
-        r"""
-        Type-casting directional link initialisation.
-
-        INPUT:
-
-            - ``source`` -- a pair (source widget, trait name)
-            - ``target`` -- a pair (target widget, trait name)
-            - ``cast`` -- a cast function
-
-        TESTS::
-            sage: from sage_combinat_widgets.grid_view_editor import cdlink
-            sage: from ipywidgets import Checkbox, Text
-            sage: b = Checkbox()
-            sage: t = Text()
-            sage: l = cdlink((b, 'value'), (t, 'value'), str)
-            sage: t.value
-            u'False'
-        """
-        self.source, self.target, self.to_cell = source, target, cast
-        try:
-            setattr(target[0], target[1], cast(getattr(source[0], source[1])))
-        finally:
-            source[0].observe(self._update_target, names=source[1])
-
-    def __repr__(self):
-        r"""
-        Try to get a useful repr for our link class.
-        """
-        return "A typecasting directional link from source=(%s, %s) to target='%s'" % (self.source[0].__class__, self.source[0].value, self.target[1])
-
-    def _update_target(self, change):
-        if self.updating:
-            return
-        with self._busy_updating():
-            setattr(self.target[0], self.target[1], self.to_cell(change.new))
+def cdlink_repr(self):
+    return "A typecasting directional link from source=(%s, %s) to target='%s'" % (self.source[0].__class__, self.source[0].value, self.target[1])
+cdlink = traitlets.dlink
+cdlink.__repr__ = cdlink_repr
 
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass(traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
