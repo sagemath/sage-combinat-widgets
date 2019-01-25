@@ -96,7 +96,6 @@ class NPM(Command):
         npmName = 'npm';
         if platform.system() == 'Windows':
             npmName = 'npm.cmd';
-
         return npmName;
 
     def has_npm(self):
