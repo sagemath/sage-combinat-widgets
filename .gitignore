@@ -14,3 +14,11 @@ js/node_modules/
 package-lock.json
 *.[1-9]
 *.print
+*.log
+*.aux
+*.nav
+*.out
+*.pdf
+*.toc
+*.snm
+*.vrb
