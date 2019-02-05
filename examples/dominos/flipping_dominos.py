@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from flipping_aztecdiamond import FlippingAztecDiamond
 from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
 from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton
 from ipywidgets import Layout, HTML
@@ -306,19 +307,18 @@ class DominosAdapter(GraphGridViewAdapter):
 class DominosWidget(GridViewWidget):
     """A widget with dominos"""
 
-    def __init__(self, g, m={}):
+    def __init__(self, g):
         r"""
-        Init a graph widget
-        with graph `g` and matching `m`.
+        Init a flipping dominos widget
+        with flipping aztec diamond graph `g`
         """
-        self.size = g.vertices()[-1]
         super(DominosWidget, self).__init__(g, adapter = GraphGridViewAdapter(),
                                             cell_widget_classes=[SmallButton, Button1, Button2, Button3, Button4],
-                                            cell_widget_class_index=make_cell_widget_class_index(m, self.size),
+                                            cell_widget_class_index=make_cell_widget_class_index(m, g.order),
                                             blank_widget_class = SmallBlank)
         self.dominos = None # clé = coord top-left du domino
         self.reset()
-        self.apply_matching(m)
+        self.apply_matching(g.matching)
 
     def match(self, b1, b2):
         """Match buttons b1 and b2, that is: create a domino"""
@@ -350,20 +350,23 @@ class DominosWidget(GridViewWidget):
         else:
             d1.flip(d2)
 
-    def find_possible_flips(self, key):
+    def find_possible_flips(self, key): # FIXME mettre dans la classe métier
         "Return list of neighbouring dominos, with same direction as self.dominos[key]"
-        possible_flips = []
         domino = self.dominos[key]
-        if domino.direction == 'horizontal':
-            if key[0] > 0:
-                possible_flips.append((key[0] - 1, key[1]))
-            if key[0] < self.size[0]:
-                possible_flips.append((key[0] + 1, key[1]))
+        pos1, pos2 = domino.first.position, domino.second.position
+        if (pos1, pos2) in self.value.matching:
+            m = (pos1, pos2)
+        elif (pos2, pos1) in self.value.matching:
+            m = (pos2, pos1)
         else:
-            if key[1] > 0:
-                possible_flips.append((key[0], key[1] - 1))
-            if key[1] < self.size[1]:
-                possible_flips.append((key[0], key[1] + 1))
+            print("Strange!")
+            return []
+        possible_flips = []
+        for n in self.value.neighbors(m):
+            if n[0] in self.dominos:
+                possible_flips.append((n[0]))
+            elif n[1] in self.dominos:
+                possible_flips.append((n[1]))
         return possible_flips
 
     def register(self, domino, change):
