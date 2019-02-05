@@ -1,5 +1,10 @@
 \documentclass[t]{beamer}
 \usepackage{hyperref}
+%\usepackage{french}
+%\usepackage[latin1]{inputenc}
+%\usepackage{times}
+\usepackage[T1]{fontenc}
+%\usepackage[a4paper]{geometry}
 
 \definecolor{rrblitbackground}{rgb}{0.55, 0.3, 0.1}
 
@@ -15,7 +20,7 @@
 
 }
 
-\usetheme{Warsaw}
+\usetheme{Boadilla}
 
 \setbeameroption{hide notes}
 
@@ -47,12 +52,27 @@
   {\csname end\DocutilsClassFunctionName \endcsname}%
 \fi
 
+% titlereference role
+\providecommand*{\DUroletitlereference}[1]{\textsl{#1}}
+
 % hyperlinks:
 \ifthenelse{\isundefined{\hypersetup}}{
   \usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
   \usepackage{bookmark}
   \urlstyle{same} % normal text font (alternatives: tt, rm, sf)
 }{}
+\hypersetup{
+  pdftitle={Sage Combinat Widgets},
+  pdfauthor={Odile Bénassy\{includegraphics\{images/logo-upsud\}\textbackslash{}The Author\}}
+}
+
+%%% Title Data
+\title{\phantomsection%
+  %
+  \subtitle{A Quick Tour}
+  \label{sage-combinat-widgets}}
+\author{Odile B\'enassy}
+\date{Feb.6, 2019 -- Combinatorics Seminar \@LIX}
 
 
 %%% Body
@@ -63,72 +83,164 @@
 
 
 A collection of \textbf{interactive widgets} for the \emph{Jupyter} notebook
-\begin{itemize}[<+-| alert@+>]
+ \pause
+\begin{itemize}
 
-\item graphically represent
-
-\item edit graphically and get the modified value
-
+\item represent math objects
+ \pause
+\item graphically edit, and get the modified value
+ \pause
 \item can be used as building blocks in applications
-
+ \pause
 \item available for
-\begin{itemize}[<+-| alert@+>]
+\begin{itemize}
 
-\item (until now only grid-representable) combinatorial objects
+\item \footnotesize{(until now only grid-representable)} \normalsize{combinatorial objects}
 
-\item (until now only grid-representable) graphs
+\item \footnotesize{(until now only grid-representable)} \normalsize{graphs}
 
 \item matrices
-
-\item write your own
+ \pause
+\item \textbf{write your own}
 \end{itemize}
 \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Editing a Young Tableau}
+\frametitle{Editing a Tableau (1)}
 
+\begin{itemize}
 
-1 image de tableau + 1 vidéo (lien)
+\item edit/add/remove cells
+\end{itemize}
+
+\hspace{1cm}
+
+\includegraphics[scale=0.500000]{images/scrn-skewtableau}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Editing a Tableau (2)}
+
+\begin{itemize}
+\item \textquotedbl{}dirty\textquotedbl{} editing
+\end{itemize}
+
+\includegraphics[scale=0.500000]{images/scrn-tableau}
+
+\href{file:///home/odile/odk/sage/git/sage-combinat-widgets/docs/video/demo_youngtableau-short.ogv}{demo \#1}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using @interact}
+
+\begin{itemize}[<+-| alert@+>]
+
+\item inserting a widget with \DUroletitlereference{@interact}
+\end{itemize}
+
+\includegraphics[scale=0.500000]{images/scrn-interact}
+
+\href{file:///home/odile/odk/sage/git/sage-combinat-widgets/docs/video/demo_interact-short.ogv}{demo \#2}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Tossing Dominos}
 
 
-\includegraphics[scale=0.250000]{images/TossedDiamond22.png}
+\emph{an implementation of}
+\url{http://images.math.cnrs.fr/Pavages-aleatoires-par-touillage}
+\begin{columns}[T]
+\column{0.47\textwidth}
 
-1 image de touillage + 1 vidéo (lien)
+\includegraphics[scale=0.300000]{images/TossingAlgorithm}
 
-couplage ? (si j'y arrive : 1 image à mettre en-dessous ou à côté)
-\end{frame}
+\column{0.47\textwidth}
 
-\begin{frame}[fragile]
-\frametitle{Using @interact}
+\includegraphics[scale=0.300000]{images/TossedDiamond22}
 
+\end{columns}
 
-1 image de products of Schur functions + vidéo (lien)
+\href{file:///home/odile/odk/sage/git/sage-combinat-widgets/docs/video/TossingDominos.ogv}{demo \#3}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Your own widget: Jeu de Taquin example (1)}
 
 
-1 image de jeu de taquin + vidéo
+\emph{example based on}
+\href{https://github.com/hivert/SageWidgetExper}{an experiment by Florent Hivert}
+
+\includegraphics[scale=0.500000]{images/scrn-taquin}
+
+\href{file:///home/odile/odk/sage/git/sage-combinat-widgets/docs/video/demo_taquin.ogv}{demo \#4}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Your own widget: Jeu de Taquin example (2)}
+\frametitle{Your own widget: Jeu de Taquin example (3)}
 
+\begin{itemize}[<+-| alert@+>]
+
+\item Math code \emph{(by F Hivert)}
+\end{itemize}
 \setbeamerfont{quote}{parent={}}
 
 \begin{DUclass}{code-block}
 \begin{quote}
 \begin{alltt}
-def myfunc (arg1, arg2='foo'):
-        global baz
-        bar = unicode (quux)
-        return 25
+def create_hole(self, corner):
+    /.../
+    inner_corners = self.inner_shape().corners()
+    if tuple(corner) not in inner_corners:
+        raise ValueError("corner must be an inner corner")
+    self._hole = corner
+    self._new_st = self.to_list()
+    spotl, spotc = self._hole
+    self._new_st[spotl][spotc] = True
+
+def slide(self):
+    if self._hole is None:
+        raise ValueError, "There is no hole"
+    spotl, spotc = self._hole
+    #Check to see if there is nothing to the right
+    if spotc == len(self._new_st[spotl]) - 1:
+        #Swap the hole with the cell below
+        self._new_st[spotl][spotc] = self._new_st[spotl+1][spotc]
+        self._new_st[spotl+1][spotc] = -1
+        spotl += 1
+    #Check to see if there is nothing below
+    elif (spotl == len(self._new_st) - 1 or
+          len(self._new_st[spotl+1]) <= spotc):
+        #Swap the hole with the cell to the right
+        /.../
+\end{alltt}
+\end{quote}
+\end{DUclass}
+\setbeamerfont{quote}{parent=quotation}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Your own widget: Jeu de Taquin example (3)}
+
+\begin{itemize}[<+-| alert@+>]
+
+\item Adapter source code
+\end{itemize}
+\setbeamerfont{quote}{parent={}}
+
+\begin{DUclass}{code-block}
+\begin{quote}
+\begin{alltt}
+# What happens when you click
+@classmethod
+def add_cell(cls, obj, pos, val, dirty=\{\}):
+    # Create a hole if there isn't
+    if not obj.has_hole():
+        obj.create_hole(pos)
+    # Slide
+    obj.slide()
+    return obj
 \end{alltt}
 \end{quote}
 \end{DUclass}

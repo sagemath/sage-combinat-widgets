@@ -3,7 +3,7 @@ Sage Combinat Widgets
 
 A collection of **interactive widgets** for the *Jupyter* notebook
 
-- graphically represent
+- graphically represent a math object
 
 - edit graphically and get the modified value
 
@@ -20,6 +20,10 @@ A collection of **interactive widgets** for the *Jupyter* notebook
 Editing a Young Tableau
 =========================
 
+- edit/add/remove cells
+
+- "dirty" editing
+
 .. image:: images/scrn-tableau
     :scale: 50 %
 
@@ -29,17 +33,19 @@ Editing a Young Tableau
 Using @interact
 =================
 
+- inserting a widget with `@interact`
+
 .. image:: images/scrn-interact
     :scale: 50 %
 
-`demo #2 <file:///home/odile/odk/sage/git/sage-combinat-widgets/docs/video/demo_interact.ogv>`_
+`demo #2 <file:///home/odile/odk/sage/git/sage-combinat-widgets/docs/video/demo_interact-short.ogv>`_
 
 
 Tossing Dominos
 ===============
 
 *an implementation of*
-`Pavages aleatoires par touillage <http://images.math.cnrs.fr/Pavages-aleatoires-par-touillage>`_
+`http://images.math.cnrs.fr/Pavages-aleatoires-par-touillage <http://images.math.cnrs.fr/Pavages-aleatoires-par-touillage>`_
 
 .. r2b_simplecolumns::
     :width: 0.95
