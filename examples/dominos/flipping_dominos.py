@@ -239,9 +239,14 @@ def make_cell_widget_class_index(matching, n):
                     return 3
                 else:
                     return 4
-        if pos in matching.keys():
-            d = DominoGeometry(pos, matching[pos])
-            return calc_index_for_domino(d, n)  
+        d = None
+        possible_matchings = [pos, (pos[0], pos[1]-1), (pos[0]-1, pos[1]), (pos[0], pos[1]+1), (pos[0]+1, pos[1])]
+        for pm in possible_matchings:
+            if pm in matching.keys():
+                d = DominoGeometry(pm, matching[pm])
+                break
+        if d:
+            return calc_index_for_domino(d, n)
         return 0
     return cell_widget_class_index
 
