@@ -3,6 +3,63 @@
 
 from sage.graphs.graph import Graph
 
+class DominoGeometry:
+    r"""
+    The geometry of the domino."""
+    def __init__(self, first, second):
+        """A domino is a pair of pairs"""
+        self.first = first
+        self.second = second
+        self.direction = None
+        self.orientation = None
+        self.neighbors = []
+        self.compute()
+
+    def __str__(self):
+        if self.value:
+            return str(self.first) + ' -> ' + str(self.second) + " PRESSED"
+        return str(self.first) + ' -> ' + str(self.second)
+
+    def compute(self):
+        if self.first[0] == self.second[0]: # same row
+            self.direction = 'horizontal'
+            if self.first[1] + 1 == self.second[1]:
+                self.orientation = 1 # left to right
+                #self.first.relpos = 'left'
+                #self.second.relpos = 'right'
+            elif self.first[1] == self.second[1] + 1:
+                self.orientation = -1 # right to left
+                #self.first.relpos = 'right'
+                #self.second.relpos = 'left'
+        elif self.first[1] == self.second[1]: # same column
+            self.direction = 'vertical'
+            if self.first[0] + 1 == self.second[0]:
+                self.orientation = 1 # top to bottom
+                #self.first.relpos = 'top'
+                #self.second.relpos = 'bottom'
+            elif self.first[0] == self.second[0] + 1:
+                self.orientation = -1 # bottom to top
+                #self.first.relpos = 'bottom'
+                #self.second.relpos = 'top'
+        if self.orientation == 1:
+            self.parity = (self.first[0]%2 + self.first[1]%2)%2
+        elif self.orientation == -1:
+            self.parity = (self.second[0]%2 + self.second[1]%2)%2
+
+    def neighbors(self):
+        r"""
+        Return list of parallel neighbouring matches
+        Note: we consider only horizontal or vertical matches"""
+        if self.direction == 'horizontal':
+            return [(((self.first[0] + 1, self.first[1]), (self.second[0] + 1, self.second[1]))),
+                    (((self.first[0] - 1, self.first[1]), (self.second[0] - 1, self.second[1])))]
+        else:
+            return [(((self.first[0], self.first[1] + 1), (self.second[0], self.second[1] + 1))),
+                    (((self.first[0], self.first[1] - 1), (self.second[0], self.second[1] - 1)))]
+
+    def reverse(self):
+        return DominoGeometry(self.second, self.first)
+
 class FlippingAztecDiamond(Graph):
     def __init__(self, n, matching=()):
         try:
@@ -22,7 +79,7 @@ class FlippingAztecDiamond(Graph):
         except:
             raise TypeException("This matching is not suitable for a flipping aztec diamond (tuple {} is not valid)." . format(t))
         self.matching = matching # tuple with only horizontal or vertical consecutive matches
-        self.order = n
+        #self.order = n # We have self.order() already
 
     def neighbors(self, m):
         r"""
@@ -32,9 +89,9 @@ class FlippingAztecDiamond(Graph):
             assert m in self.matching
         except:
             raise Exception("Pair {} is not matched" . format(m))
-        first, second = m
+        d = DominoGeometry(m[0], m[1])
         neighbors = []
-        if first[0] == second[0]:  # horizontal
+        if d.direction == 'horizontal':
             if ((first[0]+1, first[1]), (second[0]+1, second[1])) in self.matching:
                 neighbors.append(((first[0]+1, first[1]), (second[0]+1, second[1])))
             elif ((second[0]+1, second[1]), (first[0]+1, first[1])) in self.matching:

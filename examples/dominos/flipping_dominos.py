@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from flipping_aztecdiamond import FlippingAztecDiamond
+from flipping_aztecdiamond import *
 from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
 from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton
 from ipywidgets import Layout, HTML
@@ -122,13 +122,14 @@ class ddlink(dlink):
 #        return "OrderedDomino from %s to %s" % (self.first, self.second)
 
 class Domino(HasTraits):
-    """Objet non représenté en lui-même, les 2
+    r"""Objet non représenté en lui-même, les 2
     boutons qu'il contient étant, eux, des widgets"""
     value = Bool()
 
     def __init__(self, parent, b1, b2):
         """A domino has a parent widget and is made of 2 buttons"""
-        super(HasTraits, self).__init__()
+        super(Domino, self).__init__()
+        self.geometry = DominoGeometry(b1.position, b2.position)
         self.parent = parent
         self.key = None
         self.first = b1
@@ -157,47 +158,25 @@ class Domino(HasTraits):
         """Compute direction, orientation, color, buttons relative positions.
         Create double directional link from both buttons"""
         self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
-        if self.first.coord[0] == self.second.coord[0]: # same row
-            self.direction = 'horizontal'
-            if self.first.coord[1] + 1 == self.second.coord[1]:
-                self.orientation = 1 #'left_to_right'
-                self.first.position = 'left'
-                self.second.position = 'right'
-            elif self.first.coord[1] == self.second.coord[1] + 1:
-                self.orientation = -1 #right_to_left
-                self.first.position = 'right'
-                self.second.position = 'left'
-        elif self.first.coord[1] == self.second.coord[1]: # same column
-            self.direction = "vertical"
-            if self.first.coord[0] + 1 == self.second.coord[0]:
-                self.orientation = 1 #top_to_bottom
-                self.first.position = 'top'
-                self.second.position = 'bottom'
-            elif self.first.coord[0] == self.second.coord[0] + 1:
-                self.orientation = -1 #bottom_to_top
-                self.first.position = 'bottom'
-                self.second.position = 'top'
-        else: # not flippable
-            return
-        if self.orientation == 1:
-            self.key = self.first.coord
+        if self.geometry.orientation == 1:
+            self.key = self.first.position
         else:
-            self.key = self.second.coord
-        global COLORS, POSITIONS
-        for cl in COLORS + POSITIONS:
-            self.first.remove_class(cl)
-            self.second.remove_class(cl)
-        k = (self.key[0] + self.key[1]) % 2 # repérage pour la couleur
-        if self.direction == 'horizontal':
-            color = COLORS[k]
-        else:
-            color = COLORS[2+k]
-        self.first.add_class(color)
-        self.second.add_class(color)
-        if self.first.position:
-            self.first.add_class(self.first.position)
-        if self.second.position:
-            self.second.add_class(self.second.position)
+            self.key = self.second.position
+        #global COLORS, POSITIONS
+        #for cl in COLORS + POSITIONS:
+        #    self.first.remove_class(cl)
+        #    self.second.remove_class(cl)
+        #k = (self.key[0] + self.key[1]) % 2 # repérage pour la couleur
+        #if self.direction == 'horizontal':
+        #    color = COLORS[k]
+        #else:
+        #    color = COLORS[2+k]
+        #self.first.add_class(color)
+        #self.second.add_class(color)
+        #if self.first.position:
+        #    self.first.add_class(self.first.position)
+        #if self.second.position:
+        #    self.second.add_class(self.second.position)
 
     def is_pressed(self):
         """Is the domino pressed?"""
@@ -251,50 +230,38 @@ def make_cell_widget_class_index(matching, n):
     def cell_widget_class_index(pos):
         def calc_index_for_domino(d, n):
             if d.direction == 'horizontal':
-                if not d.parity(n):
+                if not d.parity:
                     return 1
                 else:
                     return 2
             else:
-                if not d.parity(n):
+                if not d.parity:
                     return 3
                 else:
                     return 4
         if pos in matching.keys():
-            d = matching[pos]
+            d = DominoGeometry(pos, matching[pos])
             return calc_index_for_domino(d, n)  
         return 0
     return cell_widget_class_index
 
 class SmallButton(ButtonCell):
     def __init__(self, content, position, layout, **kws):
-        super(SmallButton, self).__init__(content, position, **kws)
+        super(SmallButton, self).__init__(content, position, layout, **kws)
         self.layout = smallblyt
-class Button1(ButtonCell):
+
+class CSSButton(SmallButton):
+    css_class = None
     def __init__(self, content, position, layout, **kws):
-        super(Button1, self).__init__(content, position, **kws)
-        self.layout = smallblyt
-        self.add_class('b1')
-class Button2(ButtonCell):
-    def __init__(self, content, position, layout, **kws):
-        super(Button2, self).__init__(content, position, **kws)
-        self.layout = smallblyt
-        self.add_class('b2')
-class Button3(ButtonCell):
-    def __init__(self, content, position, layout, **kws):
-        super(Button3, self).__init__(content, position, **kws)
-        self.layout = smallblyt
-        self.add_class('b3')
-class Button4(ButtonCell):
-    def __init__(self, content, position, layout, **kws):
-        super(Button4, self).__init__(content, position, **kws)
-        self.layout = smallblyt
-        self.add_class('b4')
+        super(CSSButton, self).__init__(content, position, layout, **kws)
+        self.add_class(self.css_class)
+def css_button(class_name):
+    return type("{}Button" . format(class_name), (CSSButton,), {'css_class': class_name})
+
 class SmallBlank(BlankButton):
     def __init__(self, layout, **kws):
         super(SmallBlank, self).__init__(**kws)
         self.layout = smallblyt
-        self.add_class('blankb')
 
 class DominosAdapter(GraphGridViewAdapter):
     def set_cell(self, obj, pos, val=True, dirty={}):
@@ -313,8 +280,8 @@ class DominosWidget(GridViewWidget):
         with flipping aztec diamond graph `g`
         """
         super(DominosWidget, self).__init__(g, adapter = GraphGridViewAdapter(),
-                                            cell_widget_classes=[SmallButton, Button1, Button2, Button3, Button4],
-                                            cell_widget_class_index=make_cell_widget_class_index(m, g.order),
+                                            cell_widget_classes=[SmallButton, css_button('b1'), css_button('b2'), css_button('b3'), css_button('b4')],
+                                            cell_widget_class_index=make_cell_widget_class_index(g.matching, g.order),
                                             blank_widget_class = SmallBlank)
         self.dominos = None # clé = coord top-left du domino
         self.reset()
@@ -352,8 +319,8 @@ class DominosWidget(GridViewWidget):
 
     def find_possible_flips(self, key): # FIXME mettre dans la classe métier
         "Return list of neighbouring dominos, with same direction as self.dominos[key]"
-        domino = self.dominos[key]
-        pos1, pos2 = domino.first.position, domino.second.position
+        d = self.dominos[key]
+        pos1, pos2 = d.geometry.first, d.geometry.second
         if (pos1, pos2) in self.value.matching:
             m = (pos1, pos2)
         elif (pos2, pos1) in self.value.matching:
@@ -362,7 +329,12 @@ class DominosWidget(GridViewWidget):
             print("Strange!")
             return []
         possible_flips = []
-        for n in self.value.neighbors(m):
+        for n in d.geometry.neighbors():
+            if n[0] in self.dominos:
+                possible_flips.append((n[0]))
+            elif n[1] in self.dominos:
+                possible_flips.append((n[1]))
+        for n in d.geometry.reverse().neighbors():
             if n[0] in self.dominos:
                 possible_flips.append((n[0]))
             elif n[1] in self.dominos:
