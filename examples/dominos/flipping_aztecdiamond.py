@@ -15,10 +15,12 @@ class DominoGeometry:
         self.orientation = None
         self.compute()
 
-    def __str__(self):
-        if self.value:
-            return str(self.first) + ' -> ' + str(self.second) + " PRESSED"
-        return str(self.first) + ' -> ' + str(self.second)
+    def __repr__(self):
+        return "DominoGeometry %s -> %s" % (self.first, self.second)
+
+    def __eq__(self, other):
+        assert issubclass(other.__class__, DominoGeometry)
+        return self.first == other.first and self.second == other.second
 
     def compute(self):
         r"""Compute domino direction and orientation."""
@@ -39,19 +41,26 @@ class DominoGeometry:
         elif self.orientation == -1:
             self.parity = (self.second[0]%2 + self.second[1]%2)%2
 
+    def reverse(self):
+        return DominoGeometry(self.second, self.first)
+
     def neighbors(self):
         r"""
         Return list of parallel neighbouring matches
         Note: we consider only horizontal or vertical matches"""
         if self.direction == 'horizontal':
-            return [(((self.first[0] + 1, self.first[1]), (self.second[0] + 1, self.second[1]))),
-                    (((self.first[0] - 1, self.first[1]), (self.second[0] - 1, self.second[1])))]
+            return [DominoGeometry((self.first[0] + 1, self.first[1]), (self.second[0] + 1, self.second[1])),
+                    DominoGeometry((self.first[0] - 1, self.first[1]), (self.second[0] - 1, self.second[1]))]
         else:
-            return [(((self.first[0], self.first[1] + 1), (self.second[0], self.second[1] + 1))),
-                    (((self.first[0], self.first[1] - 1), (self.second[0], self.second[1] - 1)))]
+            return [DominoGeometry((self.first[0], self.first[1] + 1), (self.second[0], self.second[1] + 1)),
+                    DominoGeometry((self.first[0], self.first[1] - 1), (self.second[0], self.second[1] - 1))]
 
-    def reverse(self):
-        return DominoGeometry(self.second, self.first)
+    def flip(self, other):
+        """Flip self with some neighboring domino"""
+        if self.orientation * other.orientation == 1: # Same orientation
+            self.second, other.first = other.first, self.second
+        else:
+            self.second, other.second = other.second, self.second
 
 class FlippingAztecDiamond(Graph):
     def __init__(self, n, matching=()):
@@ -71,11 +80,13 @@ class FlippingAztecDiamond(Graph):
                         t[0][1] == t[1][1] and (t[0][0] + 1 == t[1][0] or t[0][0] == t[1][0] + 1))
         except:
             raise TypeException("This matching is not suitable for a flipping aztec diamond (tuple {} is not valid)." . format(t))
-        self.matching = matching # tuple with only horizontal or vertical consecutive matches
-        #self.order = n # We have self.order() already
+        self.matching = self.apply_matching(matching) # dominos with only horizontal or vertical consecutive matches
 
     def __copy__(self):
         return FlippingAztecDiamond.__init__(self.order(), self.matching)
+
+    def apply_matching(self, matching):
+        self.matching = [DominoGeometry(t[0], t[1]) for t in matching]
 
     def domino_for_position(self, pos):
         try:
@@ -83,41 +94,17 @@ class FlippingAztecDiamond(Graph):
             assert pos in self.vertices()
         except:
             raise TypeException("Argument `pos` must be a tuple and a graph vertex")
-        for m in self.matching:
-            if m[0] == pos:
-                return DominoGeometry(pos, m[1])
-            if m[1] == pos:
-                return DominoGeometry(m[0], pos)
+        for d in self.matching:
+            if d.first == pos or d.second == pos:
+                return d
 
-    def neighbors(self, m):
-        r"""
-        Return list of parallel neighbouring matches
-        Note: we consider only horizontal or vertical matches"""
-        try:
-            assert m in self.matching
-        except:
-            raise Exception("Pair {} is not matched" . format(m))
-        d = DominoGeometry(m[0], m[1])
-        neighbors = []
-        if d.direction == 'horizontal':
-            if ((first[0]+1, first[1]), (second[0]+1, second[1])) in self.matching:
-                neighbors.append(((first[0]+1, first[1]), (second[0]+1, second[1])))
-            elif ((second[0]+1, second[1]), (first[0]+1, first[1])) in self.matching:
-                neighbors.append(((second[0]+1, second[1]), (first[0]+1, first[1])))
-            if ((first[0]-1, first[1]), (second[0]-1, second[1])) in self.matching:
-                neighbors.append(((first[0]-1, first[1]), (second[0]-1, second[1])))
-            elif ((second[0]-1, second[1]), (first[0]-1, first[1])) in self.matching:
-                neighbors.append(((second[0]-1, second[1]), (first[0]-1, first[1])))
-        else: # vertical
-            if ((first[0], first[1]+1), (second[0], second[1]+1)) in self.matching:
-                neighbors.append(((first[0], first[1]+1), (second[0], second[1]+1)))
-            elif ((second[0], second[1]+1), (first[0], first[1]+1)) in self.matching:
-                neighbors.append(((second[0], second[1]+1), (first[0], first[1]+1)))
-            if ((first[0], first[1]-1), (second[0], second[1]-1)) in self.matching:
-                neighbors.append(((first[0], first[1]-1), (second[0], second[1]-1)))
-            elif ((second[0], second[1]-1), (first[0], first[1]-1)) in self.matching:
-                neighbors.append(((second[0], second[1]-1), (first[0], first[1]-1)))
-        return neighbors
+    @staticmethod
+    def flip(d1, d2):
+        """d1 and d2 are dominos"""
+        if d1 < d2:
+            d2.flip(d1)
+        else:
+            d1.flip(d2)
 
 class DominosAdapter(GraphGridViewAdapter):
     def set_cell(self, obj, pos, val=True, dirty={}):
@@ -126,15 +113,24 @@ class DominosAdapter(GraphGridViewAdapter):
         we prepare a possible flip
         or we try to complete the flip if it has been prepared previously
         """
-        #print(pos, val, dirty)
+        print(pos, val, dirty)
         # Find out the relevant matching for 'pos'
         d1 = obj.domino_for_position(pos)
+        print("d1 =", d1)
         if dirty: # if i'm a neighbor, then flip and return a new obj ; else return an error
             # Consider the relevant matching(s)
             for p in dirty:
+                if not dirty[p]: # check this position is pressed
+                    continue
                 d2 = obj.domino_for_position(p)
+                if d2 == d1:
+                    continue
+                print("d2 =", d2)
                 if d2 in d1.neighbors():
-                    return obj  # flip
+                    print('flipping!')
+                    # Do the flip
+                    obj.flip(d1, d2)
+                    return obj
             return Exception("Please select a second domino!")
-        else: # return an error
+        else:
             return Exception("Please select a second domino!")

@@ -131,17 +131,10 @@ class Domino(HasTraits):
         self.orientation = None
         self.compute()
 
-    def __str__(self):
+    def __repr__(self):
         if self.value:
-            return str(self.first) + ' -> ' + str(self.second) + " PRESSED"
-        return str(self.first) + ' -> ' + str(self.second)
-
-    @observe('value')
-    def signale_clic(self, change):
-        """Inform the parent widget"""
-        if not change.new : # consider only pressed dominos
-            return
-        self.parent.register(self, change)
+            return repr(self.first) + ' -> ' + repr(self.second) + " PRESSED"
+        return repr(self.first) + ' -> ' + repr(self.second)
 
     def compute(self):
         """Compute buttons relative positions.
@@ -177,45 +170,14 @@ class Domino(HasTraits):
         """Full domino reset"""
         self.value = False
         self.link.unlink()
-        #self.first.reset()
-        #self.second.reset()
 
     def flip(self, other):
         """Flip self with some neighboring domino"""
         self.reset()
         other.reset()
-        if self.orientation * other.orientation == 1: # Same orientation
-            self.second, other.first = other.first, self.second
-        else:
-            self.second, other.second = other.second, self.second
-        self.first.link.target = (self.second, 'value')
-        self.second.link.target = (self.first, 'value')
-        other.first.link.target = (other.second, 'value')
-        other.second.link.target = (other.first, 'value')
+        self.geometry.flip(other.geometry)
         self.compute()
         other.compute()
-
-def apply_matching(m, size, n):
-    matching = {}
-    shift_val = size - n
-    def shift(t):
-        return (t[0] + shift_val, t[1] + shift_val)
-    for first, second in m:
-        if first[0] < second[0] or first[1] < second[1]:
-            d = OrderedDomino(shift(first), shift(second))
-        else:
-            d = OrderedDomino(shift(second), shift(first))
-        matching[shift(first)] = d
-        matching[shift(second)] = d
-    return matching
-def figure(size):
-    g = AztecDiamondGraph(size)
-    m = (((0,0),(0,1)), ((1,0), (1,1)))
-    return g, m, apply_matching(m, size, 1)
-def parity(pos):
-    return (pos[0]%2 + pos[1]%2)%2
-def similar_position(pos, ref):
-    return ((pos[0]%2 + pos[1]%2)%2 == (ref[0]%2 + ref[1]%2)%2)
 
 def make_cell_widget_class_index(g):
     def cell_widget_class_index(pos):
@@ -285,23 +247,13 @@ class DominosWidget(GridViewWidget):
     def reset(self):
         """Clear dominos and reset every button"""
         self.dominos = {}
-        #for hb in self.children:
-        #    for dwb in hb.children:
-        #        dwb.reset()
 
     def apply_matching(self, matching):
         """Apply a matching"""
         count = -1
-        for (t1, t2) in matching:
-            self.match(self.children[t1[0]].children[t1[1]],
-                       self.children[t2[0]].children[t2[1]])
-
-    def flip(self, d1, d2):
-        """d1 and d2 are dominos"""
-        if d1 < d2:
-            d2.flip(d1)
-        else:
-            d1.flip(d2)
+        for d in matching:
+            self.match(self.children[d.first[0]].children[d.first[1]],
+                       self.children[d.second[0]].children[d.second[1]])
 
     def find_possible_flips(self, key):
         "Return list of neighbouring dominos, with same direction as self.dominos[key]"
@@ -325,18 +277,3 @@ class DominosWidget(GridViewWidget):
             elif n[1] in self.dominos:
                 possible_flips.append((n[1]))
         return possible_flips
-
-    def register(self, domino, change):
-        d_key = domino.key
-        if self.dominos.has_key(d_key):
-            d1 = self.dominos[d_key]
-            for c_key in self.find_possible_flips(d_key): # candidate key
-                if self.dominos.has_key(c_key) and self.dominos[c_key].is_pressed():
-                    d2 = self.dominos[c_key]
-                    self.flip(d1, d2)
-                    self.dominos.pop(d_key)
-                    self.dominos.pop(c_key)
-                    self.dominos[d1.key] = d1
-                    self.dominos[d2.key] = d2
-                    break # only flip once!!
-
