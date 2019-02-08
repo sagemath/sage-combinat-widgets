@@ -139,6 +139,7 @@ class Domino(HasTraits):
     def compute(self):
         """Compute buttons relative positions.
         Create double directional link from both buttons"""
+        self.geometry.compute()
         self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
         if self.geometry.orientation == 1:
             self.key = self.first.position
@@ -230,9 +231,14 @@ class DominosWidget(GridViewWidget):
                                             cell_widget_classes=[SmallButton, css_button('b1'), css_button('b2'), css_button('b3'), css_button('b4')],
                                             cell_widget_class_index=make_cell_widget_class_index(g),
                                             blank_widget_class = SmallBlank)
-        self.dominos = None # clé = coord top-left du domino
-        self.reset()
-        self.apply_matching(g.matching)
+        #self.dominos = None # clé = coord top-left du domino
+        #self.reset()
+        #self.apply_matching(self.value.matching)
+
+    def draw(self): # FIXME il faut probablement aussi demander aux dominos de se recalculer
+        self.dominos = {}
+        super(DominosWidget, self).draw()
+        self.apply_matching(self.value.matching)
 
     def match(self, b1, b2):
         """Match buttons b1 and b2, that is: create a domino"""

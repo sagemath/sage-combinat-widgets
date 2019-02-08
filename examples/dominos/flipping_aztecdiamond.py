@@ -61,6 +61,8 @@ class DominoGeometry:
             self.second, other.first = other.first, self.second
         else:
             self.second, other.second = other.second, self.second
+        self.compute()
+        other.compute()
 
 class FlippingAztecDiamond(Graph):
     def __init__(self, n, matching=()):
