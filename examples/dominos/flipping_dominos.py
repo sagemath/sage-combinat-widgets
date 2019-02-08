@@ -49,6 +49,11 @@ class ddlink(dlink):
         self.double_source = double_source
         self.intermediate_value = False # False / True / source.tooltip
 
+    def __repr__(self):
+        if self.double_source or self.target:
+            return "A double directional link from sources=%s to target='%s'" % (self.double_source, self.target)
+        return "None"
+
     def validate_tuple(self, t):
         if not len(t) == 2:
             raise TypeError("Each linked traitlet must be specified as (HasTraits, 'trait_name'), not %r" % t)
@@ -242,13 +247,14 @@ class SmallButton(ButtonCell):
     def __init__(self, content, position, layout, **kws):
         super(SmallButton, self).__init__(content, position, layout, **kws)
         self.layout = smallblyt
-        self.disabled = False
+        self.disabled = True
 
 class CSSButton(SmallButton):
     css_class = None
     def __init__(self, content, position, layout, **kws):
         super(CSSButton, self).__init__(content, position, layout, **kws)
         self.add_class(self.css_class)
+        self.disabled = False # enable only CSS buttons ie matched positions
 def css_button(class_name):
     return type("{}Button" . format(class_name), (CSSButton,), {'css_class': class_name})
 
