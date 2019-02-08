@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from sage.graphs.graph import Graph
+from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
 
 class DominoGeometry:
     r"""
@@ -12,7 +13,6 @@ class DominoGeometry:
         self.second = second
         self.direction = None
         self.orientation = None
-        self.neighbors = []
         self.compute()
 
     def __str__(self):
@@ -26,22 +26,14 @@ class DominoGeometry:
             self.direction = 'horizontal'
             if self.first[1] + 1 == self.second[1]:
                 self.orientation = 1 # left to right
-                #self.first.relpos = 'left'
-                #self.second.relpos = 'right'
             elif self.first[1] == self.second[1] + 1:
                 self.orientation = -1 # right to left
-                #self.first.relpos = 'right'
-                #self.second.relpos = 'left'
         elif self.first[1] == self.second[1]: # same column
             self.direction = 'vertical'
             if self.first[0] + 1 == self.second[0]:
                 self.orientation = 1 # top to bottom
-                #self.first.relpos = 'top'
-                #self.second.relpos = 'bottom'
             elif self.first[0] == self.second[0] + 1:
                 self.orientation = -1 # bottom to top
-                #self.first.relpos = 'bottom'
-                #self.second.relpos = 'top'
         if self.orientation == 1:
             self.parity = (self.first[0]%2 + self.first[1]%2)%2
         elif self.orientation == -1:
@@ -111,3 +103,16 @@ class FlippingAztecDiamond(Graph):
             elif ((second[0], second[1]-1), (first[0], first[1]-1)) in self.matching:
                 neighbors.append(((second[0], second[1]-1), (first[0], first[1]-1)))
         return neighbors
+
+class DominosAdapter(GraphGridViewAdapter):
+    def set_cell(self, obj, pos, val=True, dirty={}):
+        r"""
+        When we click on a graph cell,
+        we prepare a possible flip
+        or we try to complete the flip if it has been prepared previously
+        """
+        #print(pos, val, dirty)
+        if dirty: # if i'm a neighbor, then flip and return a new obj ; else return an error
+            return Exception("Please select a second domino!")
+        else: # return an error
+            return Exception("Please select a second domino!")

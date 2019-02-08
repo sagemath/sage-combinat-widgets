@@ -2,10 +2,10 @@
 # coding: utf-8
 
 from flipping_aztecdiamond import *
-from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
 from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton
 from ipywidgets import Layout, HTML
 from traitlets import dlink, HasTraits, Bool, observe
+from contextlib import contextmanager
 
 smallblyt = Layout(width='12px',height='12px', margin='0', padding='0')
 css = HTML("<style>.blankb { background-color: #fff }\n.gridbutton { border:1px solid #999 !important }\n.b1 { background-color: green }\n.b2 { background-color: blue }\n.b3 { background-color: red }\n.b4 { background-color: yellow }\n.gridbutton {\nborder-collapse: collapse;\nborder: 1px solid #666;\n}\n.left { border-right: 1px dotted #999; }\n.right { border-left: 1px dotted #999; }\n.bottom { border-top: 1px dotted #999; }\n.top { border-bottom: 1px dotted #999; }</style>")
@@ -13,9 +13,6 @@ try:
     display(css)
 except:
     pass # We are not in a browser
-
-COLORS = ['green', 'blue', 'pink', 'yellow']
-POSITIONS = ['left','right','top','bottom']
 
 class ddlink(dlink):
     """Double directional link with logic = or/and/none.
@@ -61,7 +58,7 @@ class ddlink(dlink):
         if not trait_name in obj.traits():
             raise TypeError("%r has no trait %r" % (obj, trait_name))
 
-    #@contextlib.contextmanager
+    @contextmanager
     def _busy_updating(self):
         self.updating = True
         try:
@@ -175,8 +172,8 @@ class Domino(HasTraits):
         """Full domino reset"""
         self.value = False
         self.link.unlink()
-        self.first.reset()
-        self.second.reset()
+        #self.first.reset()
+        #self.second.reset()
 
     def flip(self, other):
         """Flip self with some neighboring domino"""
@@ -229,10 +226,12 @@ def make_cell_widget_class_index(matching, n):
                 else:
                     return 4
         d = None
-        possible_matchings = [pos, (pos[0], pos[1]-1), (pos[0]-1, pos[1]), (pos[0], pos[1]+1), (pos[0]+1, pos[1])]
-        for pm in possible_matchings:
-            if pm in matching.keys():
-                d = DominoGeometry(pm, matching[pm])
+        for m in matching:
+            if m[0] == pos:
+                d = DominoGeometry(pos, m[1])
+                break
+            elif m[1] == pos:
+                d = DominoGeometry(m[0], pos)
                 break
         if d:
             return calc_index_for_domino(d, n)
@@ -258,14 +257,6 @@ class SmallBlank(BlankButton):
         super(SmallBlank, self).__init__(**kws)
         self.layout = smallblyt
 
-class DominosAdapter(GraphGridViewAdapter):
-    def set_cell(self, obj, pos, val=True, dirty={}):
-        r"""
-        When we click on a graph cell,
-        we prepare a possible flip
-        or we try to complete the flip if it has been prepared previously
-        """
-        
 class DominosWidget(GridViewWidget):
     """A widget with dominos"""
 
@@ -274,7 +265,7 @@ class DominosWidget(GridViewWidget):
         Init a flipping dominos widget
         with flipping aztec diamond graph `g`
         """
-        super(DominosWidget, self).__init__(g, adapter = GraphGridViewAdapter(),
+        super(DominosWidget, self).__init__(g, adapter = DominosAdapter(),
                                             cell_widget_classes=[SmallButton, css_button('b1'), css_button('b2'), css_button('b3'), css_button('b4')],
                                             cell_widget_class_index=make_cell_widget_class_index(g.matching, g.order),
                                             blank_widget_class = SmallBlank)
@@ -302,7 +293,7 @@ class DominosWidget(GridViewWidget):
     def apply_matching(self, matching):
         """Apply a matching"""
         count = -1
-        for (t1, t2) in matching.items():
+        for (t1, t2) in matching:
             self.match(self.children[t1[0]].children[t1[1]],
                        self.children[t2[0]].children[t2[1]])
 
@@ -313,7 +304,7 @@ class DominosWidget(GridViewWidget):
         else:
             d1.flip(d2)
 
-    def find_possible_flips(self, key): # FIXME mettre dans la classe métier
+    def find_possible_flips(self, key):
         "Return list of neighbouring dominos, with same direction as self.dominos[key]"
         d = self.dominos[key]
         pos1, pos2 = d.geometry.first, d.geometry.second
@@ -322,7 +313,6 @@ class DominosWidget(GridViewWidget):
         elif (pos2, pos1) in self.value.matching:
             m = (pos2, pos1)
         else:
-            print("Strange!")
             return []
         possible_flips = []
         for n in d.geometry.neighbors():
