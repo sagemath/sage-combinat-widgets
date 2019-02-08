@@ -21,6 +21,7 @@ class DominoGeometry:
         return str(self.first) + ' -> ' + str(self.second)
 
     def compute(self):
+        r"""Compute domino direction and orientation."""
         if self.first[0] == self.second[0]: # same row
             self.direction = 'horizontal'
             if self.first[1] + 1 == self.second[1]:

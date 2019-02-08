@@ -8,7 +8,7 @@ from ipywidgets import Layout, HTML
 from traitlets import dlink, HasTraits, Bool, observe
 
 smallblyt = Layout(width='12px',height='12px', margin='0', padding='0')
-css = HTML("<style>.blankb {background-color: #fff}\n.gridbutton {border:1px solid #999 !important}\n.b1 {background-color: green}\n.b2 {background-color: blue}\n.b3 {background-color: red}\n.b4 {background-color: yellow}\n</style>")
+css = HTML("<style>.blankb { background-color: #fff }\n.gridbutton { border:1px solid #999 !important }\n.b1 { background-color: green }\n.b2 { background-color: blue }\n.b3 { background-color: red }\n.b4 { background-color: yellow }\n.gridbutton {\nborder-collapse: collapse;\nborder: 1px solid #666;\n}\n.left { border-right: 1px dotted #999; }\n.right { border-left: 1px dotted #999; }\n.bottom { border-top: 1px dotted #999; }\n.top { border-bottom: 1px dotted #999; }</style>")
 try:
     display(css)
 except:
@@ -155,28 +155,30 @@ class Domino(HasTraits):
         self.parent.register(self, change)
 
     def compute(self):
-        """Compute direction, orientation, color, buttons relative positions.
+        """Compute buttons relative positions.
         Create double directional link from both buttons"""
         self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
         if self.geometry.orientation == 1:
             self.key = self.first.position
         else:
             self.key = self.second.position
-        #global COLORS, POSITIONS
-        #for cl in COLORS + POSITIONS:
-        #    self.first.remove_class(cl)
-        #    self.second.remove_class(cl)
-        #k = (self.key[0] + self.key[1]) % 2 # repérage pour la couleur
-        #if self.direction == 'horizontal':
-        #    color = COLORS[k]
-        #else:
-        #    color = COLORS[2+k]
-        #self.first.add_class(color)
-        #self.second.add_class(color)
-        #if self.first.position:
-        #    self.first.add_class(self.first.position)
-        #if self.second.position:
-        #    self.second.add_class(self.second.position)
+        for cl in ['left','right','top','bottom']:
+            self.first.remove_class(cl)
+            self.second.remove_class(cl)
+        if self.geometry.direction == 'horizontal':
+            if self.geometry.orientation == 1:
+                self.first.add_class('left')
+                self.second.add_class('right')
+            elif self.geometry.orientation == -1:
+                self.first.add_class('right')
+                self.second.add_class('left')
+        elif self.geometry.direction == 'vertical':
+            if self.geometry.orientation == 1:
+                self.first.add_class('top')
+                self.second.add_class('bottom')
+            elif self.geometry.orientation == -1:
+                self.first.add_class('bottom')
+                self.second.add_class('top')
 
     def is_pressed(self):
         """Is the domino pressed?"""
