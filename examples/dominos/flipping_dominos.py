@@ -108,19 +108,6 @@ class ddlink(dlink):
             source[0].unobserve(self._update, names=source[1])
         self.double_source, self.target = None, None
 
-#class OrderedDomino:
-#    def __init__(self, first, second):
-#        self.first = first
-#        self.second = second
-#        if first[0] == second[0]:
-#            self.direction = 'horizontal'
-#        else:
-#            self.direction = 'vertical'
-#    def parity(self, i):
-#        return (self.first[0] % 2 + self.first[1] % 2 + i) % 2
-#    def __repr__(self):
-#        return "OrderedDomino from %s to %s" % (self.first, self.second)
-
 class Domino(HasTraits):
     r"""Objet non représenté en lui-même, les 2
     boutons qu'il contient étant, eux, des widgets"""
@@ -256,6 +243,7 @@ class SmallButton(ButtonCell):
     def __init__(self, content, position, layout, **kws):
         super(SmallButton, self).__init__(content, position, layout, **kws)
         self.layout = smallblyt
+        self.disabled = False
 
 class CSSButton(SmallButton):
     css_class = None
@@ -296,12 +284,13 @@ class DominosWidget(GridViewWidget):
 
     def match(self, b1, b2):
         """Match buttons b1 and b2, that is: create a domino"""
-        if b1 and b2:
-            """Create a domino and let it do the work."""
-            d = Domino(self, b1, b2)
-            self.dominos[d.key] = d
-        else:
-            print('This method requires 2 buttons!!', b1, b2)
+        try:
+            assert issubclass(b1.__class__, SmallButton) and issubclass(b2.__class__, SmallButton)
+        except:
+            raise Exception('This method requires 2 buttons!! b1 = %s, b2 = %s' % (b1, b2) )
+        """Create a domino and let it do the work."""
+        d = Domino(self, b1, b2)
+        self.dominos[d.key] = d
 
     def reset(self):
         """Clear dominos and reset every button"""
