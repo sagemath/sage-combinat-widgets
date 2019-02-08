@@ -74,6 +74,9 @@ class FlippingAztecDiamond(Graph):
         self.matching = matching # tuple with only horizontal or vertical consecutive matches
         #self.order = n # We have self.order() already
 
+    def __copy__(self):
+        return FlippingAztecDiamond.__init__(self.order(), self.matching)
+
     def neighbors(self, m):
         r"""
         Return list of parallel neighbouring matches

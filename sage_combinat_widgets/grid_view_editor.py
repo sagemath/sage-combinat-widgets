@@ -502,10 +502,7 @@ class GridViewEditor(BindableEditorClass):
             raise Exception("Removing cells is not implemented for this object.")
         if val == True: # if it's a button, reverse button toggling
             val = False
-        try:
-            obj = copy(self.value)
-        except:
-            return # If we can't copy the object, then we cannot continue anyway FIXME how to make sure copy is possible?
+        obj = copy(self.value) # For your pet objects, don't forget to implement __copy__
         result = self.adapter.remove_cell(obj, pos, dirty=self.dirty)
         if issubclass(result.__class__, BaseException): # Removing cell was impossible
             if pos in self.addable_cells() or (pos in self.cells and val == self.cells[pos]) and self.dirty.keys() == [pos]: # Rollback
