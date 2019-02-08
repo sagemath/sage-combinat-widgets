@@ -217,9 +217,9 @@ def parity(pos):
 def similar_position(pos, ref):
     return ((pos[0]%2 + pos[1]%2)%2 == (ref[0]%2 + ref[1]%2)%2)
 
-def make_cell_widget_class_index(matching, n):
+def make_cell_widget_class_index(g):
     def cell_widget_class_index(pos):
-        def calc_index_for_domino(d, n):
+        def calc_index_for_domino(d):
             if d.direction == 'horizontal':
                 if not d.parity:
                     return 1
@@ -230,16 +230,9 @@ def make_cell_widget_class_index(matching, n):
                     return 3
                 else:
                     return 4
-        d = None
-        for m in matching:
-            if m[0] == pos:
-                d = DominoGeometry(pos, m[1])
-                break
-            elif m[1] == pos:
-                d = DominoGeometry(m[0], pos)
-                break
+        d = g.domino_for_position(pos)
         if d:
-            return calc_index_for_domino(d, n)
+            return calc_index_for_domino(d)
         return 0
     return cell_widget_class_index
 
@@ -273,7 +266,7 @@ class DominosWidget(GridViewWidget):
         """
         super(DominosWidget, self).__init__(g, adapter = DominosAdapter(),
                                             cell_widget_classes=[SmallButton, css_button('b1'), css_button('b2'), css_button('b3'), css_button('b4')],
-                                            cell_widget_class_index=make_cell_widget_class_index(g.matching, g.order),
+                                            cell_widget_class_index=make_cell_widget_class_index(g),
                                             blank_widget_class = SmallBlank)
         self.dominos = None # clé = coord top-left du domino
         self.reset()

@@ -77,6 +77,18 @@ class FlippingAztecDiamond(Graph):
     def __copy__(self):
         return FlippingAztecDiamond.__init__(self.order(), self.matching)
 
+    def domino_for_position(self, pos):
+        try:
+            assert type(pos) is type((0,))
+            assert pos in self.vertices()
+        except:
+            raise TypeException("Argument `pos` must be a tuple and a graph vertex")
+        for m in self.matching:
+            if m[0] == pos:
+                return DominoGeometry(pos, m[1])
+            if m[1] == pos:
+                return DominoGeometry(m[0], pos)
+
     def neighbors(self, m):
         r"""
         Return list of parallel neighbouring matches
@@ -115,7 +127,14 @@ class DominosAdapter(GraphGridViewAdapter):
         or we try to complete the flip if it has been prepared previously
         """
         #print(pos, val, dirty)
+        # Find out the relevant matching for 'pos'
+        d1 = obj.domino_for_position(pos)
         if dirty: # if i'm a neighbor, then flip and return a new obj ; else return an error
+            # Consider the relevant matching(s)
+            for p in dirty:
+                d2 = obj.domino_for_position(p)
+                if d2 in d1.neighbors():
+                    return obj  # flip
             return Exception("Please select a second domino!")
         else: # return an error
             return Exception("Please select a second domino!")
