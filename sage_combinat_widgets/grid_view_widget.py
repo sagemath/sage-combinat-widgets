@@ -379,11 +379,11 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                 if (i,j) in positions:
                     cell_content = self.cells[(i,j)]
                     cell_widget_class = cell_widget_classes[cell_widget_class_index((i,j))]
-                    cell_string = self.adapter.cell_to_display(cell_content, self.displaytype)
-                    cell = cell_widget_class(cell_string,
+                    cell_display = self.adapter.cell_to_display(cell_content, self.displaytype)
+                    cell = cell_widget_class(cell_display,
                                              (i,j),
                                              self.cell_layout,
-                                             placeholder=cell_string)
+                                             placeholder=cell_display)
                     if (i,j) in removable_positions:
                         if issubclass(cell_widget_class, ToggleButton):
                             cell.description = '-'
