@@ -71,7 +71,7 @@ Your own widget: *Jeu de Taquin* example (1)
 `demo #4 <file:///home/odile/odk/sage/git/sage-combinat-widgets/docs/video/demo_taquin.ogv>`_
 
 
-Your own widget: *Jeu de Taquin* example (3)
+Your own widget: *Jeu de Taquin* example (2)
 ==============================================
 
 - Math code *(by F Hivert)*
