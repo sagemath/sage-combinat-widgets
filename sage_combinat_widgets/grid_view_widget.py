@@ -10,6 +10,7 @@ from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, ValueWidget
 from sage.misc.misc import uniq
 from six import text_type
 from traitlets import Unicode
+from _hashlib import openssl_md5 as md5
 
 textcell_layout = Layout(width='3em', height='2em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em', height='3em', margin='0', padding='0')

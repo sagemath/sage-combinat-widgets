@@ -94,11 +94,10 @@ def get_adapter(obj):
         from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
         return GraphGridViewAdapter()
 
-def cdlink_repr(self):
-    return "A typecasting directional link from source=(%s, %s) to target='%s'" % (
-        self.source[0].__class__, self.source[0].value, self.target[1])
-cdlink = traitlets.dlink
-cdlink.__repr__ = cdlink_repr
+class cdlink(traitlets.dlink):
+    def __repr__(self):
+        return "A typecasting directional link from source=(%s, %s) to target='%s'" % (
+            self.source[0].__class__, self.source[0].value, self.target[1])
 
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass(traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
