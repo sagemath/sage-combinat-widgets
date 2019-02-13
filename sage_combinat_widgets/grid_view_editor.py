@@ -94,10 +94,10 @@ def get_adapter(obj):
         from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
         return GraphGridViewAdapter()
 
-def cdlink_repr(self):
-    return "A typecasting directional link from source=(%s, %s) to target='%s'" % (self.source[0].__class__, self.source[0].value, self.target[1])
-cdlink = traitlets.dlink
-cdlink.__repr__ = cdlink_repr
+class cdlink(traitlets.dlink):
+    def __repr__(self):
+        return "A typecasting directional link from source=(%s, %s) to target='%s'" % (
+            self.source[0].__class__, self.source[0].value, self.target[1])
 
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass(traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
@@ -343,12 +343,10 @@ class GridViewEditor(BindableEditorClass):
         self.dirty[pos] = val
         if e:
             self.dirty_errors[pos] = e
-            self.get_child(pos).set_tooltip(str(e))
 
     def unset_dirty(self, pos):
         del self.dirty[pos]
         del self.dirty_errors[pos]
-        self.get_child(pos).set_tooltip()
 
     def reset_dirty(self):
         if not self.dirty: # Prevent any interactive loops
@@ -438,6 +436,8 @@ class GridViewEditor(BindableEditorClass):
             sage: e.value
             [[None, None, 1, 2, 3], [1, 1], [4]]
         """
+        if self.initialization:
+            return
         if not change.name.startswith('add_') \
            or self.to_cell(change.new) == self.adapter.cellzero:
             return
@@ -482,6 +482,8 @@ class GridViewEditor(BindableEditorClass):
             sage: e.value
             [[None, None, 1, 2], [None, 1], [4]]
         """
+        if self.initialization:
+            return
         val = change.new
         pos = extract_coordinates(change.name)
         # Dirty _addable_ cells can be removed

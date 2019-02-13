@@ -124,17 +124,17 @@ class DisabledTextCell(BaseTextCell):
         super(DisabledTextCell, self).__init__(content, position, layout=layout, **kws)
         self.disabled = True
 
-class BaseButtonCell(ToggleButton):
+class ButtonCell(ToggleButton):
     r"""A base class for button grid cells.
 
     TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import BaseButtonCell
-        sage: b = BaseButtonCell(True, (1,2))
+        sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
+        sage: b = ButtonCell(True, (1,2))
     """
     displaytype = bool
 
     def __init__(self, content, position, layout=buttoncell_layout, **kws):
-        super(BaseButtonCell, self).__init__()
+        super(ButtonCell, self).__init__()
         self.value = content
         self.layout = layout
         self.position = position
@@ -147,8 +147,8 @@ class BaseButtonCell(ToggleButton):
         to use as a tooltip on buttons.
 
         TESTS::
-            sage: from sage_combinat_widgets.grid_view_widget import BaseButtonCell
-            sage: b = BaseButtonCell(True, (42, 7))
+            sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
+            sage: b = ButtonCell(True, (42, 7))
             sage: b.set_tooltip()
             sage: str(b.tooltip)
             '42, 7'
@@ -161,18 +161,55 @@ class BaseButtonCell(ToggleButton):
         else:
             self.tooltip = str(self.position)[1:-1]
 
-class ButtonCell(BaseButtonCell):
+class DisabledButtonCell(ButtonCell):
     r"""A button grid cell
 
     TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
-        sage: b = ButtonCell(True, (1,2))
+        sage: from sage_combinat_widgets.grid_view_widget import DisabledButtonCell
+        sage: b = DisabledButtonCell(True, (1,2))
     """
     def __init__(self, content, position, layout=buttoncell_layout, **kws):
-        super(ButtonCell, self).__init__(content, position, layout, **kws)
+        super(DisabledButtonCell, self).__init__(content, position, layout, **kws)
         self.disabled = True
 
-class AddableButtonCell(BaseButtonCell):
+class StyledButtonCell(ButtonCell):
+    disabled = False
+    css_class = None
+    def __init__(self, content, position, layout, **kws):
+        super(StyledButtonCell, self).__init__(content, position, **kws)
+        self.add_class(self.css_class)
+def styled_button(disable=False, style_name=''):
+    class_name = "{}Button" . format(style_name.capitalize())
+    if disable:
+        class_name = "Disabled" + class_name
+    return type(class_name, (StyledButton,), {'disabled' : disable, 'css_class': style_name})
+
+class ButtonCellWithLayout(ButtonCell):
+    disabled = False
+    layout = None
+    def __init__(self, content, position, layout, **kws):
+        super(ButtonCellWithLayout, self).__init__(content, position, **kws)
+        self.add_class(self.css_class)
+def button_with_layout(disable=False, layout=None):
+    class_name = "{}Button" . format(layout.__class__.__name__.capitalize())
+    if disable:
+        class_name = "Disabled" + class_name
+    return type(class_name, (ButtonCellWithLayout,), {'disabled' : disable, 'layout' : layout})
+
+class StyledButtonCellWithLayout(ButtonCell):
+    disabled = False
+    css_class = None
+    layout = None
+    def __init__(self, content, position, layout, **kws):
+        super(StyledButtonCellWithLayout, self).__init__(content, position, **kws)
+        self.add_class(self.css_class)
+def styled_button_with_layout(disable=False, style_name='', layout=None):
+    class_name = "{}{}Button" . format(style_name.capitalize(), layout.__class__.__name__.capitalize())
+    if disable:
+        class_name = "Disabled" + class_name
+    return type(class_name, (StyledButtonCellWithLayout,), {'disabled' : disable, 'css_class': style_name, 'layout' : layout})
+
+class AddableButtonCell(ButtonCell):
     r"""An addable placeholder for adding a button cell to the widget
 
     TESTS::
@@ -432,7 +469,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         super(GridViewWidget, self).set_dirty(pos, val, e)
         child = self.get_child(pos)
         child.add_class('dirty')
-        child.set_tooltip(self.dirty_info(pos))
+        if e:
+            child.set_tooltip(self.dirty_info(pos))
 
     def unset_dirty(self, pos):
         super(GridViewWidget, self).unset_dirty(pos)

@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from flipping_aztecdiamond import *
-from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton
+from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, styled_button_with_layout
 from ipywidgets import Layout, HTML
 from traitlets import dlink, HasTraits, Bool, observe
 from contextlib import contextmanager
@@ -199,21 +199,6 @@ def make_cell_widget_class_index(g):
         return 0
     return cell_widget_class_index
 
-class SmallButton(ButtonCell):
-    def __init__(self, content, position, layout, **kws):
-        super(SmallButton, self).__init__(content, position, layout, **kws)
-        self.layout = smallblyt
-        self.disabled = True
-
-class CSSButton(SmallButton):
-    css_class = None
-    def __init__(self, content, position, layout, **kws):
-        super(CSSButton, self).__init__(content, position, layout, **kws)
-        self.add_class(self.css_class)
-        self.disabled = False # enable only CSS buttons ie matched positions
-def css_button(class_name):
-    return type("{}Button" . format(class_name), (CSSButton,), {'css_class': class_name})
-
 class SmallBlank(BlankButton):
     def __init__(self, layout, **kws):
         super(SmallBlank, self).__init__(**kws)
@@ -228,7 +213,12 @@ class DominosWidget(GridViewWidget):
         with flipping aztec diamond graph `g`
         """
         super(DominosWidget, self).__init__(g, adapter = DominosAdapter(),
-                                            cell_widget_classes=[SmallButton, css_button('b1'), css_button('b2'), css_button('b3'), css_button('b4')],
+                                            cell_widget_classes=[styled_button_with_layout(layout=smallblyt),
+                                                                 styled_button_with_layout(style_name='b1', layout=smallblyt),
+                                                                 styled_button_with_layout(style_name='b2', layout=smallblyt),
+                                                                 styled_button_with_layout(style_name='b3', layout=smallblyt),
+                                                                 styled_button_with_layout(style_name='b4', layout=smallblyt),
+                                            ],
                                             cell_widget_class_index=make_cell_widget_class_index(g),
                                             blank_widget_class = SmallBlank)
         #self.dominos = None # clé = coord top-left du domino
@@ -243,7 +233,7 @@ class DominosWidget(GridViewWidget):
     def match(self, b1, b2):
         """Match buttons b1 and b2, that is: create a domino"""
         try:
-            assert issubclass(b1.__class__, SmallButton) and issubclass(b2.__class__, SmallButton)
+            assert issubclass(b1.__class__, ButtonCell) and issubclass(b2.__class__, ButtonCell)
         except:
             raise Exception('This method requires 2 buttons!! b1 = %s, b2 = %s' % (b1, b2) )
         """Create a domino and let it do the work."""

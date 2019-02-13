@@ -69,10 +69,11 @@ class FlippingAztecDiamond(Graph):
         try:
             assert n > 0 and n.is_integer()
         except:
-            raise TypeException("We need a positive integer for the graph order.")
+            raise TypeError("We need a positive integer for the graph order.")
         N = 2 * n
         positions = ((i, j) for i in range(N) for j in range(N) if i - n <= j <= n + i and n - 1 - i <= j <= 3 * n - i - 1)
         super(FlippingAztecDiamond, self).__init__(name="Flipping Aztec Diamond Graph of order {}".format(n))
+        self.aztec_order = n
         self.add_vertices(positions)
         self.add_edges((pos,(pos[0],pos[1]+1)) for pos in positions if (pos[0],pos[1]+1) in positions)
         self.add_edges((pos,(pos[0]+1,pos[1])) for pos in positions if (pos[0]+1,pos[1]) in positions)
@@ -81,11 +82,11 @@ class FlippingAztecDiamond(Graph):
                 assert (t[0][0] == t[1][0] and (t[0][1] + 1 == t[1][1] or t[0][1] == t[1][1] + 1) or \
                         t[0][1] == t[1][1] and (t[0][0] + 1 == t[1][0] or t[0][0] == t[1][0] + 1))
         except:
-            raise TypeException("This matching is not suitable for a flipping aztec diamond (tuple {} is not valid)." . format(t))
+            raise TypeError("This matching is not suitable for a flipping aztec diamond (tuple {} is not valid)." . format(t))
         self.matching = self.apply_matching(matching) # dominos with only horizontal or vertical consecutive matches
 
     def __copy__(self):
-        return FlippingAztecDiamond.__init__(self.order(), self.matching)
+        return FlippingAztecDiamond.__init__(self, self.aztec_order, ((m.first, m.second) for m in self.matching))
 
     def apply_matching(self, matching):
         self.matching = [DominoGeometry(t[0], t[1]) for t in matching]
@@ -95,7 +96,7 @@ class FlippingAztecDiamond(Graph):
             assert type(pos) is type((0,))
             assert pos in self.vertices()
         except:
-            raise TypeException("Argument `pos` must be a tuple and a graph vertex")
+            raise TypeError("Argument `pos` must be a tuple and a graph vertex")
         for d in self.matching:
             if d.first == pos or d.second == pos:
                 return d
