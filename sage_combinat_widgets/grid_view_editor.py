@@ -287,7 +287,7 @@ class GridViewEditor(BindableEditorClass):
             sage: e = GridViewEditor(Partition([3,3,2,1]))
             sage: e.compute_height()
             sage: e.height
-            5
+            4
             sage: from sage.graphs.generators.families import AztecDiamondGraph
             sage: e = GridViewEditor(AztecDiamondGraph(2))
             sage: e.compute_height()
@@ -379,12 +379,10 @@ class GridViewEditor(BindableEditorClass):
         self.dirty[pos] = val
         if e:
             self.dirty_errors[pos] = e
-            self.get_child(pos).set_tooltip(str(e))
 
     def unset_dirty(self, pos):
         del self.dirty[pos]
         del self.dirty_errors[pos]
-        self.get_child(pos).set_tooltip()
 
     def reset_dirty(self):
         if not self.dirty: # Prevent any interactive loops
@@ -462,7 +460,8 @@ class GridViewEditor(BindableEditorClass):
             sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
             sage: e = GridViewEditor(t)
             sage: e.add_cell(change)
-            Cell (1, 1) with value '8' cannot be added to this object!
+            sage: e.dirty
+            {(1, 1): 8}
             sage: e.value
             [[1, 2, 5, 6], [3], [4]]
             sage: e = GridViewEditor(SkewTableau([[None, None, 1, 2], [None, 1], [4]]))
