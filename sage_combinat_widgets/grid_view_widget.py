@@ -11,14 +11,14 @@ from sage.misc.misc import uniq
 from six import text_type
 from traitlets import Unicode
 
-textcell_layout = Layout(width='3em',height='2em', margin='0', padding='0')
-textcell_wider_layout = Layout(width='7em',height='3em', margin='0', padding='0')
-buttoncell_layout = Layout(width='5em',height='4em', margin='0', padding='0')
-buttoncell_smaller_layout = Layout(width='2em',height='2em', margin='0', padding='0')
+textcell_layout = Layout(width='3em', height='2em', margin='0', padding='0')
+textcell_wider_layout = Layout(width='7em', height='3em', margin='0', padding='0')
+buttoncell_layout = Layout(width='5em', height='4em', margin='0', padding='0')
+buttoncell_smaller_layout = Layout(width='2em', height='2em', margin='0', padding='0')
 css_lines = []
-css_lines.append(".widget-text INPUT { border-collapse: collapse !important}")
-css_lines.append(".gridbutton {border:1px solid #999; color:#666}")
-css_lines.append(".blankbutton, .addablebutton {background-color: white; color:#666}")
+css_lines.append(".widget-text INPUT {border-collapse: collapse !important}")
+css_lines.append(".gridbutton {margin:0; padding:0; width:2em; height:2em; border:1px solid #999; color:#666}")
+css_lines.append(".blankbutton, .addablebutton {background-color:white; color:#666}")
 css_lines.append(".blankbutton {border:0px !important}")
 css_lines.append(".blankcell INPUT {border:0px !important}")
 css_lines.append(".addablecell INPUT, .removablecell INPUT {background-position: right top; background-size: 1em; background-repeat: no-repeat}")
@@ -133,7 +133,7 @@ class ButtonCell(ToggleButton):
     """
     displaytype = bool
 
-    def __init__(self, content, position, layout=buttoncell_layout, **kws):
+    def __init__(self, content, position, layout=buttoncell_smaller_layout, **kws):
         super(ButtonCell, self).__init__()
         self.value = content
         self.layout = layout
@@ -174,9 +174,10 @@ class StyledButtonCell(ButtonCell):
     """
     disabled = False
     css_class = None
-    def __init__(self, content, position, layout=buttoncell_layout, **kws):
+    def __init__(self, content, position, layout=buttoncell_smaller_layout, **kws):
         super(StyledButtonCell, self).__init__(content, position, layout, **kws)
         self.add_class(self.css_class)
+
 def styled_button(disabled=False, style_name=''):
     r"""A function to create CSS-styled buttons.
 
@@ -185,10 +186,10 @@ def styled_button(disabled=False, style_name=''):
         sage: styled_button(disabled=True, style_name='mycssclass')
         <class 'traitlets.traitlets.DisabledMycssclassButton'>
     """
-    class_name = "{}Button" . format(style_name.capitalize())
+    class_name = "{}Button".format(style_name.capitalize())
     if disabled:
         class_name = "Disabled" + class_name
-    return type(class_name, (StyledButtonCell,), {'disabled' : disabled, 'css_class': style_name})
+    return type(class_name, (StyledButtonCell,), {'disabled': disabled, 'css_class': style_name})
 
 DisabledButtonCell = styled_button(disabled=True)
 r"""A disabled button cell.
@@ -207,7 +208,7 @@ class AddableButtonCell(ButtonCell):
         sage: from sage_combinat_widgets.grid_view_widget import AddableButtonCell
         sage: a = AddableButtonCell((3,4))
     """
-    def __init__(self, position, layout=buttoncell_layout, **kws):
+    def __init__(self, position, layout=buttoncell_smaller_layout, **kws):
         super(AddableButtonCell, self).__init__(False, position, layout, **kws)
         self.add_class('addablebutton')
         self.description = '+'
@@ -220,10 +221,10 @@ class BlankButton(ToggleButton):
         sage: from sage_combinat_widgets.grid_view_widget import BlankButton
         sage: b = BlankButton()
     """
-    def __init__(self, layout=buttoncell_layout):
+    def __init__(self, layout=buttoncell_smaller_layout):
         super(BlankButton, self).__init__()
         self.disabled=True
-        self.layout = buttoncell_layout
+        self.layout = buttoncell_smaller_layout
         self.add_class('blankbutton')
 
 def get_model_id(w):
@@ -239,8 +240,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
     r"""A widget for all grid-representable Sage objects
     """
 
-    def __init__(self, obj, adapter=None, display_convention='en', cell_layout=None, \
-                 cell_widget_classes=[TextCell], cell_widget_class_index=lambda x:0, \
+    def __init__(self, obj, adapter=None, display_convention='en', cell_layout=None,
+                 cell_widget_classes=[TextCell], cell_widget_class_index=lambda x:0,
                  blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
         r"""
         Grid View Widget initialization.
@@ -280,7 +281,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             cell_widget_classes[0], obj)
         if not cell_layout:
             if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
-                cell_layout = buttoncell_layout
+                cell_layout = buttoncell_smaller_layout
             else:
                 cell_layout = textcell_layout
         self.cell_layout = cell_layout
