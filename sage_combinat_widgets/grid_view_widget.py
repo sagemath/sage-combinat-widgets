@@ -411,7 +411,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                     cell_display = self.adapter.cell_to_display(cell_content, self.displaytype)
                     cell = cell_widget_class(cell_display,
                                              (i,j),
-                                             self.cell_layout,
+                                             layout=self.cell_layout,
                                              placeholder=cell_display)
                     if (i,j) in removable_positions:
                         if issubclass(cell_widget_class, ToggleButton):
@@ -422,17 +422,17 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                     hbox_children.append(cell)
                 elif (i,j) in addable_positions:
                     # Inside the grid-represented object limits
-                    hbox_children.append(addable_widget_class((i,j), self.cell_layout))
+                    hbox_children.append(addable_widget_class((i,j), layout=self.cell_layout))
                 else:
-                    hbox_children.append(blank_widget_class(self.cell_layout))
+                    hbox_children.append(blank_widget_class(layout=self.cell_layout))
                 j+=1
                 if j > max([t[0][1] for t in rows[i]]) and (i,j) in addable_positions:
                     # Outside of the grid-represented object limits
-                    hbox_children.append(self.addable_widget_class((i,j), self.cell_layout))
+                    hbox_children.append(self.addable_widget_class((i,j), layout=self.cell_layout))
             vbox_children.append(HBox(hbox_children))
         for row in addable_rows:
             if row[0] > i:
-                vbox_children.append(HBox([self.addable_widget_class((i,j), self.cell_layout) for c in row[1]]))
+                vbox_children.append(HBox([self.addable_widget_class((i,j), layout=self.cell_layout) for c in row[1]]))
         if self.display_convention == 'fr':
             vbox_children.reverse()
         self.children = vbox_children
