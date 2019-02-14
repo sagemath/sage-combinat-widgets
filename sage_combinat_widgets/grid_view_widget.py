@@ -124,17 +124,17 @@ class DisabledTextCell(BaseTextCell):
         super(DisabledTextCell, self).__init__(content, position, layout=layout, **kws)
         self.disabled = True
 
-class BaseButtonCell(ToggleButton):
+class ButtonCell(ToggleButton):
     r"""A base class for button grid cells.
 
     TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import BaseButtonCell
-        sage: b = BaseButtonCell(True, (1,2))
+        sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
+        sage: b = ButtonCell(True, (1,2))
     """
     displaytype = bool
 
     def __init__(self, content, position, layout=buttoncell_layout, **kws):
-        super(BaseButtonCell, self).__init__()
+        super(ButtonCell, self).__init__()
         self.value = content
         self.layout = layout
         self.position = position
@@ -147,8 +147,8 @@ class BaseButtonCell(ToggleButton):
         to use as a tooltip on buttons.
 
         TESTS::
-            sage: from sage_combinat_widgets.grid_view_widget import BaseButtonCell
-            sage: b = BaseButtonCell(True, (42, 7))
+            sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
+            sage: b = ButtonCell(True, (42, 7))
             sage: b.set_tooltip()
             sage: str(b.tooltip)
             '42, 7'
@@ -161,18 +161,46 @@ class BaseButtonCell(ToggleButton):
         else:
             self.tooltip = str(self.position)[1:-1]
 
-class ButtonCell(BaseButtonCell):
-    r"""A button grid cell
+class StyledButtonCell(ButtonCell):
+    r"""A class for CSS-styled button grid cells.
+    Not meant to be called directly.
 
     TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
-        sage: b = ButtonCell(True, (1,2))
+        sage: from sage_combinat_widgets.grid_view_widget import StyledButtonCell
+        sage: b = StyledButtonCell(True, (1,2))
+        Traceback (most recent call last):
+        ...
+        TraitError: Element of the '_dom_classes' trait of a StyledButtonCell instance must be a unicode string, but a value of None <type 'NoneType'> was specified.
     """
+    disabled = False
+    css_class = None
     def __init__(self, content, position, layout=buttoncell_layout, **kws):
-        super(ButtonCell, self).__init__(content, position, layout, **kws)
-        self.disabled = True
+        super(StyledButtonCell, self).__init__(content, position, layout, **kws)
+        self.add_class(self.css_class)
+def styled_button(disabled=False, style_name=''):
+    r"""A function to create CSS-styled buttons.
 
-class AddableButtonCell(BaseButtonCell):
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import styled_button
+        sage: styled_button(disabled=True, style_name='mycssclass')
+        <class 'traitlets.traitlets.DisabledMycssclassButton'>
+    """
+    class_name = "{}Button" . format(style_name.capitalize())
+    if disabled:
+        class_name = "Disabled" + class_name
+    return type(class_name, (StyledButtonCell,), {'disabled' : disabled, 'css_class': style_name})
+
+DisabledButtonCell = styled_button(disabled=True)
+r"""A disabled button cell.
+
+TESTS::
+    sage: from sage_combinat_widgets.grid_view_widget import DisabledButtonCell
+    sage: b = DisabledButtonCell(True, (1,2))
+    sage: b.disabled
+    True
+"""
+
+class AddableButtonCell(ButtonCell):
     r"""An addable placeholder for adding a button cell to the widget
 
     TESTS::
@@ -379,11 +407,11 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                 if (i,j) in positions:
                     cell_content = self.cells[(i,j)]
                     cell_widget_class = cell_widget_classes[cell_widget_class_index((i,j))]
-                    cell_string = self.adapter.cell_to_display(cell_content, self.displaytype)
-                    cell = cell_widget_class(cell_string,
+                    cell_display = self.adapter.cell_to_display(cell_content, self.displaytype)
+                    cell = cell_widget_class(cell_display,
                                              (i,j),
                                              self.cell_layout,
-                                             placeholder=cell_string)
+                                             placeholder=cell_display)
                     if (i,j) in removable_positions:
                         if issubclass(cell_widget_class, ToggleButton):
                             cell.description = '-'
@@ -432,7 +460,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         super(GridViewWidget, self).set_dirty(pos, val, e)
         child = self.get_child(pos)
         child.add_class('dirty')
-        child.set_tooltip(self.dirty_info(pos))
+        if e:
+            child.set_tooltip(self.dirty_info(pos))
 
     def unset_dirty(self, pos):
         super(GridViewWidget, self).unset_dirty(pos)
