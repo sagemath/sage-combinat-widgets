@@ -426,10 +426,10 @@ class GridViewEditor(BindableEditorClass):
             sage: e = GridViewEditor(t)
             sage: e.initialization = False
             sage: e.add_cell(change)
-            sage: e.dirty
-            {(1, 1): 8}
             sage: e.value
             [[1, 2, 5, 6], [3], [4]]
+            sage: e.dirty
+            {(1, 1): 8}
             sage: e = GridViewEditor(SkewTableau([[None, None, 1, 2], [None, 1], [4]]))
             sage: e.initialization = False
             sage: e.add_cell(Bunch({'name': 'add_0_4', 'old': 0, 'new': 3, 'owner': e, 'type': 'change'}))
