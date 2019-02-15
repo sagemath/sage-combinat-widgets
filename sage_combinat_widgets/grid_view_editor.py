@@ -414,7 +414,7 @@ class GridViewEditor(BindableEditorClass):
 
     def removable_cells(self):
         r"""
-        List removable cells for editor value
+        List removable cells for editor value.
         """
         if not hasattr(self.adapter, 'removable_cells') or not callable(self.adapter.removable_cells):
             return [] # Optional method
@@ -423,6 +423,8 @@ class GridViewEditor(BindableEditorClass):
     @traitlets.observe(traitlets.All)
     def add_cell(self, change):
         r"""
+        Add a cell to the widget.
+
         TESTS:
             sage: from sage_combinat_widgets import GridViewEditor
             sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
@@ -663,4 +665,32 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot remove column from this object.")
         obj = copy(self.value)
         obj = self.adapter.remove_column(obj, index)
+        self.set_value(obj, True) # Will take care of everything
+
+    @traitlets.observe(traitlets.All)
+    def move_forward(self, change):
+        r"""
+        Move forward in some user-defined process. Plus button.
+        """
+        if self.initialization:
+            return
+        if not hasattr(self.adapter, 'move_forward'):
+            print(change)
+            raise TypeError("No forward move is implemented for this object.")
+        obj = copy(self.value)
+        obj = self.adapter.move_forward(obj)
+        self.set_value(obj, True) # Will take care of everything
+
+    @traitlets.observe(traitlets.All)
+    def move_backward(self, change):
+        r"""
+        Move forward in some user-defined process. Minus button.
+        """
+        if self.initialization:
+            return
+        if not hasattr(self.adapter, 'move_backward'):
+            print(change)
+            raise TypeError("No backward move is implemented for this object.")
+        obj = copy(self.value)
+        obj = self.adapter.move_backward(obj)
         self.set_value(obj, True) # Will take care of everything
