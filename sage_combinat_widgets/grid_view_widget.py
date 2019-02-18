@@ -552,7 +552,12 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         if self.move_buttons:
             b_forward = self.move_button_class(self, 'forward', description='+')
             b_backward = self.move_button_class(self, 'backward', description='-')
-            self.children = [ HBox( [VBox(vbox_children), HBox(b_backward, b_forward)] ) ]
+            self.children = (
+                HBox(children= (
+                    VBox(children=vbox_children),
+                    HBox(children=(b_backward, b_forward))
+                ))
+                ,)
         else:
             self.children = vbox_children
         self.add_links()
