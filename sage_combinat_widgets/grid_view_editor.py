@@ -124,7 +124,7 @@ class GridViewEditor(BindableEditorClass):
     """
     value = traitlets.Any()
 
-    def __init__(self, obj, adapter=None):
+    def __init__(self, obj, adapter=None, move_actions=None):
         r"""
         Initialize editor.
 
@@ -166,6 +166,10 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot find an Adapter for this object (%s)" % obj.__class__)
         if not hasattr(self.adapter, 'compute_cells') or not callable(self.adapter.compute_cells):
             raise NotImplementedError("Method `compute_cells` is required!")
+        self.move_actions = None
+        if move_actions and hasattr(self.adapter, 'move'):
+            self.move_actions = move_actions
+            self.move_history = []
         self.compute()
         self.links = []
 
@@ -667,12 +671,37 @@ class GridViewEditor(BindableEditorClass):
         obj = self.adapter.remove_column(obj, index)
         self.set_value(obj, True) # Will take care of everything
 
-    def move(self, direction):
+    def trigger_move(self, direction='forward', **kws):
         r"""
         Move forward in some user-defined process and direction.
+
+        TESTS::
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: from sage.matrix.matrix_space import MatrixSpace
+            sage: S = MatrixSpace(ZZ, 4,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
+            sage: e = GridViewEditor(m)
+            sage: e.trigger_move('forward', action='multiply', by=m, history=[m])
+            sage: e.trigger_move('backward')
         """
-        if not hasattr(self.adapter, 'move'):
-            raise TypeError("No move method is implemented for this object.")
+        if not self.move_actions or ('action' in kws and not kws['action'] in self.move_actions):
+            raise NotImplementedError("No move method is implemented for this object and action.")
+        if 'action' in kws:
+            action = kws['action']
+        elif len(self.move_actions) == 1:
+           action = self.move_actions[0]
+        else:
+            raise NameError("No action specified for the move!")
         obj = copy(self.value)
-        obj = self.adapter.move(obj, direction)
-        self.set_value(obj, True) # Will take care of everything
+        if direction == 'backward':
+            if not self.move_history:
+                print("Nothing to got back to!")
+            else:
+                self.set_value(self.move_history.pop(), True)
+        elif direction == 'forward':
+            self.move_history.append(self.value)
+            if not 'action' in kws:
+                kws['action'] = action
+            self.set_value(
+                self.adapter.move(obj, direction, **kws),
+                True)
