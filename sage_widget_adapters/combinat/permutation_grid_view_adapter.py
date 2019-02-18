@@ -58,7 +58,7 @@ class PermutationGridViewAdapter(GridViewAdapter):
     @staticmethod
     def move(obj, **kws):
         r"""
-        Run a transformation on the permutation
+        Run a transformation on the permutation.
 
         TESTS::
             sage: from sage.combinat.permutation import Permutation
