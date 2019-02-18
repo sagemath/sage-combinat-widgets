@@ -103,11 +103,13 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         """
         height = max([pos[0] for pos in cells]) + 1
         outer = [max([pos[1] for pos in cells if pos[0]==i]) + 1 for i in range(height)]
-        inner = [min([pos[1] for pos in cells if pos[0]==i]) for i in range(height) if min([pos[1] for pos in cells if pos[0]==i]) > 0]
+        inner = [min([pos[1] for pos in cells if pos[0]==i]) for i in \
+                 range(height) if min([pos[1] for pos in cells if pos[0]==i]) > 0]
         try:
             return cls.objclass([outer,inner])
         except:
-            raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
+            raise TypeError(
+                "This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
 
     @staticmethod
     def get_cell(obj, pos):

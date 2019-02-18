@@ -71,7 +71,8 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
         try:
             return cls.objclass(rows)
         except:
-            raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
+            raise TypeError(
+                "This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
 
     @staticmethod
     def addable_cells(obj):
@@ -105,7 +106,8 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
 
     def add_cell(self, obj, pos, val, dirty={}):
         r"""
-        Add cell
+        Add cell.
+
         TESTS::
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter

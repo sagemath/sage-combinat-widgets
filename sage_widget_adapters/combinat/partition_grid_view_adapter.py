@@ -108,11 +108,13 @@ class PartitionGridViewAdapter(GridViewAdapter):
             sage: PartitionGridViewAdapter.from_cells({(0, 0): False, (0, 1): False, (0, 2): True, (0, 3): False, (1, 0): False, (2, 0): True})
             [4, 1, 1]
         """
-        partition_elements = [len([(i, pos[1]) for pos in cells if pos[0] == i]) for i in range(max(pos[0] for pos in cells) + 1)]
+        partition_elements = [
+            len([(i, pos[1]) for pos in cells if pos[0] == i]) for i in range(max(pos[0] for pos in cells) + 1)]
         try:
             return cls.objclass(partition_elements)
         except:
-            raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
+            raise TypeError(
+                "This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
 
     @staticmethod
     def get_cell(obj, pos):

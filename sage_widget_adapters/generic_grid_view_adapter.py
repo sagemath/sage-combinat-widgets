@@ -149,6 +149,7 @@ class GridViewAdapter(object):
         r"""
         From an object and a tuple `pos`,
         return the object cell value at position `pos`.
+
         TESTS::
             sage: from sage.matrix.constructor import Matrix
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
