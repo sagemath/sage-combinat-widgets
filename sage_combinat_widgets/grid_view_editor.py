@@ -678,14 +678,19 @@ class GridViewEditor(BindableEditorClass):
         TESTS::
             sage: from sage_combinat_widgets import GridViewEditor
             sage: from sage.matrix.matrix_space import MatrixSpace
-            sage: S = MatrixSpace(ZZ, 4,3)
-            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
-            sage: e = GridViewEditor(m)
-            sage: e.trigger_move('forward', action='multiply', by=m, history=[m])
-            sage: e.trigger_move('backward')
+            sage: S = MatrixSpace(ZZ, 3,3)
+            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2])
+            sage: e = GridViewEditor(m, move_actions=['multiply'])
+            sage: e.trigger_move(direction='forward', action='multiply', by=m, history=[m])
+            sage: e.value
+            [ 1  6 24]
+            [ 0 -3  6]
+            [ 0 -2  1]
+            sage: e.trigger_move(direction='backward')
+            sage: assert e.value == m
         """
         if not self.move_actions or ('action' in kws and not kws['action'] in self.move_actions):
-            raise NotImplementedError("No move method is implemented for this object and action.")
+            raise NotImplementedError("This move action is not implemented by this widget.")
         if 'action' in kws:
             action = kws['action']
         elif len(self.move_actions) == 1:
@@ -702,6 +707,8 @@ class GridViewEditor(BindableEditorClass):
             self.move_history.append(self.value)
             if not 'action' in kws:
                 kws['action'] = action
+            if not 'direction' in kws:
+                kws['direction'] = direction
             self.set_value(
-                self.adapter.move(obj, direction, **kws),
+                self.adapter.move(obj, **kws),
                 True)
