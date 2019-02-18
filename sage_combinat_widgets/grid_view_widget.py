@@ -305,7 +305,7 @@ class StyledMoveButton(StyledPushButton):
         self.direction = direction
 
     def on_click(self):
-        self.referent.move(self.direction)
+        self.referent.trigger_move(self.direction)
 
 def styled_move_button(disabled=False, style_name='movebutton'):
     r"""A function to create CSS-styled push buttons.
@@ -338,7 +338,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
     def __init__(self, obj, adapter=None, display_convention='en', cell_layout=None,
                  cell_widget_classes=[TextCell], cell_widget_class_index=lambda x:0,
                  blank_widget_class=BlankCell, addable_widget_class=AddableTextCell,
-                 move_button_layout=None,
+                 move_actions=None,
                  move_button_class=styled_move_button()):
         r"""
         Grid View Widget initialization.
@@ -371,7 +371,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             sage: f = interact(f)
             <html>...</html>
         """
-        GridViewEditor.__init__(self, obj, adapter)
+        GridViewEditor.__init__(self, obj, adapter, move_actions)
         VBox.__init__(self)
         self._model_id = get_model_id(self)
         self.display_convention = display_convention

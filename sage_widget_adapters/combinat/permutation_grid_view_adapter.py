@@ -54,3 +54,37 @@ class PermutationGridViewAdapter(GridViewAdapter):
             {(0, 0): 2, (0, 1): 3, (0, 2): 4, (0, 3): 5, (0, 4): 1}
         """
         return {(0,i):obj[i] for i in range(len(obj))}
+
+    @staticmethod
+    def move(obj, **kws):
+        r"""
+        Run a transformation on the permutation
+
+        TESTS::
+            sage: from sage.combinat.permutation import Permutation
+            sage: from sage_widget_adapters.combinat.permutation_grid_view_adapter import PermutationGridViewAdapter
+            sage: p = Permutation([2, 3, 4, 5, 1])
+            sage: PermutationGridViewAdapter.move(p)
+            [3, 4, 5, 1, 2]
+            sage: PermutationGridViewAdapter.move(Permutation([3, 4, 5, 1, 2]), direction='backward', history = [p])
+            [2, 3, 4, 5, 1]
+        """
+        if 'action' in kws and kws['action'] != 'compose': # Only 'compose' action is implemented
+            raise NotImplementedError("Action {} is not implemented" . format(action))
+        if 'direction' in kws and kws['direction'] not in ['forward', 'backward']:
+            raise NotImplementedError("Direction {} is not implemented" . format(direction))
+        elif 'direction' in kws:
+            direction = kws['direction']
+        else:
+            direction = 'forward'
+        if 'by' in kws:
+            compose_by = kws['by']
+        else:
+            compose_by = obj
+        if direction == 'forward':
+            return compose_by * obj
+        elif direction == 'backward':
+            if 'history' in kws:
+                return kws['history'][-1]
+            else:
+                return compose_by.inverse() * obj
