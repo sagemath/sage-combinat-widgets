@@ -21,6 +21,7 @@ authors = u"Odile Bénassy, Nicolas M. Thiéry"
 
 import sys
 import os
+from six import text_type
 
 from sage.env import SAGE_DOC_SRC, SAGE_DOC, SAGE_SRC
 
@@ -234,7 +235,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', package_name + '.tex', u'Documentation of ' + unicode(package_name),
+  ('index', package_name + '.tex', u'Documentation of ' + text_type(package_name),
    authors, 'manual'),
 ]
 
@@ -264,7 +265,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', package_name, unicode(package_name) + u" documentation",
+    ('index', package_name, text_type(package_name) + u" documentation",
      [authors], 1)
 ]
 
@@ -278,7 +279,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', package_name, unicode(package_name) + u" documentation",
+  ('index', package_name, text_type(package_name) + u" documentation",
    authors, package_name, project,
    'Miscellaneous'),
 ]
