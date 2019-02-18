@@ -284,6 +284,46 @@ TESTS ::
     sage: assert 'blankbutton' in b._dom_classes
 """
 
+class StyledMoveButton(StyledPushButton):
+    r"""A class for CSS-styled move buttons
+    with a handler to call the referent (parent) move methods.
+    Not meant to be called directly.
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import StyledMoveButton, GridViewWidget
+        sage: from sage.combinat.partition import Partitions
+        sage: w = GridViewWidget(Partitions(1).an_element())
+        sage: b = StyledMoveButton(w, 'forward')
+        Traceback (most recent call last):
+        ...
+        TraitError: Element of the '_dom_classes' trait of a StyledMoveButton instance must be a unicode string, but a value of None <type 'NoneType'> was specified.
+    """
+    description = None
+    referent = None
+
+    def __init__(self, referent, direction, layout=buttoncell_smaller_layout, description=''):
+        super(StyledMoveButton, self).__init__(layout=layout, description=description)
+        self.referent = referent
+        self.direction = direction
+
+    def on_click(self):
+        self.referent.move(self.direction)
+
+def styled_move_button(disabled=False, style_name='movebutton'):
+    r"""A function to create CSS-styled push buttons.
+    with handlers to handle forward/backward moves.
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import styled_move_button, GridViewWidget
+        sage: from sage.combinat.partition import Partitions
+        sage: w = GridViewWidget(Partitions(1).an_element())
+        sage: b = styled_move_button(style_name='mycssclass')
+        sage: b
+        <class 'traitlets.traitlets.MycssclassMoveButton'>
+    """
+    class_name = "{}MoveButton".format(style_name.capitalize())
+    return type(class_name, (StyledMoveButton,), {'disable': disabled, 'css_class': style_name})
+
 def get_model_id(w):
     r"""
     For some reason, our widgets seem to lose their model_id
@@ -301,7 +341,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                  cell_widget_classes=[TextCell], cell_widget_class_index=lambda x:0,
                  blank_widget_class=BlankCell, addable_widget_class=AddableTextCell,
                  move_button_layout=None,
-                 move_button_class=styled_push_button(style_name='movebutton')):
+                 move_button_class=styled_move_button()):
         r"""
         Grid View Widget initialization.
 
@@ -355,7 +395,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         self.blank_widget_class = blank_widget_class
         if hasattr(self.adapter, 'move_forward') and hasattr(self.adapter, 'move_backward'):
             self.move_buttons = True
-            self.move_button_class = move_button_class 
+            self.move_button_class = move_button_class
         else:
             self.move_buttons = False
             self.move_button_class = None
@@ -510,8 +550,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         if self.display_convention == 'fr':
             vbox_children.reverse()
         if self.move_buttons:
-            b_forward = self.move_button_class(description='+', disabled=False)
-            b_backward = self.move_button_class(description='-', disabled=False)
+            b_forward = self.move_button_class(self, 'forward', description='+')
+            b_backward = self.move_button_class(self, 'backward', description='-')
             self.children = [ HBox( [VBox(vbox_children), HBox(b_backward, b_forward)] ) ]
         else:
             self.children = vbox_children

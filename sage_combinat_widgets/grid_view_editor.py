@@ -667,30 +667,12 @@ class GridViewEditor(BindableEditorClass):
         obj = self.adapter.remove_column(obj, index)
         self.set_value(obj, True) # Will take care of everything
 
-    @traitlets.observe(traitlets.All)
-    def move_forward(self, change):
+    def move(self, direction):
         r"""
-        Move forward in some user-defined process. Plus button.
+        Move forward in some user-defined process and direction.
         """
-        if self.initialization:
-            return
-        if not hasattr(self.adapter, 'move_forward'):
-            print(change)
-            raise TypeError("No forward move is implemented for this object.")
+        if not hasattr(self.adapter, 'move'):
+            raise TypeError("No move method is implemented for this object.")
         obj = copy(self.value)
-        obj = self.adapter.move_forward(obj)
-        self.set_value(obj, True) # Will take care of everything
-
-    @traitlets.observe(traitlets.All)
-    def move_backward(self, change):
-        r"""
-        Move forward in some user-defined process. Minus button.
-        """
-        if self.initialization:
-            return
-        if not hasattr(self.adapter, 'move_backward'):
-            print(change)
-            raise TypeError("No backward move is implemented for this object.")
-        obj = copy(self.value)
-        obj = self.adapter.move_backward(obj)
+        obj = self.adapter.move(obj, direction)
         self.set_value(obj, True) # Will take care of everything
