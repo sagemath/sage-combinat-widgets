@@ -6,11 +6,10 @@ AUTHORS: Odile Bénassy, Nicolas Thiéry
 """
 from .grid_view_editor import *
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, ValueWidget, register
+from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, Button, ValueWidget, register
 from sage.misc.misc import uniq
 from six import text_type
 from traitlets import Unicode
-from _hashlib import openssl_md5 as md5
 
 textcell_layout = Layout(width='3em', height='2em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em', height='3em', margin='0', padding='0')
@@ -173,14 +172,17 @@ class StyledButtonCell(ButtonCell):
         ...
         TraitError: Element of the '_dom_classes' trait of a StyledButtonCell instance must be a unicode string, but a value of None <type 'NoneType'> was specified.
     """
-    disabled = False
+    disable = None
     css_class = None
     def __init__(self, content, position, layout=buttoncell_smaller_layout, **kws):
         super(StyledButtonCell, self).__init__(content, position, layout, **kws)
         self.add_class(self.css_class)
+        if self.disable:
+            self.disabled = True
 
 def styled_button(disabled=False, style_name=''):
     r"""A function to create CSS-styled buttons.
+    A regular button has a value and a position.
 
     TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import styled_button
@@ -190,7 +192,7 @@ def styled_button(disabled=False, style_name=''):
     class_name = "{}Button".format(style_name.capitalize())
     if disabled:
         class_name = "Disabled" + class_name
-    return type(class_name, (StyledButtonCell,), {'disabled': disabled, 'css_class': style_name})
+    return type(class_name, (StyledButtonCell,), {'disable': disabled, 'css_class': style_name})
 
 DisabledButtonCell = styled_button(disabled=True)
 r"""A disabled button cell.
@@ -204,6 +206,7 @@ TESTS::
 
 class AddableButtonCell(ButtonCell):
     r"""An addable placeholder for adding a button cell to the widget
+    An addable button has a position.
 
     TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import AddableButtonCell
@@ -215,18 +218,50 @@ class AddableButtonCell(ButtonCell):
         self.description = '+'
         self.tooltip = "Click to add a cell here"
 
-class BlankButton(ToggleButton):
-    r"""A blank placeholder button
+class StyledPushButton(Button):
+    r"""A class for CSS-styled push buttons.
+    Not meant to be called directly.
 
     TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import BlankButton
-        sage: b = BlankButton()
+        sage: from sage_combinat_widgets.grid_view_widget import StyledPushButton
+        sage: b = StyledPushButton()
+        Traceback (most recent call last):
+        ...
+        TraitError: Element of the '_dom_classes' trait of a StyledPushButton instance must be a unicode string, but a value of None <type 'NoneType'> was specified.
     """
-    def __init__(self, layout=buttoncell_smaller_layout):
-        super(BlankButton, self).__init__()
-        self.disabled=True
-        self.layout = buttoncell_smaller_layout
-        self.add_class('blankbutton')
+    disable = None
+    css_class = None
+    def __init__(self, layout=buttoncell_smaller_layout, description=''):
+        super(StyledPushButton, self).__init__()
+        self.layout=layout
+        self.description=description
+        self.add_class(self.css_class)
+        if self.disable:
+            self.disabled = True
+
+def styled_push_button(disabled=False, style_name=''):
+    r"""A function to create CSS-styled push buttons.
+    A push button has neither value nor position.
+
+    TESTS::
+        sage: from sage_combinat_widgets.grid_view_widget import styled_push_button
+        sage: styled_push_button(style_name='mycssclass')
+        <class 'traitlets.traitlets.MycssclassPushButton'>
+    """
+    class_name = "{}PushButton".format(style_name.capitalize())
+    if disabled:
+        class_name = "Disabled" + class_name
+    return type(class_name, (StyledPushButton,), {'disable': disabled, 'css_class': style_name})
+
+BlankButton = styled_push_button(disabled=True, style_name='.blankbutton')
+r"""A blank placeholder button.
+
+TESTS::
+    sage: from sage_combinat_widgets.grid_view_widget import BlankButton
+    sage: b = BlankButton()
+    sage: b.disabled
+    True
+"""
 
 def get_model_id(w):
     r"""
@@ -375,7 +410,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         Used classes can be passed as arguments
         to enable changing shapes, colors ..
         """
-        self.initialization = True # Suppress any interactivity while drawing the widget
+        self.initialization = True # Prevent any interactivity while drawing the widget
         self.reset_links()
         self.compute_height()
         positions = sorted(list(self.cells.keys()))
@@ -399,9 +434,9 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             r = rows[i]
             if not r: # Empty row!
                 if (i,0) in addable_positions:
-                    vbox_children.append(HBox((addable_widget_class((i,0), self.cell_layout),)))
+                    vbox_children.append(HBox((addable_widget_class((i,0), layout=self.cell_layout),)))
                 else:
-                    vbox_children.append(HBox((blank_widget_class(self.cell_layout),)))
+                    vbox_children.append(HBox((blank_widget_class(layout=self.cell_layout),)))
                 continue
             j = 0
             hbox_children = []
@@ -433,7 +468,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             vbox_children.append(HBox(hbox_children))
         for row in addable_rows:
             if row[0] > i:
-                vbox_children.append(HBox([self.addable_widget_class((i,j), layout=self.cell_layout) for c in row[1]]))
+                vbox_children.append(HBox(
+                    [self.addable_widget_class((i,j), layout=self.cell_layout) for c in row[1]]))
         if self.display_convention == 'fr':
             vbox_children.reverse()
         self.children = vbox_children
@@ -482,4 +518,5 @@ def PartitionGridViewWidget(obj, display_convention='en'):
         sage: len(w.links)
         17
     """
-    return GridViewWidget(obj, cell_widget_classes=[ButtonCell], addable_widget_class=AddableButtonCell, display_convention=display_convention)
+    return GridViewWidget(obj, cell_widget_classes=[ButtonCell],
+                          addable_widget_class=AddableButtonCell, display_convention=display_convention)
