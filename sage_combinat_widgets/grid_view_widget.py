@@ -391,7 +391,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             self.displaytype = None # Stateless cells
         self.cast = lambda x:self.adapter.display_to_cell(x, self.displaytype)
         self.blank_widget_class = blank_widget_class
-        if hasattr(self.adapter, 'move_forward') and hasattr(self.adapter, 'move_backward'):
+        if self.move_actions:
             self.move_buttons = True
             self.move_button_class = move_button_class
         else:
