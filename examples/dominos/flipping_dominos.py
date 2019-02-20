@@ -217,11 +217,8 @@ class DominosWidget(GridViewWidget):
                                             ],
                                             cell_widget_class_index=make_cell_widget_class_index(g),
                                             blank_widget_class = BlankButton)
-        #self.dominos = None # clé = coord top-left du domino
-        #self.reset()
-        #self.apply_matching(self.value.matching)
 
-    def draw(self): # FIXME il faut probablement aussi demander aux dominos de se recalculer
+    def draw(self):
         self.dominos = {}
         super(DominosWidget, self).draw()
         self.apply_matching(self.value.matching)
@@ -232,7 +229,7 @@ class DominosWidget(GridViewWidget):
             assert issubclass(b1.__class__, ButtonCell) and issubclass(b2.__class__, ButtonCell)
         except:
             raise Exception('This method requires 2 buttons!! b1 = %s, b2 = %s' % (b1, b2) )
-        """Create a domino and let it do the work."""
+        """Create a domino and let it do the work. NB: the key should always be top-left."""
         d = Domino(self, b1, b2)
         self.dominos[d.key] = d
 
@@ -246,26 +243,3 @@ class DominosWidget(GridViewWidget):
         for d in matching:
             self.match(self.children[d.first[0]].children[d.first[1]],
                        self.children[d.second[0]].children[d.second[1]])
-
-    def find_possible_flips(self, key):
-        "Return list of neighbouring dominos, with same direction as self.dominos[key]"
-        d = self.dominos[key]
-        pos1, pos2 = d.geometry.first, d.geometry.second
-        if (pos1, pos2) in self.value.matching:
-            m = (pos1, pos2)
-        elif (pos2, pos1) in self.value.matching:
-            m = (pos2, pos1)
-        else:
-            return []
-        possible_flips = []
-        for n in d.geometry.neighbors():
-            if n[0] in self.dominos:
-                possible_flips.append((n[0]))
-            elif n[1] in self.dominos:
-                possible_flips.append((n[1]))
-        for n in d.geometry.reverse().neighbors():
-            if n[0] in self.dominos:
-                possible_flips.append((n[0]))
-            elif n[1] in self.dominos:
-                possible_flips.append((n[1]))
-        return possible_flips

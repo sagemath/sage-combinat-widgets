@@ -22,6 +22,13 @@ class DominoGeometry:
         assert issubclass(other.__class__, DominoGeometry)
         return self.first == other.first and self.second == other.second
 
+    def __lt__(self, other):
+        assert issubclass(other.__class__, DominoGeometry)
+        if other.direction != self.direction:
+            return False
+        return (self.first < other.first and self.second < other.second) \
+            or (self.first < other.second and self.second < other.first)
+
     def compute(self):
         r"""Compute domino direction and orientation."""
         if self.first[0] == self.second[0]: # same row
@@ -105,9 +112,9 @@ class FlippingAztecDiamond(Graph):
     def flip(d1, d2):
         """d1 and d2 are dominos"""
         if d1 < d2:
-            d2.flip(d1)
-        else:
             d1.flip(d2)
+        else:
+            d2.flip(d1)
 
 class DominosAdapter(GraphGridViewAdapter):
     def set_cell(self, obj, pos, val=True, dirty={}):
@@ -116,10 +123,8 @@ class DominosAdapter(GraphGridViewAdapter):
         we prepare a possible flip
         or we try to complete the flip if it has been prepared previously
         """
-        print(pos, val, dirty)
         # Find out the relevant matching for 'pos'
         d1 = obj.domino_for_position(pos)
-        print("d1 =", d1)
         if dirty: # if i'm a neighbor, then flip and return a new obj ; else return an error
             # Consider the relevant matching(s)
             for p in dirty:
@@ -128,9 +133,7 @@ class DominosAdapter(GraphGridViewAdapter):
                 d2 = obj.domino_for_position(p)
                 if d2 == d1:
                     continue
-                print("d2 =", d2)
                 if d2 in d1.neighbors():
-                    print('flipping!')
                     # Do the flip
                     obj.flip(d1, d2)
                     return obj
