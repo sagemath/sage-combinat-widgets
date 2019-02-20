@@ -17,7 +17,9 @@ Grid View Adapter for tableaux
     :meth:`~StandardTableauGridViewAdapter.removable_cells` | List removable cells (StandardTableau)
     :meth:`~TableauGridViewAdapter.remove_cell` | Remove a cell
 
-AUTHORS: Odile Bénassy, Nicolas Thiéry
+AUTHORS ::
+
+    Odile Bénassy, Nicolas Thiéry
 
 """
 from sage.combinat.tableau import *
@@ -44,7 +46,8 @@ class TableauGridViewAdapter(GridViewAdapter):
         From a tableau,
         return a dictionary { coordinates pair : Integer }
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.tableau import Tableau
             sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
             sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
@@ -59,7 +62,8 @@ class TableauGridViewAdapter(GridViewAdapter):
         From a dictionary { coordinates pair : Integer }
         return a corresponding tableau
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.tableau import Tableau
             sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
             sage: TableauGridViewAdapter.from_cells({(0, 0): 1, (0, 1): 2, (0, 2): 5, (0, 3): 6, (1, 0): 3, (2, 0): 4})
@@ -82,7 +86,8 @@ class TableauGridViewAdapter(GridViewAdapter):
         r"""
         List object addable cells
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.tableau import Tableau
             sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
             sage: t = Tableau([[1, 3, 4, 8, 12, 14, 15], [2, 7, 11, 13], [5, 9], [6, 10]])
@@ -106,7 +111,8 @@ class TableauGridViewAdapter(GridViewAdapter):
         r"""
         List object removable cells
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.tableau import Tableau
             sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
@@ -119,7 +125,8 @@ class TableauGridViewAdapter(GridViewAdapter):
         r"""
         Add cell
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.tableau import Tableau
             sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
@@ -147,7 +154,8 @@ class TableauGridViewAdapter(GridViewAdapter):
         r"""
         Remove cell
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.tableau import Tableau
             sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import TableauGridViewAdapter
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])

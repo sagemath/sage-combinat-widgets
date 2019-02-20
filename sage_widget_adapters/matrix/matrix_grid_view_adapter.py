@@ -21,7 +21,9 @@ Grid View Adapter for matrices
     :meth:`~MatrixGridViewAdapter.insert_column` | Insert a column at given index
     :meth:`~MatrixGridViewAdapter.remove_column` | Remove a column at given index
 
-AUTHORS: Odile Bénassy, Nicolas Thiéry
+AUTHORS ::
+
+    Odile Bénassy, Nicolas Thiéry
 
 """
 from sage.matrix.matrix2 import Matrix
@@ -42,7 +44,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Init an adapter object, set attributes `celltype` and `cellzero`.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: from sage.matrix.constructor import Matrix
             sage: m = Matrix(QQ, 3, 3, range(9))/2
@@ -73,7 +76,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         From a widget display value `display_value`,
         return matching cell value.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.constructor import Matrix
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: m = Matrix(QQ, 3, 2, range(6))/2
@@ -101,7 +105,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         From a matrix `obj`,
         return a dictionary { coordinates pair : cell value (as a Sage object) }
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: from sage.matrix.constructor import Matrix
             sage: m = Matrix(QQ, 3, 2, range(6))/2
@@ -116,7 +121,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         From a dictionary { coordinates pair : integer },
         return a matrix with corresponding cells.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: from sage.matrix.constructor import Matrix
             sage: MatrixGridViewAdapter.from_cells({(0, 0): 0, (0, 1): 1/2, (0, 2): 1, (1, 0): 3/2, (1, 1): 2, (1, 2): 5/2})
@@ -133,7 +139,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         No cell should be added in isolation
         except for vectors
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.constructor import Matrix
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: m = Matrix(QQ, 2, 3, range(6))/2
@@ -152,7 +159,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         No cell should be removed in isolation
         except for vectors
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.constructor import Matrix
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
             sage: m = Matrix(QQ, 2, 3, range(6))/2
@@ -169,7 +177,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Append a row to a matrix.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -195,7 +204,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Insert a row into a matrix.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -224,7 +234,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Remove a row from a matrix.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
@@ -247,7 +258,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Append a column to a matrix.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -278,7 +290,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Insert a column into a matrix.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -312,7 +325,8 @@ class MatrixGridViewAdapter(GridViewAdapter):
         r"""
         Remove a column from a matrix.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter

@@ -47,14 +47,10 @@ sys.path.append(os.path.join(SAGE_SRC, "sage_setup", "docbuild", "ext"))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    #'sphinx.ext.autodoc',
     'sage_autodoc',
     'sage_package.sphinx',
     'sphinx.ext.doctest',
-    #'sphinx.ext.todo',
     'sphinx.ext.coverage',
-    #'sphinx.ext.mathjax',
-    #'sphinx.ext.extlinks',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

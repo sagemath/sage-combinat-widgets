@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 r"""
-An editable Grid View Widget for Sage Jupyter Notebook
+An editable Grid View Widget for Sage Jupyter Notebook.
 
-AUTHORS: Odile Bénassy, Nicolas Thiéry
+AUTHORS ::
+
+    Odile Bénassy, Nicolas Thiéry
+
 """
 from .grid_view_editor import *
 from sage.graphs.generic_graph import GenericGraph
@@ -69,7 +72,8 @@ class BaseTextCell(TextWithTooltip):
 class TextCell(BaseTextCell):
     r"""A regular text grid cell
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import TextCell
         sage: b = TextCell('my text', (1,2))
     """
@@ -79,7 +83,8 @@ class TextCell(BaseTextCell):
 class WiderTextCell(BaseTextCell):
     r"""A regular text grid cell
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import WiderTextCell
         sage: b = WiderTextCell('my text', (1,2))
     """
@@ -89,7 +94,8 @@ class WiderTextCell(BaseTextCell):
 class BlankCell(Text):
     r"""A blank placeholder cell
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import BlankCell
         sage: b = BlankCell()
     """
@@ -105,7 +111,8 @@ class BlankCell(Text):
 class AddableTextCell(BaseTextCell):
     r"""An addable placeholder for adding a cell to the widget
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import AddableTextCell
         sage: a = AddableTextCell((3,4))
     """
@@ -116,7 +123,8 @@ class AddableTextCell(BaseTextCell):
 class DisabledTextCell(BaseTextCell):
     r"""A disabled text grid cell
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import DisabledTextCell
         sage: b = DisabledTextCell('my text', (1,2))
     """
@@ -127,7 +135,8 @@ class DisabledTextCell(BaseTextCell):
 class ButtonCell(ToggleButton):
     r"""A base class for button grid cells.
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
         sage: b = ButtonCell(True, (1,2))
     """
@@ -146,7 +155,8 @@ class ButtonCell(ToggleButton):
         we just want the string 'i,j'
         to use as a tooltip on buttons.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_combinat_widgets.grid_view_widget import ButtonCell
             sage: b = ButtonCell(True, (42, 7))
             sage: b.set_tooltip()
@@ -165,7 +175,8 @@ class StyledButtonCell(ButtonCell):
     r"""A class for CSS-styled button grid cells.
     Not meant to be called directly.
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import StyledButtonCell
         sage: b = StyledButtonCell(True, (1,2))
         Traceback (most recent call last):
@@ -181,7 +192,8 @@ class StyledButtonCell(ButtonCell):
 def styled_button(disabled=False, style_name=''):
     r"""A function to create CSS-styled buttons.
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import styled_button
         sage: styled_button(disabled=True, style_name='mycssclass')
         <class 'traitlets.traitlets.DisabledMycssclassButton'>
@@ -194,7 +206,8 @@ def styled_button(disabled=False, style_name=''):
 DisabledButtonCell = styled_button(disabled=True)
 r"""A disabled button cell.
 
-TESTS::
+TESTS ::
+
     sage: from sage_combinat_widgets.grid_view_widget import DisabledButtonCell
     sage: b = DisabledButtonCell(True, (1,2))
     sage: b.disabled
@@ -204,7 +217,8 @@ TESTS::
 class AddableButtonCell(ButtonCell):
     r"""An addable placeholder for adding a button cell to the widget
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import AddableButtonCell
         sage: a = AddableButtonCell((3,4))
     """
@@ -217,7 +231,8 @@ class AddableButtonCell(ButtonCell):
 class BlankButton(ToggleButton):
     r"""A blank placeholder button
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import BlankButton
         sage: b = BlankButton()
     """
@@ -251,7 +266,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             - ``blank_widget_class``: a widget class for building blank cells
             - ``addable_widget_class``: a widget class for building blank cells
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_combinat_widgets.grid_view_widget import *
             sage: t = StandardTableaux(15).random_element()
             sage: w = GridViewWidget(t)
@@ -299,7 +315,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         From a widget cell value `val`,
         return a valid editor cell value.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
             sage: t = StandardTableaux(5).random_element()
             sage: w = GridViewWidget(t)
@@ -313,7 +330,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         Link each individual widget cell
         to its corresponding trait in the editor
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.tableau import StandardTableaux
             sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
             sage: t = StandardTableaux(15).random_element()
@@ -443,7 +461,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         r"""
         Get child widget corresponding to self.cells[pos]
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_combinat_widgets.grid_view_widget import GridViewWidget
             sage: t = StandardTableau([[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]])
             sage: w1 = GridViewWidget(t)
@@ -474,7 +493,8 @@ def PartitionGridViewWidget(obj, display_convention='en'):
     r"""
     A default widget for partitions.
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_widget import PartitionGridViewWidget
         sage: sp = SkewPartition([[7, 4, 2, 1],[2, 1, 1]])
         sage: w = PartitionGridViewWidget(sp,  display_convention='fr')
