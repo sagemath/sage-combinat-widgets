@@ -178,7 +178,7 @@ setup_args = {
         'sdist': js_prerelease(sdist, strict=True),
         'jsdeps': NPM,
     },
-    'install_requires': ['ipywidgets>=7.0.0']
+    'install_requires': ['ipywidgets>=7.0.0', 'sage-package', 'sphinx']
 }
 
 setup(**setup_args)
