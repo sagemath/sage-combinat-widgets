@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 r"""
-An editable Grid View Editor for Sage objects
+An editable Grid View Editor for Sage objects.
 
-EXAMPLES::
+EXAMPLES ::
+
     sage: from sage_combinat_widgets import GridViewEditor
     sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
     sage: e = GridViewEditor(t)
@@ -15,7 +16,10 @@ EXAMPLES::
     sage: A = matrix(R, 3, 3, R.gens())
     sage: e = GridViewEditor(A)
 
-AUTHORS: Odile Bénassy, Nicolas Thiéry
+AUTHORS ::
+
+    Odile Bénassy, Nicolas Thiéry
+
 """
 import re, traitlets
 from six import add_metaclass
@@ -29,7 +33,8 @@ def extract_coordinates(s):
     r"""
     Extract a coordinate pair from a string with tokens.
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_editor import extract_coordinates
         sage: extract_coordinates('add_0_4')
         (0, 4)
@@ -49,7 +54,8 @@ def get_adapter(obj):
 
     OUTPUT: an adapter object
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_combinat_widgets.grid_view_editor import get_adapter
         sage: from sage.combinat.partition import Partition
         sage: p = Partition([3,2,1,1])
@@ -127,7 +133,8 @@ class GridViewEditor(BindableEditorClass):
             - ``obj`` -- a Sage object
             - ``adapter`` -- an adapter object (optional)
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_combinat_widgets import GridViewEditor
             sage: from sage.graphs.generic_graph import GenericGraph
             sage: e = GridViewEditor(graphs.AztecDiamondGraph(2))
@@ -247,7 +254,8 @@ class GridViewEditor(BindableEditorClass):
         r"""
         Compute grid height, addable cells included.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_combinat_widgets import GridViewEditor
             sage: from sage.combinat.partition import Partition
             sage: e = GridViewEditor(Partition([3,3,2,1]))
@@ -364,7 +372,8 @@ class GridViewEditor(BindableEditorClass):
     @traitlets.observe(traitlets.All)
     def set_cell(self, change):
         r"""
-        TESTS::
+        TESTS ::
+
             sage: from sage_combinat_widgets import GridViewEditor
             sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
             sage: e = GridViewEditor(t)
@@ -471,7 +480,8 @@ class GridViewEditor(BindableEditorClass):
     @traitlets.observe(traitlets.All)
     def remove_cell(self, change):
         r"""
-        TESTS::
+        TESTS ::
+
             sage: from sage_combinat_widgets import GridViewEditor
             sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
             sage: e = GridViewEditor(t)
@@ -528,7 +538,8 @@ class GridViewEditor(BindableEditorClass):
         r"""
         Append a row to editor value.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_combinat_widgets import GridViewEditor
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
@@ -593,7 +604,8 @@ class GridViewEditor(BindableEditorClass):
         r"""
         Append a column to editor value.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_combinat_widgets import GridViewEditor
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)

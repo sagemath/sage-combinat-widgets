@@ -27,7 +27,9 @@ Generic Grid View Adapter
     :meth:`~GridViewAdapter.insert_column` | Insert a column at given index
     :meth:`~GridViewAdapter.remove_column` | Remove a column at given index
 
-AUTHORS: Odile Bénassy, Nicolas Thiéry
+AUTHORS ::
+
+    Odile Bénassy, Nicolas Thiéry
 
 """
 import traitlets, sage.all
@@ -40,7 +42,8 @@ def eval_in_main(s):
     """
     Evaluate the expression `s` in the global scope
 
-    TESTS::
+    TESTS ::
+
         sage: from sage_widget_adapters.generic_grid_view_adapter import eval_in_main
         sage: from sage.combinat.tableau import Tableaux
         sage: eval_in_main("Tableaux")
@@ -56,6 +59,7 @@ class GridViewAdapter(object):
     A generic grid view adapter.
 
     ATTRIBUTES::
+
         * ``objclass`` -- object class for this adapter
         * ``constructorname`` -- name of the constructor that builds a math object from a list
         * ``traitclass`` -- cells trait class
@@ -77,7 +81,8 @@ class GridViewAdapter(object):
         From a cell value `cell_content`,
         return widget display value.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: from six import text_type
             sage: GridViewAdapter.cell_to_display(1, text_type)
@@ -94,7 +99,8 @@ class GridViewAdapter(object):
         From an unicode string `s`,
         return matching cell value.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: a = GridViewAdapter()
             sage: from six import text_type
@@ -121,7 +127,8 @@ class GridViewAdapter(object):
         From an object `obj`,
         Try to build an object of type `cls`.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: assert issubclass(GridViewAdapter._validate(pi).__class__, SageObject)
             sage: from sage.matrix.constructor import matrix
@@ -150,7 +157,8 @@ class GridViewAdapter(object):
         From an object and a tuple `pos`,
         return the object cell value at position `pos`.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.constructor import Matrix
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: m = Matrix(QQ, 3, 3, range(9))/2
@@ -205,7 +213,8 @@ class GridViewAdapter(object):
         return a new Sage object.
         with a modified cell at position `pos`.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
             sage: from sage.combinat.tableau import Tableau
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
@@ -272,7 +281,8 @@ class GridViewAdapter(object):
         This method should try to append a row to object `obj`
         with values from list `r`.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -290,7 +300,8 @@ class GridViewAdapter(object):
         This method should try to insert a row to object `obj`
         at index `index`, with values from list `r`.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -306,7 +317,8 @@ class GridViewAdapter(object):
         r"""
         An alias for appending/inserting a row.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -334,7 +346,8 @@ class GridViewAdapter(object):
         This method should try to remove a row from object `obj`
         at index `index`.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -352,7 +365,8 @@ class GridViewAdapter(object):
         This method should try to append a column to object `obj`
         with values from list `r`.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -370,7 +384,8 @@ class GridViewAdapter(object):
         This method should try to insert a column to object `obj`
         at index `index`, with values from list `r`.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -388,7 +403,8 @@ class GridViewAdapter(object):
         This method should try to remove a column from object `obj`
         at index `index`.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
@@ -404,7 +420,8 @@ class GridViewAdapter(object):
         r"""
         An alias for appending/inserting a column.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.matrix.matrix_space import MatrixSpace
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])

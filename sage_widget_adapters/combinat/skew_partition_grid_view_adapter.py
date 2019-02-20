@@ -19,7 +19,9 @@ Grid View Adapter for skew partitions
     :meth:`~SkewPartitionGridViewAdapter.add_cell` | Add a cell
     :meth:`~SkewPartitionGridViewAdapter.remove_cell` | Remove a cell
 
-AUTHORS: Odile Bénassy, Nicolas Thiéry
+AUTHORS ::
+
+    Odile Bénassy, Nicolas Thiéry
 
 """
 from sage.combinat.skew_partition import *
@@ -45,7 +47,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         From object cell content
         to widget display value.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: SkewPartitionGridViewAdapter.cell_to_display(True)
             True
@@ -62,7 +65,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         From widget cell value
         to object display content
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: pa = SkewPartitionGridViewAdapter()
             sage: pa.display_to_cell(True)
@@ -80,7 +84,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         From a skew partition,
         return a dictionary { coordinates pair : Integer }
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.skew_partition import SkewPartition
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: sp = SkewPartition([[4, 2, 1],[2, 1]])
@@ -95,7 +100,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         From a dictionary { coordinates pair : Integer }
         return a corresponding skew partition.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.skew_partition import SkewPartition
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: SkewPartitionGridViewAdapter.from_cells({(0, 2): False, (0, 3): False, (1, 1): False, (2, 0): False})
@@ -116,7 +122,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         r"""
         Get cell value
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.skew_partition import SkewPartition
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: sp = SkewPartition([[4, 2, 1],[2, 1]])
@@ -139,7 +146,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         return a new partition with a modified cell at position `pos`.
         Actually remove the cell if it's removable, otherwise return the same partition.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.skew_partition import SkewPartition
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: sp = SkewPartition([[7, 4, 2, 1],[2, 1, 1]])
@@ -158,7 +166,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         r"""
         List object addable cells
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.skew_partition import SkewPartition
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: sp = SkewPartition([[4, 2, 1],[2, 1]])
@@ -172,7 +181,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         r"""
         List object removable cells
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.skew_partition import SkewPartition
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: SkewPartitionGridViewAdapter.removable_cells(SkewPartition([[4, 2, 1],[2, 1]]))
@@ -190,7 +200,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         r"""
         Add cell
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.skew_partition import SkewPartition
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: sp = SkewPartition([[7, 4, 2, 1],[2, 1, 1]])
@@ -220,7 +231,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         r"""
         Remove cell
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.skew_partition import SkewPartition
             sage: from sage_widget_adapters.combinat.skew_partition_grid_view_adapter import SkewPartitionGridViewAdapter
             sage: sp = SkewPartition([[7, 4, 2, 1],[2, 1, 1]])

@@ -19,7 +19,9 @@ Grid View Adapter for partitions
     :meth:`~PartitionGridViewAdapter.add_cell` | Add a cell
     :meth:`~PartitionGridViewAdapter.remove_cell` | Remove a cell
 
-AUTHORS: Odile Bénassy, Nicolas Thiéry
+AUTHORS ::
+
+    Odile Bénassy, Nicolas Thiéry
 
 """
 from sage.combinat.partition import *
@@ -46,7 +48,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
         From object cell content
         to widget display value.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: PartitionGridViewAdapter.cell_to_display(True)
             True
@@ -63,7 +66,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
         From widget cell value
         to object display content
 
-        TESTS::
+        TESTS ::
+
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: pa = PartitionGridViewAdapter()
             sage: pa.display_to_cell(True)
@@ -81,7 +85,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
         From a partition,
         return a dictionary { coordinates pair : Integer }
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([3, 2, 1, 1])
@@ -102,7 +107,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
         From a dictionary { coordinates pair : Integer }
         return a corresponding partition
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: PartitionGridViewAdapter.from_cells({(0, 0): False, (0, 1): False, (0, 2): True, (0, 3): False, (1, 0): False, (2, 0): True})
@@ -121,7 +127,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         Get cell value
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
@@ -144,7 +151,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
         return a new partition with a modified cell at position `pos`.
         Actually remove the cell if it's removable, otherwise return the same partition.
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
@@ -163,7 +171,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         List object addable cells
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
@@ -177,7 +186,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         List object removable cells
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
@@ -190,7 +200,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         Add cell
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
@@ -215,7 +226,8 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         Remove cell
 
-        TESTS::
+        TESTS ::
+
             sage: from sage.combinat.partition import Partition
             sage: from sage_widget_adapters.combinat.partition_grid_view_adapter import PartitionGridViewAdapter
             sage: p = Partition([6, 5, 2, 1])
