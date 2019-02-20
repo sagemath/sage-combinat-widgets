@@ -134,9 +134,10 @@ class ButtonCell(ToggleButton):
     displaytype = bool
 
     def __init__(self, content, position, layout=buttoncell_smaller_layout, **kws):
+        # FIXME unpack **kws
         super(ButtonCell, self).__init__()
-        self.value = content
         self.layout = layout
+        self.value = content
         self.position = position
         self.add_class('gridbutton')
         self.set_tooltip()
@@ -180,13 +181,13 @@ class StyledButtonCell(ButtonCell):
         if self.disable:
             self.disabled = True
 
-def styled_button(disabled=False, style_name=''):
+def styled_button_cell(disabled=False, style_name=''):
     r"""A function to create CSS-styled buttons.
     A regular button has a value and a position.
 
     TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import styled_button
-        sage: styled_button(disabled=True, style_name='mycssclass')
+        sage: from sage_combinat_widgets.grid_view_widget import styled_button_cell
+        sage: styled_button_cell(disabled=True, style_name='mycssclass')
         <class 'traitlets.traitlets.DisabledMycssclassButton'>
     """
     class_name = "{}Button".format(style_name.capitalize())
@@ -194,7 +195,7 @@ def styled_button(disabled=False, style_name=''):
         class_name = "Disabled" + class_name
     return type(class_name, (StyledButtonCell,), {'disable': disabled, 'css_class': style_name})
 
-DisabledButtonCell = styled_button(disabled=True)
+DisabledButtonCell = styled_button_cell(disabled=True)
 r"""A disabled button cell.
 
 TESTS::
@@ -245,22 +246,25 @@ def styled_push_button(disabled=False, style_name=''):
 
     TESTS::
         sage: from sage_combinat_widgets.grid_view_widget import styled_push_button
-        sage: styled_push_button(style_name='mycssclass')
-        <class 'traitlets.traitlets.MycssclassPushButton'>
+        sage: styled_push_button(style_name='mycssclass').__name__
+        'MycssclassPushButton'
     """
     class_name = "{}PushButton".format(style_name.capitalize())
     if disabled:
         class_name = "Disabled" + class_name
     return type(class_name, (StyledPushButton,), {'disable': disabled, 'css_class': style_name})
 
-BlankButton = styled_push_button(disabled=True, style_name='.blankbutton')
+BlankButton = styled_push_button(disabled=True, style_name='blankbutton')
 r"""A blank placeholder button.
 
 TESTS::
     sage: from sage_combinat_widgets.grid_view_widget import BlankButton
     sage: b = BlankButton()
+    sage: b.__class__.__name__
+    'DisabledBlankbuttonPushButton'
     sage: b.disabled
     True
+    sage: assert 'blankbutton' in b._dom_classes
 """
 
 def get_model_id(w):
@@ -323,7 +327,10 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         self.cell_layout = cell_layout
         self.cell_widget_classes = cell_widget_classes
         self.cell_widget_class_index = cell_widget_class_index
-        self.displaytype = cell_widget_classes[0].displaytype
+        try:
+            self.displaytype = cell_widget_classes[0].displaytype
+        except:
+            self.displaytype = None # Stateless cells
         self.cast = lambda x:self.adapter.display_to_cell(x, self.displaytype)
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class

@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from flipping_aztecdiamond import *
-from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, styled_button
+from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, styled_button_cell
 from ipywidgets import Layout, HTML
 from traitlets import dlink, HasTraits, Bool, observe
 from contextlib import contextmanager
@@ -209,11 +209,11 @@ class DominosWidget(GridViewWidget):
         """
         super(DominosWidget, self).__init__(g, adapter = DominosAdapter(),
                                             cell_layout = smallblyt,
-                                            cell_widget_classes=[styled_button(),
-                                                                 styled_button(style_name='b1'),
-                                                                 styled_button(style_name='b2'),
-                                                                 styled_button(style_name='b3'),
-                                                                 styled_button(style_name='b4'),
+                                            cell_widget_classes=[styled_button_cell(),
+                                                                 styled_button_cell(style_name='b1'),
+                                                                 styled_button_cell(style_name='b2'),
+                                                                 styled_button_cell(style_name='b3'),
+                                                                 styled_button_cell(style_name='b4'),
                                             ],
                                             cell_widget_class_index=make_cell_widget_class_index(g),
                                             blank_widget_class = BlankButton)
