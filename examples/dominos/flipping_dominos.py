@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from flipping_aztecdiamond import *
-from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, styled_button_with_layout
+from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, styled_button
 from ipywidgets import Layout, HTML
 from traitlets import dlink, HasTraits, Bool, observe
 from contextlib import contextmanager
@@ -199,11 +199,6 @@ def make_cell_widget_class_index(g):
         return 0
     return cell_widget_class_index
 
-class SmallBlank(BlankButton):
-    def __init__(self, layout, **kws):
-        super(SmallBlank, self).__init__(**kws)
-        self.layout = smallblyt
-
 class DominosWidget(GridViewWidget):
     """A widget with dominos"""
 
@@ -213,14 +208,15 @@ class DominosWidget(GridViewWidget):
         with flipping aztec diamond graph `g`
         """
         super(DominosWidget, self).__init__(g, adapter = DominosAdapter(),
-                                            cell_widget_classes=[styled_button_with_layout(layout=smallblyt),
-                                                                 styled_button_with_layout(style_name='b1', layout=smallblyt),
-                                                                 styled_button_with_layout(style_name='b2', layout=smallblyt),
-                                                                 styled_button_with_layout(style_name='b3', layout=smallblyt),
-                                                                 styled_button_with_layout(style_name='b4', layout=smallblyt),
+                                            cell_layout = smallblyt,
+                                            cell_widget_classes=[styled_button(),
+                                                                 styled_button(style_name='b1'),
+                                                                 styled_button(style_name='b2'),
+                                                                 styled_button(style_name='b3'),
+                                                                 styled_button(style_name='b4'),
                                             ],
                                             cell_widget_class_index=make_cell_widget_class_index(g),
-                                            blank_widget_class = SmallBlank)
+                                            blank_widget_class = BlankButton)
         #self.dominos = None # clé = coord top-left du domino
         #self.reset()
         #self.apply_matching(self.value.matching)
