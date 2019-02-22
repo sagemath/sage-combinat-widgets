@@ -21,7 +21,7 @@ buttoncell_smaller_layout = Layout(width='2em', height='2em', margin='0', paddin
 css_lines = []
 css_lines.append(".widget-text INPUT {border-collapse: collapse !important}")
 css_lines.append(".gridbutton {margin:0; padding:0; width:2em; height:2em; border:1px solid #999; color:#666}")
-css_lines.append(".blankbutton, .addablebutton, .movebutton {background-color:white; color:#666}")
+css_lines.append(".blankbutton, .addablebutton {background-color:white; color:#666}")
 css_lines.append(".blankbutton {border:0px !important}")
 css_lines.append(".blankcell INPUT {border:0px !important}")
 css_lines.append(".addablecell INPUT, .removablecell INPUT {background-position: right top; background-size: 1em; background-repeat: no-repeat}")
@@ -284,46 +284,6 @@ TESTS ::
     sage: assert 'blankbutton' in b._dom_classes
 """
 
-class StyledMoveButton(StyledPushButton):
-    r"""A class for CSS-styled move buttons
-    with a handler to call the referent (parent) move methods.
-    Not meant to be called directly.
-
-    TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import StyledMoveButton, GridViewWidget
-        sage: from sage.combinat.partition import Partitions
-        sage: w = GridViewWidget(Partitions(1).an_element())
-        sage: b = StyledMoveButton(w, 'forward')
-        Traceback (most recent call last):
-        ...
-        TraitError: Element of the '_dom_classes' trait of a StyledMoveButton instance must be a unicode string, but a value of None <type 'NoneType'> was specified.
-    """
-    description = None
-    referent = None
-
-    def __init__(self, referent, direction, layout=buttoncell_smaller_layout, description=''):
-        super(StyledMoveButton, self).__init__(layout=layout, description=description)
-        self.referent = referent
-        self.direction = direction
-
-    def on_click(self):
-        self.referent.trigger_move(self.direction)
-
-def styled_move_button(disabled=False, style_name='movebutton'):
-    r"""A function to create CSS-styled push buttons.
-    with handlers to handle forward/backward moves.
-
-    TESTS::
-        sage: from sage_combinat_widgets.grid_view_widget import styled_move_button, GridViewWidget
-        sage: from sage.combinat.partition import Partitions
-        sage: w = GridViewWidget(Partitions(1).an_element())
-        sage: b = styled_move_button(style_name='mycssclass')
-        sage: b
-        <class 'traitlets.traitlets.MycssclassMoveButton'>
-    """
-    class_name = "{}MoveButton".format(style_name.capitalize())
-    return type(class_name, (StyledMoveButton,), {'disable': disabled, 'css_class': style_name})
-
 def get_model_id(w):
     r"""
     For some reason, our widgets seem to lose their model_id
@@ -339,9 +299,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
 
     def __init__(self, obj, adapter=None, display_convention='en', cell_layout=None,
                  cell_widget_classes=[TextCell], cell_widget_class_index=lambda x:0,
-                 blank_widget_class=BlankCell, addable_widget_class=AddableTextCell,
-                 move_actions=None,
-                 move_button_class=styled_move_button()):
+                 blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
         r"""
         Grid View Widget initialization.
 
@@ -373,14 +331,14 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             sage: f = interact(f)
             <html>...</html>
         """
-        GridViewEditor.__init__(self, obj, adapter, move_actions)
+        GridViewEditor.__init__(self, obj, adapter)
         VBox.__init__(self)
         self._model_id = get_model_id(self)
         self.display_convention = display_convention
         self.description = "Grid view widget for Jupyter notebook with cell class '%s', for object '%s'" % (
             cell_widget_classes[0], obj)
         if not cell_layout:
-            if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
+            if issubclass(self._value.__class__, GenericGraph): # i.e. a graph
                 cell_layout = buttoncell_smaller_layout
             else:
                 cell_layout = textcell_layout
@@ -393,12 +351,6 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             self.displaytype = None # Stateless cells
         self.cast = lambda x:self.adapter.display_to_cell(x, self.displaytype)
         self.blank_widget_class = blank_widget_class
-        if self.move_actions:
-            self.move_buttons = True
-            self.move_button_class = move_button_class
-        else:
-            self.move_buttons = False
-            self.move_button_class = None
         self.addable_widget_class = addable_widget_class
         self.draw()
         self.initialization = False
@@ -476,7 +428,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                 self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
 
     def draw(self, cell_widget_classes=None, cell_widget_class_index=None,
-             addable_widget_class=None, blank_widget_class=None, move_button_class=None):
+             addable_widget_class=None, blank_widget_class=None):
         r"""
         Add children to the GridWidget:
         - Sage object/grid editor cells
@@ -505,15 +457,13 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             addable_widget_class = self.addable_widget_class
         if not blank_widget_class:
             blank_widget_class = self.blank_widget_class
-        if not move_button_class:
-            move_button_class = self.move_button_class
         for i in range(self.height):
             r = rows[i]
             if not r: # Empty row
                 if (i,0) in addable_positions:
                     vbox_children.append(HBox((addable_widget_class((i,0), layout=self.cell_layout),)))
                 else:
-                    vbox_children.append(HBox((blank_widget_class(layout=self.cell_layout), disabled=True)))
+                    vbox_children.append(HBox((blank_widget_class(layout=self.cell_layout, disabled=True))))
                 continue
             j = 0
             hbox_children = []
@@ -549,17 +499,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                     [self.addable_widget_class((i,j), layout=self.cell_layout) for c in row[1]]))
         if self.display_convention == 'fr':
             vbox_children.reverse()
-        if self.move_buttons:
-            b_forward = self.move_button_class(self, 'forward', description='+')
-            b_backward = self.move_button_class(self, 'backward', description='-')
-            self.children = (
-                HBox(children= (
-                    VBox(children=vbox_children),
-                    HBox(children=(b_backward, b_forward))
-                ))
-                ,)
-        else:
-            self.children = vbox_children
+        self.children = vbox_children
         self.add_links()
         self.initialization = False
 
@@ -578,13 +518,9 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             sage: w1.get_child((1,2)).value == w2.get_child((1,2)).value
             True
         """
-        if self.move_buttons:
-            rows = self.children[0].children[0].children
-        else:
-            rows = self.children
         if self.display_convention == 'fr':
-            return rows[self.total_height - pos[0] - 1].children[pos[1]]
-        return rows[pos[0]].children[pos[1]]
+            return self.children[self.total_height - pos[0] - 1].children[pos[1]]
+        return self.children[pos[0]].children[pos[1]]
 
     def set_dirty(self, pos, val, e=None):
         super(GridViewWidget, self).set_dirty(pos, val, e)
