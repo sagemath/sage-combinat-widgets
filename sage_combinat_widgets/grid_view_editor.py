@@ -122,9 +122,9 @@ class GridViewEditor(BindableEditorClass):
     that are refered to through object cells as a dictionary
     with coordinates (row_number, cell_number_in_row) as keys
     """
-    value = traitlets.Any()
+    _value = traitlets.Any()
 
-    def __init__(self, obj, adapter=None, move_actions=None):
+    def __init__(self, obj, adapter=None):
         r"""
         Initialize editor.
 
@@ -156,7 +156,7 @@ class GridViewEditor(BindableEditorClass):
         self.initialization = True
         self.dirty = {}
         super(GridViewEditor, self).__init__()
-        self.value = obj
+        self._value = obj
         self.dirty_errors = {}
         if adapter:
             self.adapter = adapter
@@ -166,10 +166,6 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot find an Adapter for this object (%s)" % obj.__class__)
         if not hasattr(self.adapter, 'compute_cells') or not callable(self.adapter.compute_cells):
             raise NotImplementedError("Method `compute_cells` is required!")
-        self.move_actions = None
-        if move_actions and hasattr(self.adapter, 'move'):
-            self.move_actions = move_actions
-            self.move_history = []
         self.compute()
         self.links = []
 
@@ -211,7 +207,7 @@ class GridViewEditor(BindableEditorClass):
         as a dictionary (row_number, cell_number_in_row) -> trait
         """
         if not obj:
-            obj = self.value
+            obj = self._value
         if not obj:
             return
         self.cells = self.adapter.compute_cells(obj)
@@ -275,7 +271,7 @@ class GridViewEditor(BindableEditorClass):
         if not hasattr(self, 'cells'):
             self.compute()
         maxpos = max(pos[0] for pos in self.cells)
-        self.height = maxpos + 1 # Number of rows in self.value
+        self.height = maxpos + 1 # Number of rows in self._value
         for pos in self.addable_cells():
             if pos[0] > maxpos:
                 maxpos = pos[0]
@@ -300,21 +296,39 @@ class GridViewEditor(BindableEditorClass):
     def get_value(self):
         r"""
         Return editor value.
+
+        TESTS ::
+
+            sage: from sage.combinat.tableau import Tableau
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: e = GridViewEditor(Tableau([[1, 2, 5, 6], [3], [4]]))
+            sage: e.value
+            [[1, 2, 5, 6], [3], [4]]
+            sage: type(GridViewEditor.value)
+            <type 'property'>
+            sage: GridViewEditor.value.fget(e)
+            [[1, 2, 5, 6], [3], [4]]
+            sage: GridViewEditor.value.fset(e, Tableau([[1, 2], [3], [4]]))
+            sage: e.set_value(Tableau([[1, 2], [3], [4]]))
+            sage: e.value
+            [[1, 2], [3], [4]]
         """
-        return self.value
+        return self._value
 
     def set_value(self, obj, compute=True):
         r"""
         Check compatibility, then set editor value.
         If compute=True, call methods compute() and draw().
         """
-        if not self.validate(obj, self.value.__class__):
+        if not self.validate(obj, self._value.__class__):
             raise ValueError("Object %s is not compatible." % str(obj))
         self.reset_dirty()
-        self.value = obj
+        self._value = obj
         if compute:
             self.compute()
             self.draw()
+
+    value = property(get_value, set_value)
 
     def get_cells(self):
         r"""
@@ -328,11 +342,11 @@ class GridViewEditor(BindableEditorClass):
 
         INPUT:
 
-            -  ``obj_class`` -- an object class (by default: self.value.__class__)
+            -  ``obj_class`` -- an object class (by default: self._value.__class__)
             -  ``cells`` -- a dictionary (i,j)->val
         """
-        if not obj_class and self.value:
-            obj_class = self.value.__class__
+        if not obj_class and self._value:
+            obj_class = self._value.__class__
         if not obj_class:
             return
         if hasattr(self.adapter, 'from_cells'):
@@ -398,7 +412,7 @@ class GridViewEditor(BindableEditorClass):
             return
         pos = extract_coordinates(change.name)
         val = change.new
-        result = self.adapter.set_cell(self.value, pos, val, dirty=self.dirty)
+        result = self.adapter.set_cell(self._value, pos, val, dirty=self.dirty)
         if issubclass(result.__class__, BaseException): # Setting cell was impossible
             if val == self.cells[pos] and self.dirty.keys() == [pos]: # Rollback
                 self.reset_dirty()
@@ -414,7 +428,7 @@ class GridViewEditor(BindableEditorClass):
         """
         if not hasattr(self.adapter, 'addable_cells') or not callable(self.adapter.addable_cells):
             return [] # Optional method
-        return self.adapter.addable_cells(self.value)
+        return self.adapter.addable_cells(self._value)
 
     def removable_cells(self):
         r"""
@@ -422,14 +436,16 @@ class GridViewEditor(BindableEditorClass):
         """
         if not hasattr(self.adapter, 'removable_cells') or not callable(self.adapter.removable_cells):
             return [] # Optional method
-        return self.adapter.removable_cells(self.value)
+        return self.adapter.removable_cells(self._value)
 
     @traitlets.observe(traitlets.All)
     def add_cell(self, change):
         r"""
         Add a cell to the widget.
 
-        TESTS:
+        TESTS ::
+
+            sage: from sage.combinat.tableau import Tableau
             sage: from sage_combinat_widgets import GridViewEditor
             sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
             sage: e = GridViewEditor(t)
@@ -471,7 +487,7 @@ class GridViewEditor(BindableEditorClass):
         if val is True: # if it's a button, reverse button toggling
             val = False
         pos = extract_coordinates(change.name)
-        obj = copy(self.value)
+        obj = copy(self._value)
         result = self.adapter.add_cell(obj, pos, val, dirty=self.dirty)
         if issubclass(result.__class__, BaseException): # Adding cell was impossible
             if pos in self.cells and val == self.cells[pos] and self.dirty.keys() == [pos]: # Rollback
@@ -527,7 +543,7 @@ class GridViewEditor(BindableEditorClass):
             raise Exception("Removing cells is not implemented for this object.")
         if val == True: # if it's a button, reverse button toggling
             val = False
-        obj = copy(self.value) # For your pet objects, don't forget to implement __copy__
+        obj = copy(self._value) # For your pet objects, don't forget to implement __copy__
         result = self.adapter.remove_cell(obj, pos, dirty=self.dirty)
         if issubclass(result.__class__, BaseException): # Removing cell was impossible
             if pos in self.addable_cells() or (pos in self.cells and val == self.cells[pos]) \
@@ -578,7 +594,7 @@ class GridViewEditor(BindableEditorClass):
             return
         if not hasattr(self.adapter, 'append_row'):
             raise TypeError("Cannot append row to this object.")
-        obj = copy(self.value)
+        obj = copy(self._value)
         obj = self.adapter.append_row(obj, r)
         self.set_value(obj) # Will take care of everything
 
@@ -590,7 +606,7 @@ class GridViewEditor(BindableEditorClass):
             return
         if not hasattr(self.adapter, 'insert_row'):
             raise TypeError("Cannot insert row to this object.")
-        obj = copy(self.value)
+        obj = copy(self._value)
         obj = self.adapter.insert_row(obj, index, r)
         self.set_value(obj) # Will take care of everything
 
@@ -602,7 +618,7 @@ class GridViewEditor(BindableEditorClass):
             return
         if not hasattr(self.adapter, 'remove_row'):
             raise TypeError("Cannot remove row from this object.")
-        obj = copy(self.value)
+        obj = copy(self._value)
         obj = self.adapter.remove_row(obj, index)
         self.set_value(obj) # Will take care of everything
 
@@ -643,7 +659,7 @@ class GridViewEditor(BindableEditorClass):
             return
         if not hasattr(self.adapter, 'append_column'):
             raise TypeError("Cannot append column to this object.")
-        obj = copy(self.value)
+        obj = copy(self._value)
         obj = self.adapter.append_column(obj, c)
         self.set_value(obj) # Will take care of everything
 
@@ -655,7 +671,7 @@ class GridViewEditor(BindableEditorClass):
             return
         if not hasattr(self.adapter, 'insert_column'):
             raise TypeError("Cannot insert column to this object.")
-        obj = copy(self.value)
+        obj = copy(self._value)
         obj = self.adapter.insert_column(obj, index, c)
         self.set_value(obj) # Will take care of everything
 
@@ -667,48 +683,6 @@ class GridViewEditor(BindableEditorClass):
             return
         if not hasattr(self.adapter, 'remove_column'):
             raise TypeError("Cannot remove column from this object.")
-        obj = copy(self.value)
+        obj = copy(self._value)
         obj = self.adapter.remove_column(obj, index)
         self.set_value(obj, True) # Will take care of everything
-
-    def trigger_move(self, direction='forward', **kws):
-        r"""
-        Move forward in some user-defined process and direction.
-
-        TESTS::
-            sage: from sage_combinat_widgets import GridViewEditor
-            sage: from sage.matrix.matrix_space import MatrixSpace
-            sage: S = MatrixSpace(ZZ, 3,3)
-            sage: m = S.matrix([1,7,1,0,0,3,0,-1,2])
-            sage: e = GridViewEditor(m, move_actions=['multiply'])
-            sage: e.trigger_move(direction='forward', action='multiply', by=m, history=[m])
-            sage: e.value
-            [ 1  6 24]
-            [ 0 -3  6]
-            [ 0 -2  1]
-            sage: e.trigger_move(direction='backward')
-            sage: assert e.value == m
-        """
-        if not self.move_actions or ('action' in kws and not kws['action'] in self.move_actions):
-            raise NotImplementedError("This move action is not implemented by this widget.")
-        if 'action' in kws:
-            action = kws['action']
-        elif len(self.move_actions) == 1:
-           action = self.move_actions[0]
-        else:
-            raise NameError("No action specified for the move!")
-        obj = copy(self.value)
-        if direction == 'backward':
-            if not self.move_history:
-                print("Nothing to got back to!")
-            else:
-                self.set_value(self.move_history.pop(), True)
-        elif direction == 'forward':
-            self.move_history.append(self.value)
-            if not 'action' in kws:
-                kws['action'] = action
-            if not 'direction' in kws:
-                kws['direction'] = direction
-            self.set_value(
-                self.adapter.move(obj, **kws),
-                True)
