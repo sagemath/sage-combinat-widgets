@@ -101,7 +101,7 @@ class BlankCell(Text):
     """
     displaytype = text_type
 
-    def __init__(self, layout=textcell_layout):
+    def __init__(self, layout=textcell_layout, **kws):
         super(BlankCell, self).__init__()
         self.value = ''
         self.layout = layout
@@ -461,11 +461,11 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             blank_widget_class = self.blank_widget_class
         for i in range(self.height):
             r = rows[i]
-            if not r: # Empty row!
+            if not r: # Empty row
                 if (i,0) in addable_positions:
                     vbox_children.append(HBox((addable_widget_class((i,0), layout=self.cell_layout),)))
                 else:
-                    vbox_children.append(HBox((blank_widget_class(layout=self.cell_layout),)))
+                    vbox_children.append(HBox((blank_widget_class(layout=self.cell_layout, disabled=True),)))
                 continue
             j = 0
             hbox_children = []
