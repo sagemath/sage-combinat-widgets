@@ -241,9 +241,6 @@ class StyledPushButton(Button):
 
         sage: from sage_combinat_widgets.grid_view_widget import StyledPushButton
         sage: b = StyledPushButton()
-        Traceback (most recent call last):
-        ...
-        TraitError: Element of the '_dom_classes' trait of a StyledPushButton instance must be a unicode string, but a value of None <type 'NoneType'> was specified.
     """
     disable = None
     css_class = None
