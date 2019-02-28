@@ -143,7 +143,6 @@ class ButtonCell(ToggleButton):
     displaytype = bool
 
     def __init__(self, content, position, layout=buttoncell_smaller_layout, **kws):
-        # FIXME unpack **kws
         super(ButtonCell, self).__init__()
         self.layout = layout
         self.value = content
@@ -244,7 +243,7 @@ class StyledPushButton(Button):
     """
     disable = None
     css_class = None
-    def __init__(self, value=None, position=None, layout=buttoncell_smaller_layout, description='', placeholder=None):
+    def __init__(self, content=None, position=None, layout=buttoncell_smaller_layout, description='', placeholder=None):
         super(StyledPushButton, self).__init__()
         self.layout=layout
         self.description=description
