@@ -247,17 +247,19 @@ class StyledPushButton(Button):
     """
     disable = None
     css_class = None
-    def __init__(self, layout=buttoncell_smaller_layout, description=''):
+    def __init__(self, value=None, position=None, layout=buttoncell_smaller_layout, description='', placeholder=None):
         super(StyledPushButton, self).__init__()
         self.layout=layout
         self.description=description
-        self.add_class(self.css_class)
         if self.disable:
             self.disabled = True
+        self.add_class('gridbutton')
+        if self.css_class:
+            self.add_class(self.css_class)
 
 def styled_push_button(disabled=False, style_name=''):
     r"""A function to create CSS-styled push buttons.
-    A push button has neither value nor position.
+    A push button stores neither value nor position.
 
     TESTS ::
 
