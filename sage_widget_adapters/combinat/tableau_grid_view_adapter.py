@@ -79,7 +79,8 @@ class TableauGridViewAdapter(GridViewAdapter):
         try:
             return cls.objclass(rows)
         except:
-            raise TypeError("This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
+            raise TypeError(
+                "This object is not compatible with this adapter (%s, for %s objects)" % (cls, cls.objclass))
 
     @staticmethod
     def addable_cells(obj, borders=False):

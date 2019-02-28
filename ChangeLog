@@ -1,3 +1,7 @@
+0.7.2:
+	* 2 functions returning buttons: help specifying the main widget
+	* FlippingDominos example
+	* Fixed documentation compilation and display
 0.7.1:
 	* Show errors on the cells, with tooltips
 0.7.0:

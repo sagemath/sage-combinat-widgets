@@ -100,10 +100,10 @@ def get_adapter(obj):
         from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
         return GraphGridViewAdapter()
 
-def cdlink_repr(self):
-    return "A typecasting directional link from source=(%s, %s) to target='%s'" % (self.source[0].__class__, self.source[0].value, self.target[1])
-cdlink = traitlets.dlink
-cdlink.__repr__ = cdlink_repr
+class cdlink(traitlets.dlink):
+    def __repr__(self):
+        return "A typecasting directional link from source=(%s, %s) to target='%s'" % (
+            self.source[0].__class__, self.source[0].value, self.target[1])
 
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass(traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
@@ -226,7 +226,8 @@ class GridViewEditor(BindableEditorClass):
                 try:
                     emptytrait = traitclass(addablecelltype)
                 except:
-                    raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, addablecelltype, addablecellzero))
+                    raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (
+                        traitclass, addablecelltype, addablecellzero))
             emptytrait.name = emptytraitname
             traits_to_add[emptytraitname] = emptytrait
         for pos, val in self.cells.items():
@@ -242,7 +243,8 @@ class GridViewEditor(BindableEditorClass):
                         trait = traitclass(celltype)
                         trait.value = traitvalue
                     except:
-                        raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (traitclass, celltype, cellzero))
+                        raise TypeError("Cannot init the trait (traitclass=%s, celltype=%s, default_value=%s)" % (
+                            traitclass, celltype, cellzero))
                 trait.name = traitname
                 traits_to_add[traitname] = trait
         self.traitclass = traitclass
@@ -513,8 +515,8 @@ class GridViewEditor(BindableEditorClass):
             return
         if not hasattr(self.adapter, 'remove_cell'):
             raise TypeError("Cannot remove cell from this object.")
-        if self.adapter.remove_cell.__func__.__class__ is AbstractMethod:
-            return # Method not implemented
+        if not self.adapter.remove_cell or self.adapter.remove_cell.__func__.__class__ is AbstractMethod:
+            return # Method not implemented or deliberately set to None
         if hasattr(self.adapter.remove_cell, '_optional') and self.adapter.remove_cell._optional: # Not implemented
             raise Exception("Removing cells is not implemented for this object.")
         if val == True: # if it's a button, reverse button toggling
@@ -522,7 +524,8 @@ class GridViewEditor(BindableEditorClass):
         obj = copy(self.value) # For your pet objects, don't forget to implement __copy__
         result = self.adapter.remove_cell(obj, pos, dirty=self.dirty)
         if issubclass(result.__class__, BaseException): # Removing cell was impossible
-            if pos in self.addable_cells() or (pos in self.cells and val == self.cells[pos]) and self.dirty.keys() == [pos]: # Rollback
+            if pos in self.addable_cells() or (pos in self.cells and val == self.cells[pos]) \
+               and self.dirty.keys() == [pos]: # Rollback
                 self.reset_dirty()
                 new_obj = obj
             else: # Keep temporary substraction for later
