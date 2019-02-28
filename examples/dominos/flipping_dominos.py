@@ -8,11 +8,6 @@ from traitlets import dlink, HasTraits, Bool, observe
 from contextlib import contextmanager
 
 smallblyt = Layout(width='12px',height='12px', margin='0', padding='0')
-css = HTML("<style>.blankb { background-color: #fff }\n.gridbutton { border:1px solid #999 !important }\n.b1 { background-color: green }\n.b2 { background-color: blue }\n.b3 { background-color: red }\n.b4 { background-color: yellow }\n.gridbutton {\nborder-collapse: collapse;\nborder: 1px solid #666;\n}\n.left { border-right: 1px dotted #999; }\n.right { border-left: 1px dotted #999; }\n.bottom { border-top: 1px dotted #999; }\n.top { border-bottom: 1px dotted #999; }</style>")
-try:
-    display(css)
-except:
-    pass # We are not in a browser
 
 class ddlink(dlink):
     """Double directional link with logic = or/and/none.

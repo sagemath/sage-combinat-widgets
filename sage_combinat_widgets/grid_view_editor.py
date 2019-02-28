@@ -515,8 +515,8 @@ class GridViewEditor(BindableEditorClass):
             return
         if not hasattr(self.adapter, 'remove_cell'):
             raise TypeError("Cannot remove cell from this object.")
-        if self.adapter.remove_cell.__func__.__class__ is AbstractMethod:
-            return # Method not implemented
+        if not self.adapter.remove_cell or self.adapter.remove_cell.__func__.__class__ is AbstractMethod:
+            return # Method not implemented or deliberately set to None
         if hasattr(self.adapter.remove_cell, '_optional') and self.adapter.remove_cell._optional: # Not implemented
             raise Exception("Removing cells is not implemented for this object.")
         if val == True: # if it's a button, reverse button toggling

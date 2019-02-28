@@ -117,6 +117,9 @@ class FlippingAztecDiamond(Graph):
             d2.flip(d1)
 
 class DominosAdapter(GraphGridViewAdapter):
+
+    remove_cell = None
+
     def set_cell(self, obj, pos, val=True, dirty={}):
         r"""
         When we click on a graph cell,
