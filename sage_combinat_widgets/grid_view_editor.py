@@ -157,6 +157,7 @@ class GridViewEditor(BindableEditorClass):
         self.dirty = {}
         super(GridViewEditor, self).__init__()
         self._value = obj
+        self._history = []
         self.dirty_errors = {}
         if adapter:
             self.adapter = adapter
@@ -328,7 +329,22 @@ class GridViewEditor(BindableEditorClass):
             self.compute()
             self.draw()
 
-    value = property(get_value, set_value)
+    def push_value(self, obj):
+        r"""
+        """
+        self._history.append(self.value)
+        self.set_value(obj)
+
+    value = property(get_value, push_value)
+
+    def pop_value(self):
+        r"""
+        """
+        if not self._history:
+            print("No more history!")
+            return
+        prev = self._history.pop()
+        self.set_value(prev)
 
     def get_cells(self):
         r"""
