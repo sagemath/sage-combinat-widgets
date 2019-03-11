@@ -136,10 +136,6 @@ class NPM(Command):
         # update package data in case this created new files
         update_package_data(self.distribution)
 
-#version_ns = {}
-#with open(os.path.join(here, 'sage_combinat_widgets', '_version.py')) as f:
-#    exec(f.read(), {}, version_ns)
-
 setup_args = {
     'name': 'sage-combinat-widgets',
     'version': readfile("VERSION"),
@@ -175,7 +171,6 @@ setup_args = {
     'cmdclass': {
         'test': SageTest, # adding a special setup command for tests
         'build_py': js_prerelease(build_py),
-        'egg_info': js_prerelease(egg_info),
         'sdist': js_prerelease(sdist, strict=True),
         'jsdeps': NPM,
     },
