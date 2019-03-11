@@ -1,4 +1,4 @@
-A Custom Jupyter Widget Library
+Jupyter widgets for SAGE Combinat
 
 Package Install
 ---------------

@@ -2,8 +2,8 @@
   "name": "sage-combinat-widgets",
   "version": "0.1.0",
   "license": "GPL-2.0+",
-  "description": "A Custom Jupyter Widget Library",
-  "author": "Odile Bénassy",
+  "description": "Jupyter widgets for SAGE Combinat",
+  "author": "Odile Bénassy, Nicolas Thiéry",
   "main": "lib/index.js",
   "repository": {
     "type": "git",
