@@ -701,4 +701,5 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot remove column from this object.")
         obj = copy(self._value)
         obj = self.adapter.remove_column(obj, index)
-        self.set_value(obj, True) # Will take care of everything
+        self.value = obj # Will call the observer
+

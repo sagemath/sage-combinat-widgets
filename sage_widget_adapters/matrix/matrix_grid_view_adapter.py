@@ -346,39 +346,3 @@ class MatrixGridViewAdapter(GridViewAdapter):
         if index is None:
             index = obj.ncols() - 1
         return obj.delete_columns([index])
-
-    @staticmethod
-    def move(obj, **kws):
-        r"""
-        Run a transformation on the matrix.
-
-        TESTS::
-            sage: from sage.matrix.matrix_space import MatrixSpace
-            sage: S = MatrixSpace(ZZ, 3,3)
-            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
-            sage: m = S.matrix([0,1,2,3,4,5,6,7,8])
-            sage: ma = MatrixGridViewAdapter(m)
-            sage: ma.move(m, action='multiply')
-            [ 15  18  21]
-            [ 42  54  66]
-            [ 69  90 111]
-        """
-        if 'action' in kws and kws['action'] != 'multiply': # Only 'multiply' action is implemented
-            raise NotImplementedError("Action {} is not implemented" . format(action))
-        if 'direction' in kws and kws['direction'] not in ['forward', 'backward']:
-            raise NotImplementedError("Direction {} is not implemented" . format(direction))
-        elif 'direction' in kws:
-            direction = kws['direction']
-        else:
-            direction = 'forward'
-        if 'by' in kws:
-            multiply_by = kws['by']
-        else:
-            multiply_by = obj
-        if direction == 'forward':
-            return multiply_by * obj
-        elif direction == 'backward':
-            if 'history' in kws:
-                return kws['history'][-1]
-            else:
-                return multiply_by.inverse() * obj
