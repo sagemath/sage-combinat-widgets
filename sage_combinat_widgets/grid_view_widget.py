@@ -197,6 +197,7 @@ def styled_button_cell(disabled=False, style_name=''):
         sage: styled_button_cell(disabled=True, style_name='mycssclass')
         <class 'traitlets.traitlets.DisabledMycssclassButton'>
     """
+    # FIXME passer la couleur en paramètre ? une châine CSS ?
     class_name = "{}Button".format(style_name.capitalize())
     if disabled:
         class_name = "Disabled" + class_name
@@ -332,7 +333,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         self.description = "Grid view widget for Jupyter notebook with cell class '%s', for object '%s'" % (
             cell_widget_classes[0], obj)
         if not cell_layout:
-            if issubclass(self._value.__class__, GenericGraph): # i.e. a graph
+            if issubclass(self.value.__class__, GenericGraph): # i.e. a graph
                 cell_layout = buttoncell_smaller_layout
             else:
                 cell_layout = textcell_layout
@@ -347,7 +348,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
         self.draw()
-        self.initialization = False
+        self.donottrack = False
 
     def to_cell(self, val):
         r"""
@@ -431,7 +432,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         Used classes can be passed as arguments
         to enable changing shapes, colors ..
         """
-        self.initialization = True # Prevent any interactivity while drawing the widget
+        self.donottrack = True # Prevent any interactivity while drawing the widget
         self.reset_links()
         self.compute_height()
         positions = sorted(list(self.cells.keys()))
@@ -495,7 +496,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             vbox_children.reverse()
         self.children = vbox_children
         self.add_links()
-        self.initialization = False
+        self.donottrack = False
 
     def get_child(self, pos):
         r"""
