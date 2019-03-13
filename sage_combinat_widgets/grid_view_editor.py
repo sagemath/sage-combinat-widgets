@@ -315,10 +315,9 @@ class GridViewEditor(BindableEditorClass):
         """
         return self.value
 
-    def set_value(self, obj, compute=False):
+    def set_value(self, obj):
         r"""
         Check compatibility, then set editor value.
-        If compute=True, call methods compute() and draw().
         """
         if not self.validate(obj, self.value.__class__):
             raise ValueError("Object %s is not compatible." % str(obj))
@@ -393,7 +392,7 @@ class GridViewEditor(BindableEditorClass):
         if not self.validate(obj, None, obj_class):
             raise ValueError("Could not make a compatible ('%s')  object from given cells" % str(obj_class))
         self.donottrack = True
-        self.set_value(obj, False)
+        self.set_value(obj)
         self.donottrack = False
 
     def set_dirty(self, pos, val, e=None):
@@ -625,7 +624,6 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot append row to this object.")
         obj = copy(self.value)
         obj = self.adapter.append_row(obj, r)
-        #self.set_value(obj) # Will take care of everything
         self.value = obj # Will call the observer
 
     def insert_row(self, index, r=None):
@@ -638,7 +636,6 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot insert row to this object.")
         obj = copy(self.value)
         obj = self.adapter.insert_row(obj, index, r)
-        #self.set_value(obj) # Will take care of everything
         self.value = obj # Will call the observer
 
     def remove_row(self, index=None):
@@ -651,7 +648,6 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot remove row from this object.")
         obj = copy(self.value)
         obj = self.adapter.remove_row(obj, index)
-        #self.set_value(obj) # Will take care of everything
         self.value = obj # Will call the observer
 
     def append_column(self, c=None):
@@ -693,7 +689,6 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot append column to this object.")
         obj = copy(self.value)
         obj = self.adapter.append_column(obj, c)
-        #self.set_value(obj) # Will take care of everything
         self.value = obj # Will call the observer
 
     def insert_column(self, index, c=None):
@@ -706,7 +701,6 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot insert column to this object.")
         obj = copy(self.value)
         obj = self.adapter.insert_column(obj, index, c)
-        #self.set_value(obj) # Will take care of everything
         self.value = obj # Will call the observer
 
     def remove_column(self, index=None):

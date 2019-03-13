@@ -1,3 +1,6 @@
+0.7.3:
+	* Code rewrite to make writing custom interactions easier for the user
+	* Quicker installation (not calling webpack twice)
 0.7.2:
 	* 2 functions returning buttons: help specifying the main widget
 	* FlippingDominos example
