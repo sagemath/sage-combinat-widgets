@@ -47,6 +47,7 @@ class TextWithTooltip(Text):
     _view_name = Unicode('TextWithTooltipView').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
     _view_module_version = Unicode('^0.2.0').tag(sync=True)
+    description_tooltip = Unicode().tag(sync=True)
 
     def set_tooltip(self, s=''):
         self.description_tooltip = s
