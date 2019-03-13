@@ -25,9 +25,9 @@ css_lines.append(".blankbutton, .addablebutton {background-color:white; color:#6
 css_lines.append(".blankbutton {border:0px !important}")
 css_lines.append(".blankcell INPUT {border:0px !important}")
 css_lines.append(".addablecell INPUT, .removablecell INPUT {background-position: right top; background-size: 1em; background-repeat: no-repeat}")
-css_lines.append(".addablecell INPUT {background-image: url('Plus.png')}")
+css_lines.append(".addablecell INPUT {background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAA8BAAAAAA7DH7+AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAnRSTlMAAHaTzTgAAAACYktHRAAPOjI+owAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0SU1FB+MCBRIvKscf5nsAAAAtSURBVEjHY2AYBaSBmTNnThhVM6pmaKvhnIkVTBjqagZbOI+qGVVDHTXDAwAAnSews7vfUfkAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTktMDItMDVUMTc6NDc6NDIrMDE6MDDD7zGLAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE5LTAyLTA1VDE3OjQ3OjQyKzAxOjAwsrKJNwAAAABJRU5ErkJggg==')}")
 css_lines.append(".addablecell INPUT, .addablebutton INPUT {border:1px dashed #999 !important}")
-css_lines.append(".removablecell INPUT {background-image: url('Minus.png')}")
+css_lines.append(".removablecell INPUT {background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAA8BAAAAAA7DH7+AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAnRSTlMAAHaTzTgAAAACYktHRAAPOjI+owAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0SU1FB+MCBRIvL7d1EvQAAAAgSURBVEjHY2AYBaNgFIwwwDkTK5gw1NWMglEwCgYxAAAoCFJ7GFQEKQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOS0wMi0wNVQxNzo0Nzo0NyswMTowMJHXHiwAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTktMDItMDVUMTc6NDc6NDcrMDE6MDDgiqaQAAAAAElFTkSuQmCC')}")
 css_lines.append(".dirty INPUT {background-color: pink !important}")
 css = HTML("<style>%s</style>" % '\n'.join(css_lines))
 
