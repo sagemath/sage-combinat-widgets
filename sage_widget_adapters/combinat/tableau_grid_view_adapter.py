@@ -140,6 +140,8 @@ class TableauGridViewAdapter(GridViewAdapter):
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 0)' is not addable.
+            sage: ta.add_cell(t, (3, 0), 8, dirty={(3, 0):8})
+            [[1, 2, 5, 6], [3, 7], [4], [8]]
         """
         if not pos in self.addable_cells(obj):
             raise ValueError("Cell position '%s' is not addable." % str(pos))
