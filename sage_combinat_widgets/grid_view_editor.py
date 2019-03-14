@@ -517,6 +517,8 @@ class GridViewEditor(BindableEditorClass):
         if val is True: # if it's a button, reverse button toggling
             val = False
         pos = extract_coordinates(change.name)
+        if pos in self.dirty:
+            self.dirty[pos] = val # edit the value before sending to the adapter
         obj = copy(self.value)
         result = self.adapter.add_cell(obj, pos, val, dirty=self.dirty)
         if issubclass(result.__class__, BaseException): # Adding cell was impossible
