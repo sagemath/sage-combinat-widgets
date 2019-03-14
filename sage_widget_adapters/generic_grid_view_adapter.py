@@ -207,18 +207,18 @@ class GridViewAdapter(object):
             [[1, 2, 5, 6], [3, 7, 42], [4]]
         """
         for p in dirty:
-            if len(l) > p[0]:
-                if len(l[p[0]]) > p[1]:
+            if p[0] < len(l):
+                if p[1] < len(l[p[0]]):
                     if dirty[p] == self.cellzero:
                         del l[p[0]][p[1]]
                     else:
                         l[p[0]][p[1]] = dirty[p]
                 elif len(l[p[0]]) == p[1] and dirty[p] != self.cellzero:
                     l[p[0]].append(dirty[p])
-            elif len(l) == p[0] and dirty[p] == self.cellzero:
-                l.append([dirty[p]])
             else:
-                raise Exception("Value is out of range: " + str(p))
+                for i in range(p[0] - len(l)):
+                    l.append([])
+                l.append([dirty[p]])
         return l
 
     def set_cell(self, obj, pos, val, dirty={}, constructorname=''):
