@@ -83,8 +83,8 @@ class NPM(Command):
     node_modules = os.path.join(node_root, 'node_modules')
 
     targets = [
-        os.path.join(here, 'sage-combinat-widgets', 'static', 'extension.js'),
-        os.path.join(here, 'sage-combinat-widgets', 'static', 'index.js')
+        os.path.join(here, 'sage_combinat_widgets', 'static', 'extension.js'),
+        os.path.join(here, 'sage_combinat_widgets', 'static', 'index.js')
     ]
 
     def initialize_options(self):
@@ -148,9 +148,9 @@ setup_args = {
     'include_package_data': True,
     'data_files': [
         ('share/jupyter/nbextensions/sage-combinat-widgets', [
-            'sage-combinat-widgets/static/extension.js',
-            'sage-combinat-widgets/static/index.js',
-            'sage-combinat-widgets/static/index.js.map',
+            'sage_combinat_widgets/static/extension.js',
+            'sage_combinat_widgets/static/index.js',
+            'sage_combinat_widgets/static/index.js.map',
         ],),
         ('etc/jupyter/nbconfig/notebook.d/' ,['sage-combinat-widgets.json'])
     ],
