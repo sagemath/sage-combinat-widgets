@@ -77,6 +77,42 @@ class TextCell(BaseTextCell):
     def __init__(self, content, position, layout=textcell_layout, **kws):
         super(TextCell, self).__init__(content, position, layout, **kws)
 
+class StyledTextCell(TextCell):
+    r"""A class for CSS-styled text grid cells.
+    Not meant to be called directly.
+
+    TESTS ::
+
+        sage: from sage_combinat_widgets.grid_view_widget import StyledTextCell
+        sage: b = StyledTextCell("ok", (1,2))
+        Traceback (most recent call last):
+        ...
+        TraitError: Element of the '_dom_classes' trait of a StyledTextCell instance must be a unicode string, but a value of None <type 'NoneType'> was specified.
+    """
+    disable = None
+    css_class = None
+    def __init__(self, content, position, layout=textcell_layout, **kws):
+        super(StyledTextCell, self).__init__(content, position, layout, **kws)
+        self.add_class(self.css_class)
+        if self.disable:
+            self.disabled = True
+
+def styled_text_cell(disabled=False, style_name=''):
+    r"""A function to create CSS-styled cells.
+    A regular text cell has a value and a position.
+
+    TESTS ::
+
+        sage: from sage_combinat_widgets.grid_view_widget import styled_text_cell
+        sage: styled_text_cell(disabled=True, style_name='mycssclass')
+        <class 'traitlets.traitlets.DisabledMycssclassTextCell'>
+    """
+    # FIXME passer la couleur en paramètre ? une chaîne CSS ?
+    class_name = "{}TextCell".format(style_name.capitalize())
+    if disabled:
+        class_name = "Disabled" + class_name
+    return type(class_name, (StyledTextCell,), {'disable': disabled, 'css_class': style_name})
+
 class WiderTextCell(BaseTextCell):
     r"""A regular text grid cell
 
@@ -198,7 +234,7 @@ def styled_button_cell(disabled=False, style_name=''):
         sage: styled_button_cell(disabled=True, style_name='mycssclass')
         <class 'traitlets.traitlets.DisabledMycssclassButton'>
     """
-    # FIXME passer la couleur en paramètre ? une châine CSS ?
+    # FIXME passer la couleur en paramètre ? une chaîne CSS ?
     class_name = "{}Button".format(style_name.capitalize())
     if disabled:
         class_name = "Disabled" + class_name
