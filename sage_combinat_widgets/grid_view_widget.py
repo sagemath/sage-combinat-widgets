@@ -91,27 +91,41 @@ class StyledTextCell(TextCell):
     """
     disable = None
     css_class = None
+    style = None
     def __init__(self, content, position, layout=textcell_layout, **kws):
         super(StyledTextCell, self).__init__(content, position, layout, **kws)
         self.add_class(self.css_class)
         if self.disable:
             self.disabled = True
+        if self.style:
+            apply_css(self.style)
 
-def styled_text_cell(disabled=False, style_name=''):
+def apply_css(css_line):
+    try:
+        ip = get_ipython()
+        for base in ip.__class__.__mro__:
+            """If we are in a notebook, we will find 'notebook' in those names"""
+            if 'otebook' in base.__name__:
+                ip.display_formatter.format(HTML("<style>%s</style>" % css_line))
+                break
+    except:
+        pass # We are in the test environment
+
+def styled_text_cell(disabled=False, style_name='', style=None):
     r"""A function to create CSS-styled cells.
     A regular text cell has a value and a position.
 
     TESTS ::
 
         sage: from sage_combinat_widgets.grid_view_widget import styled_text_cell
-        sage: styled_text_cell(disabled=True, style_name='mycssclass')
+        sage: styled_text_cell(disabled=True, style_name='mycssclass', style="")
         <class 'traitlets.traitlets.DisabledMycssclassTextCell'>
     """
     # FIXME passer la couleur en paramètre ? une chaîne CSS ?
     class_name = "{}TextCell".format(style_name.capitalize())
     if disabled:
         class_name = "Disabled" + class_name
-    return type(class_name, (StyledTextCell,), {'disable': disabled, 'css_class': style_name})
+    return type(class_name, (StyledTextCell,), {'disable': disabled, 'css_class': style_name, 'style': style})
 
 class WiderTextCell(BaseTextCell):
     r"""A regular text grid cell
