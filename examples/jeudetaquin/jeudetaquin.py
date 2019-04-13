@@ -1,9 +1,9 @@
 from sage.combinat.tableau import Tableaux
-from sage.combinat.skew_tableau import *
-from sage.all import SageObject
+from sage.combinat.skew_tableau import SkewTableau, SkewTableaux
 
 Tableaux.options.display="array"
 Tableaux.options.convention="French"
+
 
 class JeuDeTaquin(SkewTableau):
     def __init__(self, st):
@@ -254,7 +254,7 @@ class JeuDeTaquin(SkewTableau):
 
     def create_hole(self, corner):
         if self._hole is not None:
-            raise ValueError, "There is already a hole at %s"%(self._hole,)
+            raise ValueError("There is already a hole at %s" % (self._hole,))
         inner_corners = self.inner_shape().corners()
         if tuple(corner) not in inner_corners:
             raise ValueError("corner must be an inner corner")
@@ -265,7 +265,7 @@ class JeuDeTaquin(SkewTableau):
 
     def slide(self):
         if self._hole is None:
-            raise ValueError, "There is no hole"
+            raise ValueError("There is no hole")
         spotl, spotc = self._hole
         #Check to see if there is nothing to the right
         if spotc == len(self._new_st[spotl]) - 1:

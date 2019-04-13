@@ -22,9 +22,10 @@ AUTHORS ::
     Odile Bénassy, Nicolas Thiéry
 
 """
-from sage.combinat.tableau import *
+from sage.combinat.tableau import Tableau, StandardTableau, SemistandardTableau
 from sage.rings.integer import Integer
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+
 
 class TableauGridViewAdapter(GridViewAdapter):
     r"""
