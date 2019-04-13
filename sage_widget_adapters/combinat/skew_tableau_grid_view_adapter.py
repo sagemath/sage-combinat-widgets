@@ -21,9 +21,10 @@ AUTHORS ::
     Odile Bénassy, Nicolas Thiéry
 
 """
-from sage.combinat.skew_tableau import *
+from sage.combinat.skew_tableau import SkewTableau
 from sage.rings.integer import Integer
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+
 
 class SkewTableauGridViewAdapter(GridViewAdapter):
     r"""

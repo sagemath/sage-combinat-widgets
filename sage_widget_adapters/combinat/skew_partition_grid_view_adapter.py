@@ -24,9 +24,10 @@ AUTHORS ::
     Odile Bénassy, Nicolas Thiéry
 
 """
-from sage.combinat.skew_partition import *
+from sage.combinat.skew_partition import SkewPartition
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 from six import text_type
+
 
 class SkewPartitionGridViewAdapter(GridViewAdapter):
     r"""
