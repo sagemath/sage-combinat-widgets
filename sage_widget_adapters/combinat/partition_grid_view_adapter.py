@@ -24,7 +24,7 @@ AUTHORS ::
     Odile Bénassy, Nicolas Thiéry
 
 """
-from sage.combinat.partition import *
+from sage.combinat.partition import Partition
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 from six import text_type
 

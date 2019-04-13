@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from flipping_aztecdiamond import *
+from flipping_aztecdiamond import DominoGeometry, DominosAdapter
 from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, styled_button_cell
-from ipywidgets import Layout, HTML
-from traitlets import dlink, HasTraits, Bool, observe
+from ipywidgets import Layout
+from traitlets import dlink, HasTraits, Bool
 from contextlib import contextmanager
 
 smallblyt = Layout(width='12px',height='12px', margin='0', padding='0')
+
 
 class ddlink(dlink):
     """Double directional link with logic = or/and/none.
@@ -234,7 +235,6 @@ class DominosWidget(GridViewWidget):
 
     def apply_matching(self, matching):
         """Apply a matching"""
-        count = -1
         for d in matching:
             self.match(self.children[d.first[0]].children[d.first[1]],
                        self.children[d.second[0]].children[d.second[1]])

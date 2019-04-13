@@ -40,10 +40,15 @@ Usage
 
 Once the package is installed, you can use it in Sage Jupyter Notebook.
 
+
     from sage_combinat_widgets import GridViewWidget
+    
     S = StandardTableaux(15).random_element()
+    
     w = TableauWidget(t)
+    
     w
+
 
 See the `demo notebook <demo_GridViewWidget.ipynb>`_.
 

@@ -7,7 +7,7 @@ AUTHORS ::
     Odile Bénassy, Nicolas Thiéry
 
 """
-from .grid_view_editor import *
+from .grid_view_editor import GridViewEditor, cdlink, get_ipython
 from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, Button, ValueWidget, register
 from sage.misc.misc import uniq
