@@ -682,7 +682,6 @@ class GridViewEditor(BindableEditorClass):
         if issubclass(result.__class__, BaseException): # Adding cell was impossible
             if pos in self.cells and val == self.cells[pos] and self.dirty.keys() == [pos]: # Rollback
                 self.reset_dirty()
-                new_obj = obj
             else: # Keep temporary addition for later
                 self.set_dirty(pos, val, result)
             return
@@ -740,7 +739,6 @@ class GridViewEditor(BindableEditorClass):
             if pos in self.addable_cells() or (pos in self.cells and val == self.cells[pos]) \
                and self.dirty.keys() == [pos]: # Rollback
                 self.reset_dirty()
-                new_obj = obj
             else: # Keep temporary substraction for later
                 self.set_dirty(pos, val, result)
             return
