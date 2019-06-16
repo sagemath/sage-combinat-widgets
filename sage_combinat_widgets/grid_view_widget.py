@@ -448,18 +448,20 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             sage: def test4(w): return (w.links[4].source[0].__class__, w.links[4].source[0].value, w.links[4].target[1])
             sage: assert test0(w1) == test0(w2)
             sage: assert test4(w1) == test4(w2)
-            sage: w2.links[2]
-            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.TextCell'>, 1) to target='cell_0_2'
-            sage: w2.links[6]
-            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>, ) to target='add_0_4'
+            sage: len(w2.links)
+            10
+            sage: w2.links[2].source[0].__class__
+            <class 'sage_combinat_widgets.grid_view_widget.TextCell'>
+            sage: w2.links[6].source[0].__class__
+            <class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>
             sage: from traitlets import Bunch
             sage: w2.add_cell(Bunch({'name': 'add_0_4', 'old': 0, 'new': 3, 'owner': w2, 'type': 'change'}))
             sage: w2.value
             [[None, None, 1, 2, 3], [None, 1], [4]]
-            sage: w2.links[2]
-            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.TextCell'>, 4) to target='cell_2_0'
-            sage: w2.links[7]
-            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>, ) to target='add_0_5'
+            sage: w2.links[2].source[0].__class__
+            <class 'sage_combinat_widgets.grid_view_widget.TextCell'>
+            sage: w2.links[7].source[0].__class__
+            <class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>
         """
         for pos in self.cells.keys():
             traitname = 'cell_%d_%d' % (pos)
