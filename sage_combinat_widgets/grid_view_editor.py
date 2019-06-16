@@ -28,6 +28,7 @@ from sage.misc.bindable_class import BindableClass
 from sage.all import SageObject
 from sage.misc.abstract_method import AbstractMethod
 from sage.misc.misc import uniq
+MAX_LEN_HISTORY = 50
 
 def extract_coordinates(s):
     r"""
@@ -153,10 +154,12 @@ class GridViewEditor(BindableEditorClass):
             ...
             TypeError: Cannot find an Adapter for this object (<type 'sage.symbolic.expression.Expression'>)
         """
-        self.initialization = True
+        self.donottrack = True
         self.dirty = {}
         super(GridViewEditor, self).__init__()
         self.value = obj
+        self._initval = obj
+        self._history = []
         self.dirty_errors = {}
         if adapter:
             self.adapter = adapter
@@ -177,13 +180,31 @@ class GridViewEditor(BindableEditorClass):
         """
         return val
 
-    def validate(self, obj, value=None, obj_class=None):
+    def validate(self, new_obj, obj_class=None):
         r"""
         Validate object type.
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: obj = Tableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(obj)
+            sage: e.donottrack = False # This class is not meant to work by itself without a widget.
+            sage: new_valid_obj = Tableau([[1, 2, 3, 6], [4], [5]])
+            sage: e.validate(new_valid_obj, obj.__class__)
+            True
+            sage: new_invalid_obj = Partition([3,3,1])
+            sage: issubclass(new_invalid_obj.__class__, obj.__class__)
+            False
+            sage: e.validate(new_invalid_obj, obj.__class__)
+            False
+            sage: new_invalid_obj = 42
+            sage: e.validate(new_invalid_obj)
+            False
         """
         if obj_class:
-            return issubclass(obj.__class__, obj_class)
-        return issubclass(obj.__class__, SageObject)
+            return issubclass(new_obj.__class__, obj_class)
+        return issubclass(new_obj.__class__, SageObject) and hasattr(new_obj, 'cells')
 
     def modified_add_traits(self, **traits):
         r"""
@@ -296,21 +317,112 @@ class GridViewEditor(BindableEditorClass):
     def get_value(self):
         r"""
         Return editor value.
+
+        TESTS ::
+
+            sage: from sage.combinat.tableau import Tableau
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: e = GridViewEditor(Tableau([[1, 2, 5, 6], [3], [4]]))
+            sage: e.get_value()
+            [[1, 2, 5, 6], [3], [4]]
         """
         return self.value
 
-    def set_value(self, obj, compute=True):
+    def set_value(self, obj):
         r"""
         Check compatibility, then set editor value.
-        If compute=True, call methods compute() and draw().
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: e.donottrack = False # This class is not meant to work by itself without a widget.
+            sage: new_valid_obj = Tableau([[1, 2, 7, 6], [3], [4]])
+            sage: e.set_value(new_valid_obj)
+            sage: e.value
+            [[1, 2, 7, 6], [3], [4]]
+            sage: new_invalid_obj = 42
+            sage: e.set_value(new_invalid_obj)
+            Traceback (most recent call last):
+            ...
+            ValueError: Object 42 is not compatible.
         """
         if not self.validate(obj, self.value.__class__):
             raise ValueError("Object %s is not compatible." % str(obj))
-        self.reset_dirty()
         self.value = obj
-        if compute:
+
+    def push_history(self, obj):
+        r"""
+        Push an object to editor history.
+        Ensure that history does not become too long.
+
+        INPUT:
+
+            - ``obj`` -- an object (the old one)
+
+        TESTS::
+
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: e._history
+            []
+            sage: e.push_history(t)
+            sage: e._history
+            [[[1, 2, 5, 6], [3], [4]]]
+
+        """
+        self._history.append(obj)
+        if len(self._history) > MAX_LEN_HISTORY:
+            self._history = self._history[1:]
+
+    @traitlets.observe('value')
+    def value_changed(self, change):
+        r"""
+        What to do when the value has been changed.
+
+        INPUT:
+
+            - ``change`` -- a change Bunch
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
+            sage: new_t = Tableau([[1, 2, 7, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: e.donottrack = False # This class is not meant to work by itself without a widget.
+            sage: e._history
+            []
+            sage: from traitlets import Bunch
+            sage: e.value_changed(Bunch({'name': 'value', 'old': t, 'new': new_t, 'owner': e, 'type': 'change'}))
+            sage: e._history
+            [[[1, 2, 5, 6], [3], [4]]]
+        """
+        self.reset_dirty()
+        if self.donottrack:
+            return
+        old_val = change.old
+        new_val = change.new
+        actually_changed = (id(new_val) != id(old_val))
+        if actually_changed:
+            self.push_history(old_val)
             self.compute()
             self.draw()
+
+    def pop_value(self):
+        r"""
+        """
+        if not self._history:
+            print("No more history!")
+            return
+        prev = self._history.pop()
+        self.donottrack = True
+        self.value = prev
+        self.compute()
+        self.draw()
+        self.donottrack = False
 
     def get_cells(self):
         r"""
@@ -345,26 +457,116 @@ class GridViewEditor(BindableEditorClass):
                     print("These cells cannot be turned into a %s" % cl)
         else:
             raise TypeError("Unable to cast the given cells into a grid-like object.")
-        if not self.validate(obj, None, obj_class):
+        if not self.validate(obj, obj_class):
             raise ValueError("Could not make a compatible ('%s')  object from given cells" % str(obj_class))
-        self.set_value(obj, False)
+        self.donottrack = True
+        self.set_value(obj)
+        self.donottrack = False
 
-    def set_dirty(self, pos, val, e=None):
+    def set_dirty(self, pos, val, err=None):
+        r"""
+        Set a cell 'dirty'.
+
+        INPUT:
+
+            - ``pos`` -- a tuple
+            - ``val`` -- a(n incorrect) value for `pos`
+            - ``err`` -- an exception
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: e.donottrack = False # This class is not meant to work by itself without a widget.
+            sage: from traitlets import Bunch
+            sage: err = e.set_cell(Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'}))
+            sage: e.set_dirty((0,2), 7, err)
+            sage: e.dirty
+            {(0, 2): 7}
+            sage: e.dirty_errors[(0,2)]
+            ValueError('the entries in each row of a semistandard tableau must be weakly increasing',)
+        """
         self.dirty[pos] = val
-        if e:
-            self.dirty_errors[pos] = e
+        if err:
+            self.dirty_errors[pos] = err
 
     def unset_dirty(self, pos):
+        r"""
+        Set a cell no more 'dirty'.
+
+        INPUT:
+
+            - ``pos`` -- a tuple
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: e.donottrack = False # This class is not meant to work by itself without a widget.
+            sage: from traitlets import Bunch
+            sage: err = e.set_cell(Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'}))
+            sage: e.set_dirty((0,2), 7, err)
+            sage: err = e.set_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 9, 'owner': e, 'type': 'change'}))
+            sage: e.set_dirty((2,0), 9, err)
+            sage: e.dirty
+            {(0, 2): 7, (2, 0): 9}
+            sage: e.unset_dirty((0,2))
+            sage: e.dirty
+            {(2, 0): 9}
+        """
         del self.dirty[pos]
         del self.dirty_errors[pos]
 
     def reset_dirty(self):
+        r"""
+        Reset all previously 'dirty' cells.
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: e.donottrack = False # This class is not meant to work by itself without a widget.
+            sage: from traitlets import Bunch
+            sage: err = e.set_cell(Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'}))
+            sage: e.set_dirty((0,2), 7, err)
+            sage: err = e.set_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 9, 'owner': e, 'type': 'change'}))
+            sage: e.set_dirty((2,0), 9, err)
+            sage: e.dirty
+            {(0, 2): 7, (2, 0): 9}
+            sage: e.reset_dirty()
+            sage: e.dirty
+            {}
+        """
         if not self.dirty: # Prevent any interactive loops
             return
-        for pos in self.dirty.keys():
-            self.unset_dirty(pos)
+        self.dirty = {}
+        self.dirty_errors = {}
 
     def dirty_info(self, pos):
+        r"""
+        Get error details from a 'dirty' cell.
+
+        INPUT:
+
+            - ``pos`` -- a tuple
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets import GridViewEditor
+            sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+            sage: e = GridViewEditor(t)
+            sage: e.donottrack = False # This class is not meant to work by itself without a widget.
+            sage: from traitlets import Bunch
+            sage: err = e.set_cell(Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'}))
+            sage: e.set_dirty((0,2), 7, err)
+            sage: err = e.set_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 9, 'owner': e, 'type': 'change'}))
+            sage: e.set_dirty((2,0), 9, err)
+            sage: e.dirty_info((0, 2))
+            'the entries in each row of a semistandard tableau must be weakly increasing'
+        """
         if pos in self.dirty_errors:
             return str(self.dirty_errors[pos])
         return ''
@@ -372,19 +574,21 @@ class GridViewEditor(BindableEditorClass):
     @traitlets.observe(traitlets.All)
     def set_cell(self, change):
         r"""
+        What to do when a cell value has been changed.
+
         TESTS ::
 
             sage: from sage_combinat_widgets import GridViewEditor
             sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
             sage: e = GridViewEditor(t)
-            sage: e.initialization = False # This class is not meant to work by itself without a widget.
+            sage: e.donottrack = False # This class is not meant to work by itself without a widget.
             sage: from traitlets import Bunch
             sage: change = Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'})
             sage: e.set_cell(change)
             sage: e.value
             [[1, 2, 7, 6], [3], [4]]
         """
-        if self.initialization:
+        if self.donottrack:
             return
         if not change.name.startswith('cell_'):
             return
@@ -402,7 +606,9 @@ class GridViewEditor(BindableEditorClass):
                 self.set_dirty(pos, val, result)
             return
         # Success
+        self.donottrack = True
         self.set_value(result)
+        self.donottrack = False
 
     def addable_cells(self):
         r"""
@@ -414,7 +620,7 @@ class GridViewEditor(BindableEditorClass):
 
     def removable_cells(self):
         r"""
-        List removable cells for editor value
+        List removable cells for editor value.
         """
         if not hasattr(self.adapter, 'removable_cells') or not callable(self.adapter.removable_cells):
             return [] # Optional method
@@ -423,11 +629,15 @@ class GridViewEditor(BindableEditorClass):
     @traitlets.observe(traitlets.All)
     def add_cell(self, change):
         r"""
-        TESTS:
+        Add a cell to the widget.
+
+        TESTS ::
+
+            sage: from sage.combinat.tableau import Tableau
             sage: from sage_combinat_widgets import GridViewEditor
             sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
             sage: e = GridViewEditor(t)
-            sage: e.initialization = False
+            sage: e.donottrack = False
             sage: from traitlets import Bunch
             sage: change = Bunch({'name': 'add_1_1', 'old': 0, 'new': 8, 'owner': e, 'type': 'change'})
             sage: e.add_cell(change)
@@ -435,14 +645,14 @@ class GridViewEditor(BindableEditorClass):
             [[1, 2, 5, 6], [3, 8], [4]]
             sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
             sage: e = GridViewEditor(t)
-            sage: e.initialization = False
+            sage: e.donottrack = False
             sage: e.add_cell(change)
             sage: e.value
             [[1, 2, 5, 6], [3], [4]]
             sage: e.dirty
             {(1, 1): 8}
             sage: e = GridViewEditor(SkewTableau([[None, None, 1, 2], [None, 1], [4]]))
-            sage: e.initialization = False
+            sage: e.donottrack = False
             sage: e.add_cell(Bunch({'name': 'add_0_4', 'old': 0, 'new': 3, 'owner': e, 'type': 'change'}))
             sage: e.value
             [[None, None, 1, 2, 3], [None, 1], [4]]
@@ -450,7 +660,7 @@ class GridViewEditor(BindableEditorClass):
             sage: e.value
             [[None, None, 1, 2, 3], [1, 1], [4]]
         """
-        if self.initialization:
+        if self.donottrack:
             return
         if not change.name.startswith('add_') \
            or self.to_cell(change.new) == self.adapter.cellzero:
@@ -465,6 +675,8 @@ class GridViewEditor(BindableEditorClass):
         if val is True: # if it's a button, reverse button toggling
             val = False
         pos = extract_coordinates(change.name)
+        if pos in self.dirty:
+            self.dirty[pos] = val # edit the value before sending to the adapter
         obj = copy(self.value)
         result = self.adapter.add_cell(obj, pos, val, dirty=self.dirty)
         if issubclass(result.__class__, BaseException): # Adding cell was impossible
@@ -474,18 +686,19 @@ class GridViewEditor(BindableEditorClass):
             else: # Keep temporary addition for later
                 self.set_dirty(pos, val, result)
             return
-        new_obj = result
-        self.set_value(new_obj) # Calls compute() and draw() by default
+        self.value = result # Will call the observer
 
     @traitlets.observe(traitlets.All)
     def remove_cell(self, change):
         r"""
+        What to do when a cell has been removed.
+
         TESTS ::
 
             sage: from sage_combinat_widgets import GridViewEditor
             sage: t = Tableau([[1, 2, 5, 6], [3], [4]])
             sage: e = GridViewEditor(t)
-            sage: e.initialization = False
+            sage: e.donottrack = False
             sage: from traitlets import Bunch
             sage: e.remove_cell(Bunch({'name': 'cell_0_3', 'old': 6, 'new': 0, 'owner': e, 'type': 'change'}))
             sage: e.value
@@ -494,14 +707,17 @@ class GridViewEditor(BindableEditorClass):
             sage: e.value
             [[1, 2, 5], [3]]
             sage: e = GridViewEditor(SkewTableau([[None, None, 1, 2, 3], [None, 1], [4]]))
-            sage: e.initialization = False
+            sage: e.donottrack = False
             sage: e.remove_cell(Bunch({'name': 'cell_0_4', 'old': 3, 'new': 0, 'owner': e, 'type': 'change'}))
             sage: e.value
             [[None, None, 1, 2], [None, 1], [4]]
         """
-        if self.initialization:
+        # Do nothing at widget donottrack and do not track widget value
+        if self.donottrack or change.name == 'value':
             return
         val = change.new
+        if val == True: # if it's a button, reverse button toggling
+            val = False
         pos = extract_coordinates(change.name)
         # Dirty _addable_ cells can be removed
         if pos in self.dirty and change.name.startswith('add_') and self.to_cell(val) == self.adapter.cellzero:
@@ -509,8 +725,7 @@ class GridViewEditor(BindableEditorClass):
             return
         # Don't remove non empty cells
         # Don't remove addable cells ; this test will do something only if adapter addablecellzero is specified (therefore not eq to cellzero)
-        # Do nothing at widget initialization
-        elif not change.name.startswith('cell_') or self.to_cell(val) != self.adapter.cellzero \
+        if not change.name.startswith('cell_') or self.to_cell(val) != self.adapter.cellzero \
            or self.to_cell(val) == self.adapter.addablecellzero or change.old == traitlets.Undefined:
             return
         if not hasattr(self.adapter, 'remove_cell'):
@@ -519,8 +734,6 @@ class GridViewEditor(BindableEditorClass):
             return # Method not implemented or deliberately set to None
         if hasattr(self.adapter.remove_cell, '_optional') and self.adapter.remove_cell._optional: # Not implemented
             raise Exception("Removing cells is not implemented for this object.")
-        if val == True: # if it's a button, reverse button toggling
-            val = False
         obj = copy(self.value) # For your pet objects, don't forget to implement __copy__
         result = self.adapter.remove_cell(obj, pos, dirty=self.dirty)
         if issubclass(result.__class__, BaseException): # Removing cell was impossible
@@ -531,8 +744,7 @@ class GridViewEditor(BindableEditorClass):
             else: # Keep temporary substraction for later
                 self.set_dirty(pos, val, result)
             return
-        new_obj = result
-        self.set_value(new_obj) # Calls compute() and draw() by default
+        self.value = result # Will call the observer
 
     def append_row(self, r=None):
         r"""
@@ -545,7 +757,7 @@ class GridViewEditor(BindableEditorClass):
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
             sage: e = GridViewEditor(m)
-            sage: e.initialization = False
+            sage: e.donottrack = False
             sage: e.value
             [ 1  7  1]
             [ 0  0  3]
@@ -560,7 +772,7 @@ class GridViewEditor(BindableEditorClass):
             [ 1  2  3]
             sage: from sage.combinat.tableau import Tableau
             sage: e = GridViewEditor(Tableau([[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]]))
-            sage: e.initialization = False
+            sage: e.donottrack = False
             sage: e.value
             [[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]]
             sage: e.append_row((1,2,3))
@@ -568,37 +780,37 @@ class GridViewEditor(BindableEditorClass):
             ...
             TypeError: 'NotImplementedType' object is not callable
         """
-        if self.initialization:
+        if self.donottrack:
             return
         if not hasattr(self.adapter, 'append_row'):
             raise TypeError("Cannot append row to this object.")
         obj = copy(self.value)
         obj = self.adapter.append_row(obj, r)
-        self.set_value(obj) # Will take care of everything
+        self.value = obj # Will call the observer
 
     def insert_row(self, index, r=None):
         r"""
         Insert a row into editor value.
         """
-        if self.initialization:
+        if self.donottrack:
             return
         if not hasattr(self.adapter, 'insert_row'):
             raise TypeError("Cannot insert row to this object.")
         obj = copy(self.value)
         obj = self.adapter.insert_row(obj, index, r)
-        self.set_value(obj) # Will take care of everything
+        self.value = obj # Will call the observer
 
     def remove_row(self, index=None):
         r"""
         Remove a row from editor value.
         """
-        if self.initialization:
+        if self.donottrack:
             return
         if not hasattr(self.adapter, 'remove_row'):
             raise TypeError("Cannot remove row from this object.")
         obj = copy(self.value)
         obj = self.adapter.remove_row(obj, index)
-        self.set_value(obj) # Will take care of everything
+        self.value = obj # Will call the observer
 
     def append_column(self, c=None):
         r"""
@@ -611,7 +823,7 @@ class GridViewEditor(BindableEditorClass):
             sage: S = MatrixSpace(ZZ, 4,3)
             sage: m = S.matrix([1,7,1,0,0,3,0,-1,2,1,0,-3])
             sage: e = GridViewEditor(m)
-            sage: e.initialization = False
+            sage: e.donottrack = False
             sage: e.value
             [ 1  7  1]
             [ 0  0  3]
@@ -625,7 +837,7 @@ class GridViewEditor(BindableEditorClass):
             [ 1  0 -3  0]
             sage: from sage.combinat.tableau import Tableau
             sage: e = GridViewEditor(Tableau([[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]]))
-            sage: e.initialization = False
+            sage: e.donottrack = False
             sage: e.value
             [[1, 4, 7, 8, 9, 10, 11], [2, 5, 13], [3, 6], [12, 15], [14]]
             sage: e.append_column((1,2,3))
@@ -633,34 +845,34 @@ class GridViewEditor(BindableEditorClass):
             ...
             TypeError: 'NotImplementedType' object is not callable
         """
-        if self.initialization:
+        if self.donottrack:
             return
         if not hasattr(self.adapter, 'append_column'):
             raise TypeError("Cannot append column to this object.")
         obj = copy(self.value)
         obj = self.adapter.append_column(obj, c)
-        self.set_value(obj) # Will take care of everything
+        self.value = obj # Will call the observer
 
     def insert_column(self, index, c=None):
         r"""
         Insert a column into editor value.
         """
-        if self.initialization:
+        if self.donottrack:
             return
         if not hasattr(self.adapter, 'insert_column'):
             raise TypeError("Cannot insert column to this object.")
         obj = copy(self.value)
         obj = self.adapter.insert_column(obj, index, c)
-        self.set_value(obj) # Will take care of everything
+        self.value = obj # Will call the observer
 
     def remove_column(self, index=None):
         r"""
         Remove a column from editor value.
         """
-        if self.initialization:
+        if self.donottrack:
             return
         if not hasattr(self.adapter, 'remove_column'):
             raise TypeError("Cannot remove column from this object.")
         obj = copy(self.value)
         obj = self.adapter.remove_column(obj, index)
-        self.set_value(obj, True) # Will take care of everything
+        self.value = obj # Will call the observer

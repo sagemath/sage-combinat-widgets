@@ -25,9 +25,9 @@ css_lines.append(".blankbutton, .addablebutton {background-color:white; color:#6
 css_lines.append(".blankbutton {border:0px !important}")
 css_lines.append(".blankcell INPUT {border:0px !important}")
 css_lines.append(".addablecell INPUT, .removablecell INPUT {background-position: right top; background-size: 1em; background-repeat: no-repeat}")
-css_lines.append(".addablecell INPUT {background-image: url('Plus.png')}")
+css_lines.append(".addablecell INPUT {background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAA8BAAAAAA7DH7+AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAnRSTlMAAHaTzTgAAAACYktHRAAPOjI+owAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0SU1FB+MCBRIvKscf5nsAAAAtSURBVEjHY2AYBaSBmTNnThhVM6pmaKvhnIkVTBjqagZbOI+qGVVDHTXDAwAAnSews7vfUfkAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTktMDItMDVUMTc6NDc6NDIrMDE6MDDD7zGLAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE5LTAyLTA1VDE3OjQ3OjQyKzAxOjAwsrKJNwAAAABJRU5ErkJggg==')}")
 css_lines.append(".addablecell INPUT, .addablebutton INPUT {border:1px dashed #999 !important}")
-css_lines.append(".removablecell INPUT {background-image: url('Minus.png')}")
+css_lines.append(".removablecell INPUT {background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAA8BAAAAAA7DH7+AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAnRSTlMAAHaTzTgAAAACYktHRAAPOjI+owAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0SU1FB+MCBRIvL7d1EvQAAAAgSURBVEjHY2AYBaNgFIwwwDkTK5gw1NWMglEwCgYxAAAoCFJ7GFQEKQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOS0wMi0wNVQxNzo0Nzo0NyswMTowMJHXHiwAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTktMDItMDVUMTc6NDc6NDcrMDE6MDDgiqaQAAAAAElFTkSuQmCC')}")
 css_lines.append(".dirty INPUT {background-color: pink !important}")
 css = HTML("<style>%s</style>" % '\n'.join(css_lines))
 
@@ -45,15 +45,12 @@ except:
 class TextWithTooltip(Text):
     """Input text with a help title (tooltip)."""
     _view_name = Unicode('TextWithTooltipView').tag(sync=True)
-    _model_name = Unicode('TextWithTooltipModel').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
     _view_module_version = Unicode('^0.2.0').tag(sync=True)
-    _model_module_version = Unicode('^0.2.0').tag(sync=True)
-    tooltip = Unicode().tag(sync=True)
+    description_tooltip = Unicode().tag(sync=True)
 
     def set_tooltip(self, s=''):
-        self.tooltip = s
+        self.description_tooltip = s
 
 class BaseTextCell(TextWithTooltip):
     r"""
@@ -79,6 +76,56 @@ class TextCell(BaseTextCell):
     """
     def __init__(self, content, position, layout=textcell_layout, **kws):
         super(TextCell, self).__init__(content, position, layout, **kws)
+
+class StyledTextCell(TextCell):
+    r"""A class for CSS-styled text grid cells.
+    Not meant to be called directly.
+
+    TESTS ::
+
+        sage: from sage_combinat_widgets.grid_view_widget import StyledTextCell
+        sage: b = StyledTextCell("ok", (1,2))
+        Traceback (most recent call last):
+        ...
+        TraitError: Element of the '_dom_classes' trait of a StyledTextCell instance must be a unicode string, but a value of None <type 'NoneType'> was specified.
+    """
+    disable = None
+    css_class = None
+    style = None
+    def __init__(self, content, position, layout=textcell_layout, **kws):
+        super(StyledTextCell, self).__init__(content, position, layout, **kws)
+        self.add_class(self.css_class)
+        if self.disable:
+            self.disabled = True
+        if self.style:
+            apply_css(self.style)
+
+def apply_css(css_line):
+    try:
+        ip = get_ipython()
+        for base in ip.__class__.__mro__:
+            """If we are in a notebook, we will find 'notebook' in those names"""
+            if 'otebook' in base.__name__:
+                ip.display_formatter.format(HTML("<style>%s</style>" % css_line))
+                break
+    except:
+        pass # We are in the test environment
+
+def styled_text_cell(disabled=False, style_name='', style=None):
+    r"""A function to create CSS-styled cells.
+    A regular text cell has a value and a position.
+
+    TESTS ::
+
+        sage: from sage_combinat_widgets.grid_view_widget import styled_text_cell
+        sage: styled_text_cell(disabled=True, style_name='mycssclass', style="")
+        <class 'traitlets.traitlets.DisabledMycssclassTextCell'>
+    """
+    # FIXME passer la couleur en paramètre ? une chaîne CSS ?
+    class_name = "{}TextCell".format(style_name.capitalize())
+    if disabled:
+        class_name = "Disabled" + class_name
+    return type(class_name, (StyledTextCell,), {'disable': disabled, 'css_class': style_name, 'style': style})
 
 class WiderTextCell(BaseTextCell):
     r"""A regular text grid cell
@@ -201,6 +248,7 @@ def styled_button_cell(disabled=False, style_name=''):
         sage: styled_button_cell(disabled=True, style_name='mycssclass')
         <class 'traitlets.traitlets.DisabledMycssclassButton'>
     """
+    # FIXME passer la couleur en paramètre ? une chaîne CSS ?
     class_name = "{}Button".format(style_name.capitalize())
     if disabled:
         class_name = "Disabled" + class_name
@@ -351,7 +399,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         self.blank_widget_class = blank_widget_class
         self.addable_widget_class = addable_widget_class
         self.draw()
-        self.initialization = False
+        self.donottrack = False
 
     def to_cell(self, val):
         r"""
@@ -400,18 +448,20 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             sage: def test4(w): return (w.links[4].source[0].__class__, w.links[4].source[0].value, w.links[4].target[1])
             sage: assert test0(w1) == test0(w2)
             sage: assert test4(w1) == test4(w2)
-            sage: w2.links[2]
-            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.TextCell'>, 1) to target='cell_0_2'
-            sage: w2.links[6]
-            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>, ) to target='add_0_4'
+            sage: len(w2.links)
+            10
+            sage: w2.links[2].source[0].__class__
+            <class 'sage_combinat_widgets.grid_view_widget.TextCell'>
+            sage: w2.links[6].source[0].__class__
+            <class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>
             sage: from traitlets import Bunch
             sage: w2.add_cell(Bunch({'name': 'add_0_4', 'old': 0, 'new': 3, 'owner': w2, 'type': 'change'}))
             sage: w2.value
             [[None, None, 1, 2, 3], [None, 1], [4]]
-            sage: w2.links[2]
-            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.TextCell'>, 4) to target='cell_2_0'
-            sage: w2.links[7]
-            A typecasting directional link from source=(<class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>, ) to target='add_0_5'
+            sage: w2.links[2].source[0].__class__
+            <class 'sage_combinat_widgets.grid_view_widget.TextCell'>
+            sage: w2.links[7].source[0].__class__
+            <class 'sage_combinat_widgets.grid_view_widget.AddableTextCell'>
         """
         for pos in self.cells.keys():
             traitname = 'cell_%d_%d' % (pos)
@@ -435,7 +485,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         Used classes can be passed as arguments
         to enable changing shapes, colors ..
         """
-        self.initialization = True # Prevent any interactivity while drawing the widget
+        self.donottrack = True # Prevent any interactivity while drawing the widget
         self.reset_links()
         self.compute_height()
         positions = sorted(list(self.cells.keys()))
@@ -499,7 +549,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             vbox_children.reverse()
         self.children = vbox_children
         self.add_links()
-        self.initialization = False
+        self.donottrack = False
 
     def get_child(self, pos):
         r"""

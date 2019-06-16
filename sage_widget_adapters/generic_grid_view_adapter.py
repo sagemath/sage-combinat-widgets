@@ -192,19 +192,33 @@ class GridViewAdapter(object):
             raise ValueError("Cell '%s' does not exist!" % str(pos))
 
     def make_dirty(self, l, dirty={}):
+        r"""
+        Append 'dirty' values to list 'l'.
+        Return a list.
+
+        TESTS ::
+
+            sage: from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
+            sage: from sage.combinat.tableau import Tableau
+            sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
+            sage: ga = GridViewAdapter()
+            sage: ga.cellzero = 0
+            sage: ga.make_dirty(t.to_list(), {(1,2):42})
+            [[1, 2, 5, 6], [3, 7, 42], [4]]
+        """
         for p in dirty:
-            if len(l) > p[0]:
-                if len(l[p[0]]) > p[1]:
+            if p[0] < len(l):
+                if p[1] < len(l[p[0]]):
                     if dirty[p] == self.cellzero:
                         del l[p[0]][p[1]]
                     else:
                         l[p[0]][p[1]] = dirty[p]
                 elif len(l[p[0]]) == p[1] and dirty[p] != self.cellzero:
                     l[p[0]].append(dirty[p])
-            elif len(l) == p[0] and dirty[p] == self.cellzero:
-                l.append([dirty[p]])
             else:
-                raise Exception("Value is out of range: " + str(p))
+                for i in range(p[0] - len(l)):
+                    l.append([])
+                l.append([dirty[p]])
         return l
 
     def set_cell(self, obj, pos, val, dirty={}, constructorname=''):
