@@ -166,10 +166,20 @@ class TableauGridViewAdapter(GridViewAdapter):
             sage: ta = TableauGridViewAdapter()
             sage: ta.remove_cell(t, (1, 1))
             [[1, 2, 5, 6], [3], [4]]
+            sage: ta.remove_cell(t, (2, 0))
+            [[1, 2, 5, 6], [3, 7]]
             sage: ta.remove_cell(t, (2, 1))
             Traceback (most recent call last):
             ...
             ValueError: Cell position '(2, 1)' is not removable.
+            sage: from sage.combinat.tableau import StandardTableau
+            sage: from sage_widget_adapters.combinat.tableau_grid_view_adapter import StandardTableauGridViewAdapter
+            sage: st = StandardTableau([[1, 2, 5, 6], [3, 7], [4]])
+            sage: sta = StandardTableauGridViewAdapter()
+            sage: sta.remove_cell(st, (1, 1))
+            [[1, 2, 5, 6], [3], [4]]
+            sage: sta.remove_cell(st, (2, 0))
+            ValueError('the entries in a standard tableau must be in bijection with 1,2,...,n',)
         """
         if not pos in self.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
