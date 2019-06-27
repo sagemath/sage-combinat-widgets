@@ -188,6 +188,7 @@ class TableauGridViewAdapter(GridViewAdapter):
         tl[pos[0]].pop()
         if not tl[pos[0]]:
             tl.pop()
+        tl = [r for r in tl if r] # do not keep any empty row before the test
         return self._validate(tl)
 
 class SemistandardTableauGridViewAdapter(TableauGridViewAdapter):
