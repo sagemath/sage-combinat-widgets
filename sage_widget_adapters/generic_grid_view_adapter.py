@@ -194,7 +194,7 @@ class GridViewAdapter(object):
     def make_dirty(self, l, dirty={}):
         r"""
         Append 'dirty' values to list 'l'.
-        Return a list.
+        Return a list with no empty values.
 
         TESTS ::
 
@@ -205,6 +205,8 @@ class GridViewAdapter(object):
             sage: ga.cellzero = 0
             sage: ga.make_dirty(t.to_list(), {(1,2):42})
             [[1, 2, 5, 6], [3, 7, 42], [4]]
+            sage: ga.make_dirty(t.to_list(), {(2,0):0})
+            [[1, 2, 5, 6], [3, 7]]
         """
         for p in dirty:
             if p[0] < len(l):
@@ -219,7 +221,7 @@ class GridViewAdapter(object):
                 for i in range(p[0] - len(l)):
                     l.append([])
                 l.append([dirty[p]])
-        return l
+        return [val for val in l if val]
 
     def set_cell(self, obj, pos, val, dirty={}, constructorname=''):
         r"""
