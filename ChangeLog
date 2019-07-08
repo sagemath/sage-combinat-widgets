@@ -1,3 +1,6 @@
+0.7.4:
+	* Fixed an edition bug in a standard tableau
+	* No more using `uniq` function
 0.7.3:
 	* Code rewrite to make writing custom interactions easier for the user
 	* Quicker installation (not calling webpack twice)

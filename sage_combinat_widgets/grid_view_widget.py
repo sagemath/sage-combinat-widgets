@@ -10,7 +10,6 @@ AUTHORS ::
 from .grid_view_editor import GridViewEditor, cdlink
 from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, Button, ValueWidget, register
-from sage.misc.misc import uniq
 from six import text_type
 from traitlets import Unicode
 
@@ -496,7 +495,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         addable_rows = []
         removable_positions = self.removable_cells()
         addable_rows = [(i,[pos for pos in addable_positions if pos[0]==i]) \
-                        for i in uniq([t[0] for t in addable_positions])]
+                        for i in set([t[0] for t in addable_positions])]
         if not cell_widget_classes:
             cell_widget_classes = self.cell_widget_classes
         if not cell_widget_class_index:
