@@ -27,7 +27,6 @@ from copy import copy
 from sage.misc.bindable_class import BindableClass
 from sage.all import SageObject
 from sage.misc.abstract_method import AbstractMethod
-from sage.misc.misc import uniq
 MAX_LEN_HISTORY = 50
 
 def extract_coordinates(s):
@@ -452,7 +451,7 @@ class GridViewEditor(BindableEditorClass):
             positions = sorted(list(cells.keys()))
             for cl in obj_class.__mro__:
                 try:
-                    obj = cl([[cells[pos] for pos in positions if pos[0]==i] for i in uniq([t[0] for t in positions])])
+                    obj = cl([[cells[pos] for pos in positions if pos[0]==i] for i in set([t[0] for t in positions])])
                 except:
                     print("These cells cannot be turned into a %s" % cl)
         else:

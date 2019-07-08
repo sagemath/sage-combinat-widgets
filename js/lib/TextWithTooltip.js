@@ -1,6 +1,5 @@
 var widgets = require('@jupyter-widgets/base');
 var widgets = require('@jupyter-widgets/controls');
-var _ = require('lodash');
 
 var TextWithTooltipView = widgets.TextView.extend({
     render: function() {
