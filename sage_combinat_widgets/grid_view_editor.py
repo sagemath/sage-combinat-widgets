@@ -228,7 +228,7 @@ class GridViewEditor(BindableEditorClass):
         """
         if not obj:
             obj = self.value
-        if not obj:
+        if obj is None:
             return
         self.cells = self.adapter.compute_cells(obj)
         celltype = self.adapter.celltype
@@ -290,7 +290,10 @@ class GridViewEditor(BindableEditorClass):
         """
         if not hasattr(self, 'cells'):
             self.compute()
-        maxpos = max(pos[0] for pos in self.cells)
+        if self.cells:
+            maxpos = max(pos[0] for pos in self.cells)
+        else:
+            maxpos = -1
         self.height = maxpos + 1 # Number of rows in self.value
         for pos in self.addable_cells():
             if pos[0] > maxpos:
@@ -709,6 +712,11 @@ class GridViewEditor(BindableEditorClass):
             sage: e.remove_cell(Bunch({'name': 'cell_0_4', 'old': 3, 'new': 0, 'owner': e, 'type': 'change'}))
             sage: e.value
             [[None, None, 1, 2], [None, 1], [4]]
+            sage: p = Partition([1])
+            sage: e = GridViewEditor(p)
+            sage: e.remove_cell(Bunch({'name': 'cell_0_0', 'old': False, 'new': True, 'owner': e, 'type': 'change'}))
+            sage: e.value
+            []
         """
         # Do nothing at widget donottrack and do not track widget value
         if self.donottrack or change.name == 'value':
