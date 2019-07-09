@@ -504,6 +504,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             addable_widget_class = self.addable_widget_class
         if not blank_widget_class:
             blank_widget_class = self.blank_widget_class
+        i, j = -1, -1 # initialization ; necessary for an empty grid
         for i in range(self.height):
             r = rows[i]
             if not r: # Empty row
