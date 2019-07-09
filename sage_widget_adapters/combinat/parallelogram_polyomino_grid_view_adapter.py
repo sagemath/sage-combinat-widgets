@@ -35,7 +35,7 @@ class PolyominoGridViewAdapter(GridViewAdapter):
     objclass = ParallelogramPolyomino
     celltype = bool
     cellzero = False
-    
+
     @staticmethod
     def compute_cells(obj):
         r"""
@@ -48,16 +48,16 @@ class PolyominoGridViewAdapter(GridViewAdapter):
             sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import PolyominoGridViewAdapter
             sage: pp = ParallelogramPolyomino([[0, 1, 1],[1, 1 ,0]])
             sage: PolyominoGridViewAdapter.compute_cells(pp)
-            {(0, 0): False, (0, 1): False}
+            {(0, 0): True, (0, 1): True}
         """
         cells = {}
         lower_heights = obj.lower_heights()
         upper_heights = obj.upper_heights()
         for i in range(obj.width()):
             for j in range(upper_heights[i],lower_heights[i]):
-                cells[j,i] = False
+                cells[j,i] = True
         return cells
-    
+
     @staticmethod
     def addable_cells(obj):
         r"""
@@ -69,19 +69,25 @@ class PolyominoGridViewAdapter(GridViewAdapter):
             sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import PolyominoGridViewAdapter
             sage: pp = ParallelogramPolyomino([[0, 1, 0, 1], [1, 1, 0, 0]])
             sage: PolyominoGridViewAdapter.addable_cells(pp)
-            [(1, 0)]
+            [(1, 0), (2, 1), (1, 2)]
         """
         cells = []
+
         upper_heights = obj.upper_heights()
         for i,c in enumerate(upper_heights[1:]):
             if c != upper_heights[i]:
                 cells.append((c-1,i+1))
+
         lower_heights = obj.lower_heights()
         for i,c in enumerate(lower_heights[1:]):
             if c != lower_heights[i]:
                 cells.append((lower_heights[i],i))
+
+        height, width = obj.geometry()
+        cells += [(height,width-1), (height-1,width)]
+
         return cells
-    
+
     @staticmethod
     def removable_cells(obj):
         r"""
@@ -106,9 +112,15 @@ class PolyominoGridViewAdapter(GridViewAdapter):
                 cells.append((x2,i-1))
             if x2 < y2-1 and y1 != y2 and y2-1 > x3:
                 cells.append((y2-1,i-1))
-            
+
+        if len(heights) > 3:
+            x1,y1 = heights[-3]
+            x2,y2 = heights[-2]
+            if y1 < y2 or x2+1 == y2:
+                cells.append((y2-1, len(heights)-3))
+
         return cells
-    
+
     def add_cell(self, obj, pos, val=None, dirty={}):
         r"""
         Add cell
@@ -126,21 +138,33 @@ class PolyominoGridViewAdapter(GridViewAdapter):
             ...
             ValueError: Cell position '(1, 1)' is not addable.
         """
-        if not pos in self.addable_cells(obj):
+        if pos not in self.addable_cells(obj):
             raise ValueError("Cell position '%s' is not addable." % str(pos))
 
         heights = list(zip(obj.upper_heights(),obj.lower_heights()))
+
         upper_path = obj.upper_path()
         lower_path = obj.lower_path()
+
+        height, width = obj.geometry()
+
         i,j = pos
-        index = i+j
-        if heights[j][0] == i+1:
-            upper_path[index:index+2] = [1,0]
-        if heights[j][1] == i:
-            lower_path[index:index+2] = [0,1]
-            
+        if i < height and j < width:
+            index = i+j
+            if heights[j][0] == i+1:
+                upper_path[index:index+2] = [1,0]
+            if heights[j][1] == i:
+                lower_path[index:index+2] = [0,1]
+        else:
+            if i == height:
+                lower_path[-1:] = [0,1]
+                upper_path += [0]
+            else:
+                lower_path += [1]
+                upper_path[-1:] = [1,0]
+
         return ParallelogramPolyomino([lower_path, upper_path])
-    
+
     def remove_cell(self, obj, pos, dirty={}):
         r"""
         Remove cell
@@ -158,18 +182,29 @@ class PolyominoGridViewAdapter(GridViewAdapter):
             ...
             ValueError: Cell position '(1, 1)' is not removable.
         """
-        if not pos in self.removable_cells(obj):
+        if pos not in self.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
-            
+
         heights = list(zip(obj.upper_heights(),obj.lower_heights()))
         upper_path = obj.upper_path()
         lower_path = obj.lower_path()
         i,j = pos
         index = i+j
-        if heights[j][0] == i:
-            upper_path[index:index+2] = [0,1]
-        if heights[j][1]-1 == i:
-            lower_path[index:index+2] = [1,0]
-            
+
+        if len(heights) != j+1:
+            if heights[j][0] == i:
+                upper_path[index:index+2] = [0,1]
+            if heights[j][1]-1 == i:
+                lower_path[index:index+2] = [1,0]
+        else:
+            if heights[j][0] != i and heights[j][1]-1 == i:
+                lower_path[index:index+2] = [1]
+                upper_path.pop()
+            elif heights[j][1]-1 == i:
+                lower_path.pop()
+                upper_path[index:index+2] = [0]
+            else:
+                upper_path[index:index+2] = [0,1]
+
         return ParallelogramPolyomino([lower_path, upper_path])
 
