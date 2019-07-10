@@ -9,11 +9,11 @@ Grid View Adapter for parallelogram polyominos
     :widths: 30, 70
     :delim: |
 
-    :meth:`~PolyominoGridViewAdapter.compute_cells` | Compute parallelogram polyomino celss as a dictionary { coordinate pair : False }
-    :meth:`~PolyominoGridViewAdapter.addable_cells` | List addable cells
-    :meth:`~PolyominoGridViewAdapter.removable_cells` | List removable cells
-    :meth:`~PolyominoGridViewAdapter.add_cell` | Add a cell
-    :meth:`~PolyominoGridViewAdapter.remove_cell` | Remove a cell
+    :meth:`~ParallelogramPolyominoGridViewAdapter.compute_cells` | Compute parallelogram polyomino celss as a dictionary { coordinate pair : False }
+    :meth:`~ParallelogramPolyominoGridViewAdapter.addable_cells` | List addable cells
+    :meth:`~ParallelogramPolyominoGridViewAdapter.removable_cells` | List removable cells
+    :meth:`~ParallelogramPolyominoGridViewAdapter.add_cell` | Add a cell
+    :meth:`~ParallelogramPolyominoGridViewAdapter.remove_cell` | Remove a cell
 
 AUTHORS ::
 
@@ -23,7 +23,7 @@ AUTHORS ::
 from sage.combinat.parallelogram_polyomino import ParallelogramPolyomino
 from sage_widget_adapters.generic_grid_view_adapter import GridViewAdapter
 
-class PolyominoGridViewAdapter(GridViewAdapter):
+class ParallelogramPolyominoGridViewAdapter(GridViewAdapter):
     r"""
     Grid view adapter for parallelogram polyominos.
 
@@ -45,9 +45,9 @@ class PolyominoGridViewAdapter(GridViewAdapter):
         TESTS ::
 
             sage: from sage.combinat.parallelogram_polyomino import ParallelogramPolyomino
-            sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import PolyominoGridViewAdapter
+            sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import ParallelogramPolyominoGridViewAdapter
             sage: pp = ParallelogramPolyomino([[0, 1, 1],[1, 1 ,0]])
-            sage: PolyominoGridViewAdapter.compute_cells(pp)
+            sage: ParallelogramPolyominoGridViewAdapter.compute_cells(pp)
             {(0, 0): True, (0, 1): True}
         """
         cells = {}
@@ -66,9 +66,9 @@ class PolyominoGridViewAdapter(GridViewAdapter):
         TESTS ::
 
             sage: from sage.combinat.parallelogram_polyomino import ParallelogramPolyomino
-            sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import PolyominoGridViewAdapter
+            sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import ParallelogramPolyominoGridViewAdapter
             sage: pp = ParallelogramPolyomino([[0, 1, 0, 1], [1, 1, 0, 0]])
-            sage: PolyominoGridViewAdapter.addable_cells(pp)
+            sage: ParallelogramPolyominoGridViewAdapter.addable_cells(pp)
             [(1, 0), (2, 1), (1, 2)]
         """
         cells = []
@@ -96,9 +96,9 @@ class PolyominoGridViewAdapter(GridViewAdapter):
         TESTS ::
 
             sage: from sage.combinat.parallelogram_polyomino import ParallelogramPolyomino
-            sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import PolyominoGridViewAdapter
+            sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import ParallelogramPolyominoGridViewAdapter
             sage: pp = ParallelogramPolyomino([[0, 0, 1, 1], [1, 1, 0, 0]])
-            sage: PolyominoGridViewAdapter.removable_cells(pp)
+            sage: ParallelogramPolyominoGridViewAdapter.removable_cells(pp)
             [(1, 0), (0, 1)]
         """
         heights = [(0,0)] + list(zip(obj.upper_heights(),obj.lower_heights()))
@@ -128,9 +128,9 @@ class PolyominoGridViewAdapter(GridViewAdapter):
         TESTS ::
 
             sage: from sage.combinat.parallelogram_polyomino import ParallelogramPolyomino
-            sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import PolyominoGridViewAdapter
+            sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import ParallelogramPolyominoGridViewAdapter
             sage: pp = ParallelogramPolyomino([[0, 1, 0, 1], [1, 1, 0, 0],])
-            sage: ppa = PolyominoGridViewAdapter()
+            sage: ppa = ParallelogramPolyominoGridViewAdapter()
             sage: ppa.add_cell(pp, (1, 0))
             [[0, 0, 1, 1], [1, 1, 0, 0]]
             sage: ppa.add_cell(pp, (1, 1))
@@ -172,9 +172,9 @@ class PolyominoGridViewAdapter(GridViewAdapter):
         TESTS ::
 
             sage: from sage.combinat.parallelogram_polyomino import ParallelogramPolyomino
-            sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import PolyominoGridViewAdapter
+            sage: from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import ParallelogramPolyominoGridViewAdapter
             sage: pp = ParallelogramPolyomino([[0, 0, 1, 1], [1, 1, 0, 0]])
-            sage: ppa = PolyominoGridViewAdapter()
+            sage: ppa = ParallelogramPolyominoGridViewAdapter()
             sage: ppa.remove_cell(pp, (1, 0))
             [[0, 1, 0, 1], [1, 1, 0, 0]]
             sage: ppa.remove_cell(pp, (1, 1))
