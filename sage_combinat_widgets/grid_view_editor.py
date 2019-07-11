@@ -350,9 +350,8 @@ class GridViewEditor(BindableEditorClass):
             ...
             ValueError: Object 42 is not compatible.
         """
-        if not self.validate(obj, self.value.__class__):
-            raise ValueError("Object %s is not compatible." % str(obj))
-        self.value = obj
+        self.reset_dirty()
+        self.value = obj # Will call the observer, but only if value has changed
 
     def push_history(self, obj):
         r"""
@@ -608,9 +607,7 @@ class GridViewEditor(BindableEditorClass):
                 self.set_dirty(pos, val, result)
             return
         # Success
-        self.donottrack = True
         self.set_value(result)
-        self.donottrack = False
 
     def addable_cells(self):
         r"""
@@ -687,7 +684,7 @@ class GridViewEditor(BindableEditorClass):
             else: # Keep temporary addition for later
                 self.set_dirty(pos, val, result)
             return
-        self.value = result # Will call the observer
+        self.set_value(result)
 
     @traitlets.observe(traitlets.All)
     def remove_cell(self, change):
@@ -749,7 +746,7 @@ class GridViewEditor(BindableEditorClass):
             else: # Keep temporary substraction for later
                 self.set_dirty(pos, val, result)
             return
-        self.value = result # Will call the observer
+        self.set_value(result)
 
     def append_row(self, r=None):
         r"""
