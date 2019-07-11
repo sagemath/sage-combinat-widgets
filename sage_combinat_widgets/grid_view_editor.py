@@ -722,7 +722,7 @@ class GridViewEditor(BindableEditorClass):
         if self.donottrack or change.name == 'value':
             return
         val = change.new
-        if val == True: # if it's a button, reverse button toggling
+        if val is True: # if it's a button, reverse button toggling
             val = False
         pos = extract_coordinates(change.name)
         # Dirty _addable_ cells can be removed
