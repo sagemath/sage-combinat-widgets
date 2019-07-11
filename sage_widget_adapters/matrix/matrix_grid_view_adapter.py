@@ -173,6 +173,24 @@ class MatrixGridViewAdapter(GridViewAdapter):
             return [(obj.nrows()-1, 0)]
         return []
 
+    def remove_cell(self, obj, pos, dirty={}):
+        r"""
+        What to do if the user removes a value.
+        (we replace the resulting blank with a zero)
+
+        TESTS ::
+
+            sage: from sage.matrix.constructor import Matrix
+            sage: from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
+            sage: m = Matrix(QQ, 2, 3, range(6))/2
+            sage: ma = MatrixGridViewAdapter(m)
+            sage: ma.remove_cell(m, (1,0))
+            [ 0 1/2   1]
+            [ 0   2 5/2]
+        """
+        obj[pos] = self.cellzero
+        return obj
+
     def append_row(self, obj, r=None):
         r"""
         Append a row to a matrix.
