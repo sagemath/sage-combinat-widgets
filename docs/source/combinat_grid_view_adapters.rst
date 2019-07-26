@@ -22,3 +22,8 @@ Combinat Grid View Adapters
    :members:
    :undoc-members:
    :show-inheritance:
+
+.. automodule:: sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter
+   :members:
+   :undoc-members:
+   :show-inheritance:

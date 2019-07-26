@@ -155,7 +155,7 @@ setup_args = {
         ('etc/jupyter/nbconfig/notebook.d/' ,['sage-combinat-widgets.json'])
     ],
     'url': 'https://github.com/sagemath/sage-combinat-widgets',
-    'author': 'Odile Bénassy, Nicolas M. Thiéry',
+    'author': 'Odile Bénassy, Henri Derycke, Nicolas M. Thiéry',
     'author_email': 'odile.benassy@u-psud.fr',
     'license': 'GPLv3+',
     'classifiers': [

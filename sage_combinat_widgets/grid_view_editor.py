@@ -91,6 +91,10 @@ def get_adapter(obj):
     if issubclass(obj.__class__, SkewTableau):
         from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
         return SkewTableauGridViewAdapter()
+    from sage.combinat.parallelogram_polyomino import ParallelogramPolyomino
+    if issubclass(obj.__class__, ParallelogramPolyomino):
+        from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import ParallelogramPolyominoGridViewAdapter
+        return ParallelogramPolyominoGridViewAdapter()
     from sage.matrix.matrix2 import Matrix
     if issubclass(obj.__class__, Matrix):
         from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
@@ -350,9 +354,8 @@ class GridViewEditor(BindableEditorClass):
             ...
             ValueError: Object 42 is not compatible.
         """
-        if not self.validate(obj, self.value.__class__):
-            raise ValueError("Object %s is not compatible." % str(obj))
-        self.value = obj
+        self.reset_dirty()
+        self.value = obj # Will call the observer, but only if value has changed
 
     def push_history(self, obj):
         r"""
@@ -608,9 +611,7 @@ class GridViewEditor(BindableEditorClass):
                 self.set_dirty(pos, val, result)
             return
         # Success
-        self.donottrack = True
         self.set_value(result)
-        self.donottrack = False
 
     def addable_cells(self):
         r"""
@@ -687,7 +688,7 @@ class GridViewEditor(BindableEditorClass):
             else: # Keep temporary addition for later
                 self.set_dirty(pos, val, result)
             return
-        self.value = result # Will call the observer
+        self.set_value(result)
 
     @traitlets.observe(traitlets.All)
     def remove_cell(self, change):
@@ -722,7 +723,7 @@ class GridViewEditor(BindableEditorClass):
         if self.donottrack or change.name == 'value':
             return
         val = change.new
-        if val == True: # if it's a button, reverse button toggling
+        if val is True: # if it's a button, reverse button toggling
             val = False
         pos = extract_coordinates(change.name)
         # Dirty _addable_ cells can be removed
@@ -749,7 +750,7 @@ class GridViewEditor(BindableEditorClass):
             else: # Keep temporary substraction for later
                 self.set_dirty(pos, val, result)
             return
-        self.value = result # Will call the observer
+        self.set_value(result)
 
     def append_row(self, r=None):
         r"""

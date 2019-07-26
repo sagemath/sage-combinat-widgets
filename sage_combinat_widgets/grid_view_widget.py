@@ -542,9 +542,14 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                     hbox_children.append(self.addable_widget_class((i,j), layout=self.cell_layout))
             vbox_children.append(HBox(hbox_children))
         for row in addable_rows:
-            if row[0] > i:
-                vbox_children.append(HBox(
-                    [self.addable_widget_class((i,j), layout=self.cell_layout) for c in row[1]]))
+            if row[0] >= self.height:
+                hbox_children = []
+                for c in range(max(row[1])[1]+1):
+                    if (row[0],c) in row[1]:
+                        hbox_children.append(self.addable_widget_class((i,j), layout=self.cell_layout))
+                    else:
+                        hbox_children.append(blank_widget_class(layout=self.cell_layout))
+                vbox_children.append(HBox(hbox_children))
         if self.display_convention == 'fr':
             vbox_children.reverse()
         self.children = vbox_children
@@ -582,6 +587,13 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         child = self.get_child(pos)
         child.remove_class('dirty')
         child.set_tooltip()
+
+    def reset_dirty(self):
+        for pos in self.dirty:
+            child = self.get_child(pos)
+            child.remove_class('dirty')
+            child.set_tooltip()
+        super(GridViewWidget, self).reset_dirty()
 
 def PartitionGridViewWidget(obj, display_convention='en'):
     r"""

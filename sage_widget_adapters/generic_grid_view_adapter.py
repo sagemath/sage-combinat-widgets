@@ -237,6 +237,9 @@ class GridViewAdapter(object):
             sage: ga = GridViewAdapter()
             sage: ga.set_cell(t, (1,1), 8, constructorname='Tableau')
             [[1, 2, 5, 6], [3, 8], [4]]
+            sage: ga.cellzero = 0
+            sage: ga.set_cell(t, (0,3), 6, {(0,3):5}, constructorname='StandardTableau')
+            [[1, 2, 5, 6], [3, 7], [4]]
             sage: from sage.matrix.constructor import Matrix, matrix
             sage: m = Matrix(QQ, 3, 3, range(9))/2
             sage: ga.set_cell(m, (0,1), 2/3, constructorname='matrix')
