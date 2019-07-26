@@ -352,9 +352,12 @@ class GridViewEditor(BindableEditorClass):
             sage: e.set_value(new_invalid_obj)
             Traceback (most recent call last):
             ...
-            ValueError: Object 42 is not compatible.
+            ValueError: Object 42 is not compatible. A tableau must be a list of iterables.
         """
         self.reset_dirty()
+        res = self.adapter._validate(obj)
+        if issubclass(res.__class__, BaseException):
+            raise ValueError("Object %s is not compatible. %s" % (obj, res))
         self.value = obj # Will call the observer, but only if value has changed
 
     def push_history(self, obj):
@@ -715,6 +718,7 @@ class GridViewEditor(BindableEditorClass):
             [[None, None, 1, 2], [None, 1], [4]]
             sage: p = Partition([1])
             sage: e = GridViewEditor(p)
+            sage: e.donottrack = False
             sage: e.remove_cell(Bunch({'name': 'cell_0_0', 'old': False, 'new': True, 'owner': e, 'type': 'change'}))
             sage: e.value
             []
