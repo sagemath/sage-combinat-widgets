@@ -119,6 +119,8 @@ class GridViewAdapter(object):
         r"""
         From an object `obj`,
         return a dictionary { coordinates pair : integer }
+        and, optionally, a second dictionary for graphical options
+        (None by default).
         """
 
     @classmethod
