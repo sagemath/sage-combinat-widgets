@@ -9,6 +9,7 @@ Jupyter editable widgets for Sagemath combinatorial objects:
 
 - Partition & Skew Partition
 - Standard/Semi-standard/Generic Tableau & Skew Tableau
+- Parallelogram Polyomino
 
 Also : 
 
