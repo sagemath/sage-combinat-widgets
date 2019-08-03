@@ -139,6 +139,8 @@ class GridViewAdapter(object):
                 return eval_in_main(constructorname)(obj)
             if cls.constructorname:
                 return eval_in_main(cls.constructorname)(obj)
+            if issubclass(obj.__class__, cls.objclass):
+                return obj
             return cls.objclass(obj)
         except Exception as e:
             return e
