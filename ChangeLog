@@ -1,7 +1,8 @@
+0.7.5:
+	* Parallelogram polyomino adapter
 0.7.4:
 	* Suppress empty rows in tableau editing + fixed some special cases in editing
 	* No more using `uniq` function (deprecated in favor of `set`)
-	* Parallelogram polyomino adapter
 0.7.3:
 	* Code rewrite to make writing custom interactions easier for the user
 	* Quicker installation (not calling webpack twice)
