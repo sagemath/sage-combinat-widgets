@@ -45,7 +45,7 @@ class TextWithTooltip(Text):
     """Input text with a help title (tooltip)."""
     _view_name = Unicode('TextWithTooltipView').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _view_module_version = Unicode('^0.7.5').tag(sync=True)
+    _view_module_version = Unicode('^0.7.6').tag(sync=True)
     description_tooltip = Unicode().tag(sync=True)
 
     def set_tooltip(self, s=''):

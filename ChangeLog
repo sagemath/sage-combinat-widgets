@@ -1,4 +1,4 @@
-0.7.5:
+0.7.6:
 	* Parallelogram polyomino adapter
 0.7.4:
 	* Suppress empty rows in tableau editing + fixed some special cases in editing
