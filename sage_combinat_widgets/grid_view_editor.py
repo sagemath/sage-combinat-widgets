@@ -234,11 +234,14 @@ class GridViewEditor(BindableEditorClass):
             obj = self.value
         if obj is None:
             return
-        try:
-            self.cells, self.options = self.adapter.compute_cells(obj)
-        except:
-            self.cells = self.adapter.compute_cells(obj)
-            self.options = None
+        # Fetch information from the object, through the adapter
+        res = self.adapter.compute_cells(obj)
+        if type(res) == type(()) and len(res) == 2:
+            self.cells, self.cell_options = res
+        elif type(res) == type({}):
+            self.cells, self.cell_options = res, None
+        else:
+            raise TypeError("Method compute_cells should return one or two dictionaries, not a %s" % type(res))
         celltype = self.adapter.celltype
         cellzero = self.adapter.cellzero
         addablecelltype = self.adapter.addablecelltype or celltype

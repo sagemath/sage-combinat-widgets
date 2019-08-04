@@ -12,6 +12,7 @@ from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, Button, ValueWidget, register
 from six import text_type
 from traitlets import Unicode
+import re
 
 textcell_layout = Layout(width='3em', height='2em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em', height='3em', margin='0', padding='0')
@@ -39,6 +40,50 @@ try:
             break
 except:
     pass # We are in the test environment
+
+def parse_style(data):
+    r"""
+    Parse input dictionary `data`,
+    and make up a style / layout
+    to apply that styling data.
+    """
+    cell_style = {}
+    if 'style' in data:
+        cell_style = data['style']
+    if 'background' in data:
+        cell_style['background'] = data['background']
+    if 'background-color' in data:
+        cell_style['background-color'] = data['background-color']
+    if 'background-image' in data:
+        cell_style['background-image'] = data['background-image']
+    return cell_style
+
+def inject_css(css_cls, style={}):
+    r"""
+    Inject input dictionary `style`
+    as CSS paragraph
+    for input CSS class name `css_cls`.
+    """
+    css_lines = []
+    css_lines.append("." + css_cls + " INPUT {")
+    for k in style:
+        if k == 'background-image' and 'svg' in style[k].lower():
+            css_lines.append('  ' + k + ': url("data:image/svg+xml,' + optimize_svg(style[k]) + '") !important;')
+        else:
+            css_lines.append("  " + k + ": " + style[k] + " !important;!")
+    css_lines.append("}")
+    get_ipython().display_formatter.format(HTML("<style>%s</style>" % '\n'.join(css_lines)))
+
+def optimize_svg(s):
+    r"""
+    Strip new lines and try to minimize SVG code size.
+    """
+    # Escape or unescape, when acceptable
+    s = s.replace('%20', ' ').replace('%2F', '/').replace('<', '%3c').replace('>', '%3e')
+    # Substitute single quotes around attribute values
+    s = re.sub(r'=\s*"(\w*)"', lambda m:"='" + m.group(1) + "'", s)
+    # Compress white space
+    return re.sub(r'\s+', ' ', s)
 
 @register
 class TextWithTooltip(Text):
@@ -188,14 +233,28 @@ class ButtonCell(ToggleButton):
     """
     displaytype = bool
 
-    def __init__(self, content, position, layout=buttoncell_smaller_layout, **kws):
+    def __init__(self, content, position, layout=buttoncell_smaller_layout,
+                 label=None, style=None, tooltip=None, **kws):
         super(ButtonCell, self).__init__()
         self.layout = layout
         self.value = content
         self.position = position
+        if label is not None:
+            self.description = label
+        if style:
+            self.set_style(style)
         self.add_class('gridbutton')
-        self.set_tooltip()
+        self.add_class('pos_%d_%d' % position)
+        self.set_tooltip(tooltip)
 
+    def set_style(self, st={}):
+        r"""
+        Parse input dictionary `st`
+        and inject corresponding style.
+        """
+        self.style = parse_style(st)
+                             
+        
     def set_tooltip(self, s=None):
         r"""From a position (i,j),
         we just want the string 'i,j'
@@ -475,7 +534,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                 self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
 
     def draw(self, cell_widget_classes=None, cell_widget_class_index=None,
-             addable_widget_class=None, blank_widget_class=None):
+             addable_widget_class=None, blank_widget_class=None, cell_options=None):
         r"""
         Add children to the GridWidget:
         - Sage object/grid editor cells
@@ -504,6 +563,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             addable_widget_class = self.addable_widget_class
         if not blank_widget_class:
             blank_widget_class = self.blank_widget_class
+        if not cell_options:
+            cell_options = self.cell_options
         i, j = -1, -1 # initialization ; necessary for an empty grid
         for i in range(self.height):
             r = rows[i]
@@ -520,10 +581,20 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                     cell_content = self.cells[(i,j)]
                     cell_widget_class = cell_widget_classes[cell_widget_class_index((i,j))]
                     cell_display = self.adapter.cell_to_display(cell_content, self.displaytype)
+                    cell_label, cell_style, cell_tooltip = None, None, None
+                    if cell_options:
+                        if 'label' in cell_options[(i,j)]:
+                            cell_label = cell_options[(i,j)]['label']
+                        if 'tooltip' in cell_options[(i,j)]:
+                            cell_tooltip = cell_options[(i,j)]['tooltip']
+                        cell_style = parse_style(cell_options[(i,j)])
                     cell = cell_widget_class(cell_display,
                                              (i,j),
                                              layout=self.cell_layout,
-                                             placeholder=cell_display)
+                                             placeholder=cell_display,
+                                             label=cell_label,
+                                             style=cell_style,
+                                             tooltip=cell_tooltip)
                     if (i,j) in removable_positions:
                         if issubclass(cell_widget_class, ToggleButton):
                             cell.description = '-'
