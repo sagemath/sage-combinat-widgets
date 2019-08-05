@@ -1,5 +1,5 @@
 import StyleModel from '@jupyter-widgets/base';
-import TextView from '@jupyter-widgets/controls';
+//import TextView from '@jupyter-widgets/controls';
 
 export
 class CellStyleModel extends StyleModel {
