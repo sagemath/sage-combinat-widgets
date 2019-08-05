@@ -9,7 +9,9 @@ AUTHORS ::
 """
 from .grid_view_editor import GridViewEditor, cdlink
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, Button, ValueWidget, register
+from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, Button, ValueWidget, register, widget_serialization
+from ipywidgets.widgets.widget_description import DescriptionStyle
+from ipywidgets.widgets.trait_types import InstanceDict, Color
 from six import text_type
 from traitlets import Unicode
 import re
@@ -47,16 +49,16 @@ def parse_style(data):
     and make up a style / layout
     to apply that styling data.
     """
-    cell_style = {}
+    cell_style_dict = {}
     if 'style' in data:
-        cell_style = data['style']
+        cell_style_dict = data['style']
     if 'background' in data:
-        cell_style['background'] = data['background']
+        cell_style_dict['background'] = data['background']
     if 'background-color' in data:
-        cell_style['background-color'] = data['background-color']
+        cell_style_dict['background-color'] = data['background-color']
     if 'background-image' in data:
-        cell_style['background-image'] = data['background-image']
-    return cell_style
+        cell_style_dict['background-image'] = data['background-image']
+    return cell_style_dict
 
 def inject_css(css_cls, style={}):
     r"""
@@ -85,6 +87,17 @@ def optimize_svg(s):
     # Compress white space
     return re.sub(r'\s+', ' ', s)
 
+class CellStyle(DescriptionStyle):
+    r"""
+    Extend style implementation
+    for ToggleButton and Text.
+    """
+    # background_color, background_image, background
+    _model_name = Unicode('CellStyleModel').tag(sync=True)
+    background_color = Color(None, allow_none=True, help="Cell background color").tag(sync=True)
+    background_image = Unicode(help="Cell background image").tag(sync=True)
+    background = Unicode(help="Cell background").tag(sync=True)
+
 @register
 class TextWithTooltip(Text):
     """Input text with a help title (tooltip)."""
@@ -101,6 +114,7 @@ class BaseTextCell(TextWithTooltip):
     Abstract class for all text cells except blank.
     """
     displaytype = text_type
+    #style = InstanceDict(CellStyle, help="Cell styling customizations").tag(sync=True, **widget_serialization)
 
     def __init__(self, content, position, layout, **kws):
         super(BaseTextCell, self).__init__()
@@ -232,6 +246,7 @@ class ButtonCell(ToggleButton):
         sage: b = ButtonCell(True, (1,2))
     """
     displaytype = bool
+    #style = InstanceDict(CellStyle, help="Cell styling customizations").tag(sync=True, **widget_serialization)
 
     def __init__(self, content, position, layout=buttoncell_smaller_layout,
                  label=None, style=None, tooltip=None, **kws):
@@ -252,8 +267,7 @@ class ButtonCell(ToggleButton):
         Parse input dictionary `st`
         and inject corresponding style.
         """
-        self.style = parse_style(st)
-                             
+        self.style_dict = parse_style(st)
         
     def set_tooltip(self, s=None):
         r"""From a position (i,j),
