@@ -1,11 +1,17 @@
-var path = require('path');
-var version = require('./package.json').version;
+const path = require('path');
+const version = require('./package.json').version;
 
-var rules = [
+const rules = [
+    { test: /\.ts$/, loader: 'ts-loader' },
+    { test: /\.js$/, loader: 'source-map-loader' },
     { test: /\.css$/, use: ['style-loader', 'css-loader']},
     { test: /\.(jpg|png|gif)$/, use: ['url-loader']}
-]
-var externals = ['@jupyter-widgets/base', '@jupyter-widgets/controls']
+];
+// Packages that shouldn't be bundled but loaded at runtime
+const externals = ['@jupyter-widgets/base', '@jupyter-widgets/controls'];
+const resolve = {
+  extensions: [".webpack.js", ".web.js", ".ts", ".js"]
+};
 
 module.exports = [
   /**
@@ -29,7 +35,7 @@ module.exports = [
 	externals,
 	resolve,
     },
-    
+
     {
 	mode: 'development',
 	entry: './src/index.ts',
@@ -40,5 +46,9 @@ module.exports = [
 	},
 	module: {
 	    rules: rules
-	}
-    ];
+	},
+	devtool: 'source-map',
+	externals,
+	resolve,
+    }
+];

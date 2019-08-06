@@ -29,14 +29,16 @@
   "devDependencies": {
     "rimraf": "^2.6.1",
     "typescript": "^3.5.3",
-    "webpack": "^3.5.5"
+    "webpack-cli": "^3.3.6"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.0.0",
     "@jupyter-widgets/controls": "^1.0.0",
     "@types/node": "^12.6.9",
-    "lodash": "^4.17.4",
-    "npm": "^6.6.0",
+    "ajv": "^6.10.2",
+    "lodash": "^4.17.15",
+    "npm": "^6.10.2",
+    "webpack": "^4.39.1"
   },
   "jupyterlab": {
     "extension": "lib/labplugin"
