@@ -94,6 +94,8 @@ class CellStyle(DescriptionStyle):
     """
     # background_color, background_image, background
     _model_name = Unicode('CellStyleModel').tag(sync=True)
+    _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
+    _model_module_version = Unicode('^0.7.6').tag(sync=True)
     background_color = Color(None, allow_none=True, help="Cell background color").tag(sync=True)
     background_image = Unicode(help="Cell background image").tag(sync=True)
     background = Unicode(help="Cell background").tag(sync=True)
@@ -114,7 +116,7 @@ class BaseTextCell(TextWithTooltip):
     Abstract class for all text cells except blank.
     """
     displaytype = text_type
-    #style = InstanceDict(CellStyle, help="Cell styling customizations").tag(sync=True, **widget_serialization)
+    style = InstanceDict(CellStyle, help="Cell styling customizations").tag(sync=True, **widget_serialization)
 
     def __init__(self, content, position, layout, **kws):
         super(BaseTextCell, self).__init__()
@@ -246,7 +248,7 @@ class ButtonCell(ToggleButton):
         sage: b = ButtonCell(True, (1,2))
     """
     displaytype = bool
-    #style = InstanceDict(CellStyle, help="Cell styling customizations").tag(sync=True, **widget_serialization)
+    style = InstanceDict(CellStyle, help="Cell styling customizations").tag(sync=True, **widget_serialization)
 
     def __init__(self, content, position, layout=buttoncell_smaller_layout,
                  label=None, style=None, tooltip=None, **kws):
