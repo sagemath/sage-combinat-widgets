@@ -1,46 +1,37 @@
-var path = require('path');
-var version = require('./package.json').version;
+const path = require('path');
+const version = require('./package.json').version;
 
-var rules = [
+const rules = [
+    { test: /\.ts$/, loader: 'ts-loader' },
+    { test: /\.js$/, loader: 'source-map-loader' },
     { test: /\.css$/, use: ['style-loader', 'css-loader']},
     { test: /\.(jpg|png|gif)$/, use: ['url-loader']}
-]
-var externals = ['@jupyter-widgets/base', '@jupyter-widgets/controls']
+];
+// Packages that shouldn't be bundled but loaded at runtime
+const externals = ['@jupyter-widgets/base', '@jupyter-widgets/controls'];
+const resolve = {
+  extensions: [".webpack.js", ".web.js", ".ts", ".js"]
+};
 
 module.exports = [
-    {// Notebook extension
-        entry: './lib/extension.js',
-        output: {
-            filename: 'extension.js',
-            path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'static'),
-            libraryTarget: 'amd'
-        }
+  /**
+   * Notebook extension
+   *
+   * This bundle only contains the part of the JavaScript that is run on load of
+   * the notebook.
+   */
+   {
+       entry: './src/extension.ts',
+       output: {
+	   filename: 'index.js',
+           path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'static'),
+           libraryTarget: 'amd'
+       },
+    module: {
+      rules: rules
     },
-    {// sage-combinat-widgets bundle for the notebook
-        entry: './lib/index.js',
-        output: {
-            filename: 'index.js',
-            path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'static'),
-            libraryTarget: 'amd'
-        },
-        devtool: 'source-map',
-        module: {
-            rules: rules
-        },
-        externals: externals
-    },
-    {// embeddable sage-combinat-widgets bundle
-        entry: './lib/embed.js',
-        output: {
-            filename: 'index.js',
-            path: path.resolve(__dirname, 'dist'),
-            libraryTarget: 'amd',
-            publicPath: 'https://unpkg.com/sage-combinat-widgets@' + version + '/dist/'
-        },
-        devtool: 'source-map',
-        module: {
-            rules: rules
-        },
-        externals: externals
-    }
+    devtool: 'source-map',
+    externals,
+    resolve,
+  }
 ];
