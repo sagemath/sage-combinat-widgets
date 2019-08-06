@@ -1,5 +1,5 @@
 import { StyleModel } from '@jupyter-widgets/base';
-//import TextView from '@jupyter-widgets/controls';
+import { TextView } from '@jupyter-widgets/controls';
 
 export
 const SAGE_COMBINAT_WIDGETS_VERSION = (require('../package.json') as any).version;
@@ -33,16 +33,18 @@ class CellStyleModel extends StyleModel {
     };
 }
 
-/*export
+export
 class TextWithTooltipView extends TextView {
+    /**
+     * Called when view is rendered.
+     */
     render() {
-        widgets.TextView.prototype.render.call(this);
+        super.render();
         this.update_title();
         this.model.on('change:description_tooltip', this.update_title, this);
-    },
+    }
+
     update_title() {
         this.textbox.title = this.model.get('description_tooltip');
     }
 };
-}*/
-
