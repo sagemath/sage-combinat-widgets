@@ -1,16 +1,17 @@
 import { StyleModel } from '@jupyter-widgets/base';
 import { TextView } from '@jupyter-widgets/controls';
+import { MODULE_NAME, MODULE_VERSION } from './index'; 
 
-export
-const SAGE_COMBINAT_WIDGETS_VERSION = (require('../package.json') as any).version;
+//export
+//const MODULE_VERSION = (require('../package.json') as any).version;
 
 export
 class CellStyleModel extends StyleModel {
     defaults() {
         return {...super.defaults(),
             _model_name: 'CellStyleModel',
-            _model_module: '@jupyter-widgets/controls',
-            _model_module_version: SAGE_COMBINAT_WIDGETS_VERSION,
+            _model_module: MODULE_NAME,
+            _model_module_version: MODULE_VERSION,
         };
     }
 
