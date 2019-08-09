@@ -13,7 +13,7 @@ from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, Button, Val
 from ipywidgets.widgets.widget_description import DescriptionStyle
 from ipywidgets.widgets.trait_types import InstanceDict, Color
 from six import text_type
-from traitlets import Unicode
+from traitlets import Unicode, observe
 import re
 
 textcell_layout = Layout(width='3em', height='2em', margin='0', padding='0')
@@ -52,12 +52,12 @@ def parse_style(data):
     cell_style_dict = {}
     if 'style' in data:
         cell_style_dict = data['style']
-    if 'background' in data:
-        cell_style_dict['background'] = data['background']
-    if 'background-color' in data:
-        cell_style_dict['background-color'] = data['background-color']
-    if 'background-image' in data:
-        cell_style_dict['background-image'] = data['background-image']
+    for attr in ['background', 'background-color', 'background-image', 'background-position',
+                'background-repeat', 'background-size']:
+        if attr in data:
+            cell_style_dict[attr] = data[attr]
+        elif 'style' in data and attr in data['style']:
+            cell_style_dict[attr] = data['style'][attr]
     return cell_style_dict
 
 def inject_css(css_cls, style={}):
@@ -69,10 +69,7 @@ def inject_css(css_cls, style={}):
     css_lines = []
     css_lines.append("." + css_cls + " INPUT {")
     for k in style:
-        if k == 'background-image' and 'svg' in style[k].lower():
-            css_lines.append('  ' + k + ': url("data:image/svg+xml,' + optimize_svg(style[k]) + '") !important;')
-        else:
-            css_lines.append("  " + k + ": " + style[k] + " !important;!")
+        css_lines.append("  " + k + ": " + style[k] + " !important;")
     css_lines.append("}")
     get_ipython().display_formatter.format(HTML("<style>%s</style>" % '\n'.join(css_lines)))
 
@@ -102,6 +99,33 @@ class CellStyle(DescriptionStyle):
     background_repeat = Unicode(help="Cell background repeat").tag(sync=True)
     background_size = Unicode(help="Cell background size").tag(sync=True)
     background = Unicode(help="Cell background").tag(sync=True)
+
+    def __init__(self, **kwargs):
+        super(CellStyle, self).__init__(**kwargs)
+        if 'parent_position' in kwargs:
+            self.parent_position = kwargs['parent_position']
+        if 'parent_layout' in kwargs:
+            self.parent_layout = kwargs['parent_layout']
+        self.donottrack = False
+
+    @observe('background_image')
+    def background_image_changed(self, change):
+        if self.donottrack:
+            return
+        #print("CHANGING")
+        #print(change)
+        background_image = ''
+        if '<svg' in change.new.lower() and not change.new.lower().startswith('url'):
+            # we do not intervene if the user has set the image entirely by herself
+            background_image = "url(\"data:image/svg+xml,%s\")" % optimize_svg(change.new)
+        if change.new.startswith('url'):
+            background_image = change.new
+        if not self.background_size:
+            self.background_size = self.parent_layout.height
+        inject_css('pos_%d_%d' % self.parent_position, {
+            'background-image': background_image,
+            'background-size': self.background_size
+        })
 
 @register
 class TextWithTooltip(Text):
@@ -261,19 +285,16 @@ class ButtonCell(ToggleButton):
         self.position = position
         if label is not None:
             self.description = label
-        if style:
-            self.set_style(style)
+        if style: # should be a dict
+            style['parent_position'] = position
+            style['parent_layout'] = layout
+            self.style = CellStyle(**style)
+        else:
+            self.style = CellStyle(**{'parent_position': position, 'parent_layout': layout})
         self.add_class('gridbutton')
         self.add_class('pos_%d_%d' % position)
         self.set_tooltip(tooltip)
 
-    def set_style(self, st={}):
-        r"""
-        Parse input dictionary `st`
-        and inject corresponding style.
-        """
-        self.style_dict = parse_style(st)
-        
     def set_tooltip(self, s=None):
         r"""From a position (i,j),
         we just want the string 'i,j'
