@@ -92,12 +92,15 @@ class CellStyle(DescriptionStyle):
     Extend style implementation
     for ToggleButton and Text.
     """
-    # background_color, background_image, background
+    # background_color, background_image, background_position, background_repeat, background_size, background
     _model_name = Unicode('CellStyleModel').tag(sync=True)
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
     _model_module_version = Unicode('^0.7.6').tag(sync=True)
     background_color = Color(None, allow_none=True, help="Cell background color").tag(sync=True)
     background_image = Unicode(help="Cell background image").tag(sync=True)
+    background_position = Unicode(help="Cell background position").tag(sync=True)
+    background_repeat = Unicode(help="Cell background repeat").tag(sync=True)
+    background_size = Unicode(help="Cell background size").tag(sync=True)
     background = Unicode(help="Cell background").tag(sync=True)
 
 @register

@@ -26,6 +26,21 @@ class CellStyleModel extends StyleModel {
             attribute: 'background-image',
             default: ''
         },
+        background_position: {
+            selector: '',
+            attribute: 'background-position',
+            default: ''
+        },
+        background_repeat: {
+            selector: '',
+            attribute: 'background-repeat',
+            default: ''
+        },
+        background_size: {
+            selector: '',
+            attribute: 'background-size',
+            default: ''
+        },
         background: {
             selector: '',
             attribute: 'background',
