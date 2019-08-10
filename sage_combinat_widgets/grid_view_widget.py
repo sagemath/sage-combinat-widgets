@@ -52,12 +52,16 @@ def parse_style(data):
     cell_style_dict = {}
     if 'style' in data:
         cell_style_dict = data['style']
-    for attr in ['background', 'background-color', 'background-image', 'background-position',
-                'background-repeat', 'background-size']:
+    for attr in ['background', 'background_color', 'background_image', 'background_position',
+                'background_repeat', 'background_size']:
         if attr in data:
             cell_style_dict[attr] = data[attr]
+        elif attr.replace('-', '_') in data:
+            cell_style_dict[attr] = data[attr.replace('-', '_')]
         elif 'style' in data and attr in data['style']:
             cell_style_dict[attr] = data['style'][attr]
+        elif 'style' in data and attr.replace('-', '_') in data['style']:
+            cell_style_dict[attr] = data['style'][attr.replace('-', '_')]
     return cell_style_dict
 
 def inject_css(css_cls, style={}):
@@ -101,17 +105,22 @@ class CellStyle(DescriptionStyle):
     background = Unicode(help="Cell background").tag(sync=True)
 
     def __init__(self, **kwargs):
-        super(CellStyle, self).__init__(**kwargs)
+        parent_position, parent_layout = None, None
         if 'parent_position' in kwargs:
-            self.parent_position = kwargs['parent_position']
+            parent_position = kwargs['parent_position']
+            del(kwargs['parent_position'])
         if 'parent_layout' in kwargs:
-            self.parent_layout = kwargs['parent_layout']
+            parent_layout = kwargs['parent_layout']
+            del(kwargs['parent_layout'])
+        self.parent_position = parent_position
+        self.parent_layout = parent_layout
+        super(CellStyle, self).__init__(**kwargs)
         self.donottrack = False
 
     @observe('background_image')
     def background_image_changed(self, change):
-        if self.donottrack:
-            return
+        #if self.donottrack:
+        #    return
         #print("CHANGING")
         #print(change)
         background_image = ''
