@@ -281,12 +281,14 @@ class ButtonCell(ToggleButton):
     displaytype = bool
     style = InstanceDict(CellStyle, help="Cell styling customizations").tag(sync=True, **widget_serialization)
 
-    def __init__(self, content, position, layout=buttoncell_smaller_layout,
-                 label=None, style=None, tooltip=None, **kws):
+    def __init__(self, content, position=(0,0), layout=buttoncell_smaller_layout,
+                 disabled=False, label=None, style=None, tooltip=None, **kws):
         super(ButtonCell, self).__init__()
         self.layout = layout
         self.value = content
         self.position = position
+        if disabled:
+            self.disabled = disabled
         if label is not None:
             self.description = label
         if style: # should be a dict
@@ -492,7 +494,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             else:
                 cell_layout = textcell_layout
         self.cell_layout = cell_layout
-        self.cell_options = cell_options
+        if cell_options:
+            self.cell_options = cell_options
         self.cell_widget_classes = cell_widget_classes
         self.cell_widget_class_index = cell_widget_class_index
         try:
@@ -626,8 +629,10 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                     cell_content = self.cells[(i,j)]
                     cell_widget_class = cell_widget_classes[cell_widget_class_index((i,j))]
                     cell_display = self.adapter.cell_to_display(cell_content, self.displaytype)
-                    cell_label, cell_style, cell_tooltip = None, None, None
+                    cell_disabled, cell_label, cell_style, cell_tooltip = None, None, None, None
                     if cell_options and (i,j) in cell_options:
+                        if 'disabled' in cell_options[(i,j)]:
+                            cell_disabled = cell_options[(i,j)]['disabled']
                         if 'label' in cell_options[(i,j)]:
                             cell_label = cell_options[(i,j)]['label']
                         if 'tooltip' in cell_options[(i,j)]:
@@ -637,6 +642,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                                              (i,j),
                                              layout=self.cell_layout,
                                              placeholder=cell_display,
+                                             disabled=cell_disabled,
                                              label=cell_label,
                                              style=cell_style,
                                              tooltip=cell_tooltip)
