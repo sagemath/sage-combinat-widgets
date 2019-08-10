@@ -16,6 +16,11 @@ class CellStyleModel extends StyleModel {
     }
 
     public static styleProperties = {
+        color: {
+            selector: '',
+            attribute: 'color',
+            default: null as any
+        },
         background_color: {
             selector: '',
             attribute: 'background-color',

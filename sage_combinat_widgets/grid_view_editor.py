@@ -172,6 +172,7 @@ class GridViewEditor(BindableEditorClass):
             raise TypeError("Cannot find an Adapter for this object (%s)" % obj.__class__)
         if not hasattr(self.adapter, 'compute_cells') or not callable(self.adapter.compute_cells):
             raise NotImplementedError("Method `compute_cells` is required!")
+        self.cell_options = None
         self.compute()
         self.links = []
 
@@ -236,7 +237,7 @@ class GridViewEditor(BindableEditorClass):
             return
         # Fetch information from the object, through the adapter
         res = self.adapter.compute_cells(obj)
-        if type(res) == type(()) and len(res) == 2:
+        if not self.cell_options and type(res) == type(()) and len(res) == 2:
             self.cells, self.cell_options = res
         elif type(res) == type({}):
             self.cells, self.cell_options = res, None
