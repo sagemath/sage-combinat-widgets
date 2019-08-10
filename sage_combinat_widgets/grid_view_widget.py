@@ -13,7 +13,7 @@ from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, Button, Val
 from ipywidgets.widgets.widget_description import DescriptionStyle
 from ipywidgets.widgets.trait_types import InstanceDict, Color
 from six import text_type
-from traitlets import Instance, Tuple, Unicode, observe
+from traitlets import Instance, Unicode, observe
 import re
 
 textcell_layout = Layout(width='3em', height='2em', margin='0', padding='0')
@@ -71,7 +71,7 @@ def inject_css(css_cls, style={}):
     for input CSS class name `css_cls`.
     """
     css_lines = []
-    css_lines.append("." + css_cls + ", " + css_cls + " INPUT {")
+    css_lines.append("." + css_cls + ", ." + css_cls + " INPUT {")
     for k in style:
         css_lines.append("  " + k + ": " + style[k] + " !important;")
     css_lines.append("}")
@@ -97,8 +97,8 @@ class CellStyle(DescriptionStyle):
     _model_name = Unicode('CellStyleModel').tag(sync=True)
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
     _model_module_version = Unicode('^0.7.6').tag(sync=True)
-    parent_position = Tuple(default_value=(0,0))
-    parent_layout = Instance(klass=Layout)
+    cssname = Unicode()
+    layout = Instance(klass=Layout)
     color = Color(None, allow_none=True, help="Cell background color").tag(sync=True)
     background_color = Color(None, allow_none=True, help="Cell background color").tag(sync=True)
     background_image = Unicode(help="Cell background image").tag(sync=True)
@@ -107,12 +107,9 @@ class CellStyle(DescriptionStyle):
     background_size = Unicode(help="Cell background size").tag(sync=True)
     background = Unicode(help="Cell background").tag(sync=True)
 
-    def __init__(self, **kwargs):
-        super(CellStyle, self).__init__(**kwargs)
-
     @observe('color', 'background_color')
     def attr_changed(self, change):
-        inject_css('pos_%d_%d' % self.parent_position, {
+        inject_css(self.cssname, {
             change.name.replace('_', '-'): getattr(self, change.name)
         })
 
@@ -125,8 +122,8 @@ class CellStyle(DescriptionStyle):
         if change.new.startswith('url'):
             background_image = change.new
         if not self.background_size:
-            self.background_size = self.parent_layout.height
-        inject_css('pos_%d_%d' % self.parent_position, {
+            self.background_size = self.layout.height
+        inject_css(self.cssname, {
             'background-image': background_image,
             'background-size': self.background_size
         })
@@ -291,14 +288,16 @@ class ButtonCell(ToggleButton):
             self.disabled = disabled
         if label is not None:
             self.description = label
+        #self.cssname = "%x_%d_%d" % (id(self), position[0], position[1])
+        self.cssname = "pos_%d_%d" % (position)
         if style: # should be a dict
-            style['parent_position'] = position
-            style['parent_layout'] = layout
+            style['cssname'] = self.cssname
+            style['layout'] = layout
             self.style = CellStyle(**style)
         else:
-            self.style = CellStyle(**{'parent_position': position, 'parent_layout': layout})
+            self.style = CellStyle(**{'cssname': self.cssname, 'layout': layout})
         self.add_class('gridbutton')
-        self.add_class('pos_%d_%d' % position)
+        self.add_class(self.cssname)
         self.set_tooltip(tooltip)
 
     def set_tooltip(self, s=None):
