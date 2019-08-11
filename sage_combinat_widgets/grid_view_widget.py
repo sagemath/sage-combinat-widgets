@@ -288,8 +288,7 @@ class ButtonCell(ToggleButton):
             self.disabled = disabled
         if label is not None:
             self.description = label
-        #self.cssname = "%x_%d_%d" % (id(self), position[0], position[1])
-        self.cssname = "pos_%d_%d" % (position)
+        self.cssname = "cell_%d_%d_%X" % (position[0], position[1], id(self))
         if style: # should be a dict
             style['cssname'] = self.cssname
             style['layout'] = layout
