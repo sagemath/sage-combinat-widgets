@@ -8,39 +8,37 @@ var rules = [
 var externals = ['@jupyter-widgets/base', '@jupyter-widgets/controls']
 
 module.exports = [
-    {// Notebook extension
-        entry: './lib/extension.js',
-        output: {
-            filename: 'extension.js',
+  /**
+   * Notebook extension
+   *
+   * This bundle only contains the part of the JavaScript that is run on load of
+   * the notebook.
+   */
+    {
+	mode: 'development',
+	entry: './src/extension.ts',
+	output: {
+	    filename: 'extension.js',
             path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'static'),
             libraryTarget: 'amd'
-        }
+	},
+	module: {
+	    rules: rules
+	},
+	devtool: 'none',
+	externals,
+	resolve,
     },
-    {// sage-combinat-widgets bundle for the notebook
-        entry: './lib/index.js',
-        output: {
-            filename: 'index.js',
+    
+    {
+	mode: 'development',
+	entry: './src/index.ts',
+	output: {
+	    filename: 'index.js',
             path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'static'),
             libraryTarget: 'amd'
-        },
-        devtool: 'source-map',
-        module: {
-            rules: rules
-        },
-        externals: externals
-    },
-    {// embeddable sage-combinat-widgets bundle
-        entry: './lib/embed.js',
-        output: {
-            filename: 'index.js',
-            path: path.resolve(__dirname, 'dist'),
-            libraryTarget: 'amd',
-            publicPath: 'https://unpkg.com/sage-combinat-widgets@' + version + '/dist/'
-        },
-        devtool: 'source-map',
-        module: {
-            rules: rules
-        },
-        externals: externals
-    }
-];
+	},
+	module: {
+	    rules: rules
+	}
+    ];
