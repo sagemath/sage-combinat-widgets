@@ -1,6 +1,6 @@
 import { StyleModel } from '@jupyter-widgets/base';
 import { TextView } from '@jupyter-widgets/controls';
-import { MODULE_NAME, MODULE_VERSION } from './index'; 
+import { MODULE_NAME, MODULE_VERSION } from './index';
 
 //export
 //const MODULE_VERSION = (require('../package.json') as any).version;

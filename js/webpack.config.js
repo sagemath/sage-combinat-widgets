@@ -20,8 +20,25 @@ module.exports = [
    * This bundle only contains the part of the JavaScript that is run on load of
    * the notebook.
    */
-   {
+    {
+	mode: 'development',
        entry: './src/extension.ts',
+       output: {
+	   filename: 'extension.js',
+           path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'static'),
+           libraryTarget: 'amd'
+       },
+    module: {
+      rules: rules
+    },
+    devtool: 'none',
+    externals,
+    resolve,
+   },
+
+   {
+	mode: 'development',
+       entry: './src/index.ts',
        output: {
 	   filename: 'index.js',
            path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'static'),
