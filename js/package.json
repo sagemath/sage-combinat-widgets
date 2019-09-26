@@ -27,8 +27,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "webpack": "^3.5.5",
-    "rimraf": "^2.6.1"
+    "rimraf": "^2.6.1",
+    "typescript": "^3.5.3",
+    "webpack": "^3.5.5"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.0.0",
