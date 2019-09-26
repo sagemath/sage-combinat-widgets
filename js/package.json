@@ -17,17 +17,35 @@
     "jupyterlab-extension"
   ],
   "files": [
-    "lib/**/*.js",
-    "lib/**/*.css",
+    "lib/*.d.ts",
+    "lib/*.js",
+    "lib/*.css",
     "dist/*.js"
   ],
   "scripts": {
+    "build": "npm run build:lib && npm run build:nbextension",
+    "build:labextension": "npm run clean:labextension && mkdirp sage_combinat_widgets/labextension && cd sage_combinat_widgets/labextension && npm pack ../..",
+    "build:lib": "tsc",
+    "build:nbextension": "webpack -p",
+    "build:all": "npm run build:labextension && npm run build:nbextension",
     "clean": "rimraf dist/",
+    "clean:lib": "rimraf lib",
+    "clean:labextension": "rimraf ../sage_combinat_widgets/labextension",
+    "clean:nbextension": "rimraf ../sage_combinat_widgets/nbextension/static/index.js",
+    "prepack": "npm run build:lib",
     "prepare": "webpack",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test:firefox",
+    "test:chrome": "karma start --browsers=Chrome tests/karma.conf.js",
+    "test:debug": "karma start --browsers=Chrome --singleRun=false --debug=true tests/karma.conf.js",
+    "test:firefox": "karma start --browsers=Firefox tests/karma.conf.js",
+    "test:ie": "karma start --browsers=IE tests/karma.conf.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:lib": "tsc -w",
+    "watch:nbextension": "webpack --watch"
   },
   "devDependencies": {
     "rimraf": "^2.6.1",
+    "ts-loader": "^6.1.2",
     "typescript": "^3.5.3",
     "webpack-cli": "^3.3.6"
   },

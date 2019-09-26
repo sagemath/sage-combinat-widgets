@@ -1,5 +1,5 @@
-const path = require('path');
-const version = require('./package.json').version;
+var path = require('path');
+var version = require('./package.json').version;
 
 const rules = [
     { test: /\.ts$/, loader: 'ts-loader' },
@@ -24,24 +24,8 @@ module.exports = [
 	mode: 'development',
 	entry: './src/extension.ts',
 	output: {
-	    filename: 'extension.js',
-            path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'static'),
-            libraryTarget: 'amd'
-	},
-	module: {
-	    rules: rules
-	},
-	devtool: 'none',
-	externals,
-	resolve,
-    },
-
-    {
-	mode: 'development',
-	entry: './src/index.ts',
-	output: {
 	    filename: 'index.js',
-            path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'static'),
+            path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'nbextension', 'static'),
             libraryTarget: 'amd'
 	},
 	module: {
@@ -50,5 +34,21 @@ module.exports = [
 	devtool: 'source-map',
 	externals,
 	resolve,
-    }
+    }//,
+
+/*    {
+	mode: 'development',
+	entry: './src/index.ts',
+	output: {
+	    filename: 'index.js',
+            path: path.resolve(__dirname, '..', 'sage_combinat_widgets', 'nbextension', 'static'),
+            libraryTarget: 'amd'
+	},
+	module: {
+	    rules: rules
+	},
+	devtool: 'source-map',
+	externals,
+	resolve,
+    } */
 ];
