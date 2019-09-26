@@ -9,9 +9,9 @@ AUTHORS ::
 """
 from .grid_view_editor import GridViewEditor, cdlink
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, Text, HTML, ToggleButton, Button, ValueWidget, register
+from ipywidgets import Layout, VBox, HBox, HTML, Text, ToggleButton, Button, ValueWidget
+from .cell_widgets import *
 from six import text_type
-from traitlets import Unicode
 
 textcell_layout = Layout(width='3em', height='2em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em', height='3em', margin='0', padding='0')
@@ -40,16 +40,6 @@ try:
 except:
     pass # We are in the test environment
 
-@register
-class TextWithTooltip(Text):
-    """Input text with a help title (tooltip)."""
-    _view_name = Unicode('TextWithTooltipView').tag(sync=True)
-    _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _view_module_version = Unicode('^0.7.6').tag(sync=True)
-    description_tooltip = Unicode().tag(sync=True)
-
-    def set_tooltip(self, s=''):
-        self.description_tooltip = s
 
 class BaseTextCell(TextWithTooltip):
     r"""

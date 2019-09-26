@@ -1,4 +1,7 @@
 0.7.6:
+	* Isolate cell widgets sub-package
+	* Integrate CSS code into javascript install process
+0.7.5:
 	* Parallelogram polyomino adapter
 0.7.4:
 	* Suppress empty rows in tableau editing + fixed some special cases in editing
