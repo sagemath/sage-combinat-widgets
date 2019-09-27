@@ -1,0 +1,5 @@
+{
+  "load_extensions": {
+    "cell-widgets/extension": true
+  }
+}
