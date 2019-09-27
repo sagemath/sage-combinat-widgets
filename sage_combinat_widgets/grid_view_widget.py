@@ -10,7 +10,7 @@ AUTHORS ::
 from .grid_view_editor import GridViewEditor, cdlink
 from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import Layout, VBox, HBox, HTML, Text, ToggleButton, Button, ValueWidget
-from .cell_widgets import *
+from unit_widgets import *
 from six import text_type
 
 textcell_layout = Layout(width='3em', height='2em', margin='0', padding='0')
@@ -41,7 +41,7 @@ except:
     pass # We are in the test environment
 
 
-class BaseTextCell(TextWithTooltip):
+class BaseTextCell(TextUnit):
     r"""
     Abstract class for all text cells except blank.
     """
