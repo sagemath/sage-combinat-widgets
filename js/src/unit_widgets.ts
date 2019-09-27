@@ -1,8 +1,12 @@
-import { TextModel, TextView, ComboboxModel, ComboboxView, TextareaModel, TextareaView } from '@jupyter-widgets/controls';
+import { ComboboxModel, ComboboxView,
+       DropdownModel, DropdownView,
+       TextModel, TextView,
+       TextareaModel, TextareaView,
+       ToggleButtonModel, ToggleButtonView } from '@jupyter-widgets/controls';
 import { MODULE_NAME, MODULE_VERSION } from './version';
 
 export
-class TextUnitModel extends TextModel {
+class ComboboxUnitModel extends ComboboxModel {
     defaults() {
         return {...super.defaults(),
 	_model_name: 'TextUnitModel',
@@ -17,7 +21,22 @@ class TextUnitModel extends TextModel {
 }
 
 export
-class ComboboxUnitModel extends ComboboxModel {
+class DropdownUnitModel extends DropdownModel {
+    defaults() {
+        return {...super.defaults(),
+	_model_name: 'TextUnitModel',
+	_model_module: MODULE_NAME,
+	_model_module_version: MODULE_VERSION,
+	_view_name: 'TextUnitView',
+	_view_module: MODULE_NAME,
+	_view_module_version: MODULE_VERSION,
+        _focus: null,
+        };
+    }
+}
+
+export
+class TextUnitModel extends TextModel {
     defaults() {
         return {...super.defaults(),
 	_model_name: 'TextUnitModel',
@@ -47,25 +66,19 @@ class TextareaUnitModel extends TextareaModel {
 }
 
 export
-class TextUnitView extends TextView {
-    render() {
-        super.render();
-        this.update_title();
-        this.model.on('change:description_tooltip', this.update_title, this);
-        this.model.on('change:_focus', this.update_focus, this);
+class ToggleButtonUnitModel extends ToggleButtonModel {
+    defaults() {
+        return {...super.defaults(),
+	_model_name: 'TextUnitModel',
+	_model_module: MODULE_NAME,
+	_model_module_version: MODULE_VERSION,
+	_view_name: 'TextUnitView',
+	_view_module: MODULE_NAME,
+	_view_module_version: MODULE_VERSION,
+        _focus: null,
+        };
     }
-
-    update_title() {
-        this.textbox.title = this.model.get('description_tooltip');
-    }
-
-    update_focus() {
-        let focus = this.model.get('_focus');
-	if (!focus) return;
-	if (focus == 'on') { this.textbox.focus(); }
-	else if (focus == 'off') { this.textbox.blur(); }
-    }
-};
+}
 
 export
 class ComboboxUnitView extends ComboboxView {
@@ -77,7 +90,58 @@ class ComboboxUnitView extends ComboboxView {
     }
 
     update_title() {
-        this.textbox.title = this.model.get('description_tooltip');
+        if (this.model.get('description_tooltip')) {
+	    this.textbox.title = this.model.get('description_tooltip');
+	}
+	else this.textbox.title = '';
+    }
+
+    update_focus() {
+        let focus = this.model.get('_focus');
+	if (!focus) return;
+	if (focus == 'on') { this.textbox.focus(); }
+	else if (focus == 'off') { this.textbox.blur(); }
+    }
+};
+
+export
+class DropdownUnitView extends DropdownView {
+    render() {
+        super.render();
+        this.update_title();
+        this.model.on('change:description_tooltip', this.update_title, this);
+        this.model.on('change:_focus', this.update_focus, this);
+    }
+
+    update_title() {
+        if (this.model.get('description_tooltip')) {
+	    this.listbox.title = this.model.get('description_tooltip');
+	}
+	else this.listbox.title = '';
+    }
+
+    update_focus() {
+        let focus = this.model.get('_focus');
+	if (!focus) return;
+	if (focus == 'on') { this.listbox.focus(); }
+	else if (focus == 'off') { this.listbox.blur(); }
+    }
+};
+
+export
+class TextUnitView extends TextView {
+    render() {
+        super.render();
+        this.update_title();
+        this.model.on('change:description_tooltip', this.update_title, this);
+        this.model.on('change:_focus', this.update_focus, this);
+    }
+
+    update_title() {
+        if (this.model.get('description_tooltip')) {
+	    this.textbox.title = this.model.get('description_tooltip');
+	}
+	else this.textbox.title = '';
     }
 
     update_focus() {
@@ -98,7 +162,10 @@ class TextareaUnitView extends TextareaView {
     }
 
     update_title() {
-        this.textbox.title = this.model.get('description_tooltip');
+        if (this.model.get('description_tooltip')) {
+	    this.textbox.title = this.model.get('description_tooltip');
+	}
+	else this.textbox.title = '';
     }
 
     update_focus() {
@@ -106,5 +173,29 @@ class TextareaUnitView extends TextareaView {
 	if (!focus) return;
 	if (focus == 'on') { this.textbox.focus(); }
 	else if (focus == 'off') { this.textbox.blur(); }
+    }
+};
+
+export
+class ToggleButtonUnitView extends ToggleButtonView {
+    render() {
+        super.render();
+        this.update_title();
+        this.model.on('change:description_tooltip', this.update_title, this);
+        this.model.on('change:_focus', this.update_focus, this);
+    }
+
+    update_title() {
+        if (this.model.get('description_tooltip')) {
+	    this.el.title = this.model.get('description_tooltip');
+	}
+	else this.el.title = '';
+    }
+
+    update_focus() {
+        let focus = this.model.get('_focus');
+	if (!focus) return;
+	if (focus == 'on') { this.el.focus(); }
+	else if (focus == 'off') { this.el.blur(); }
     }
 };
