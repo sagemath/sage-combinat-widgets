@@ -25,7 +25,7 @@ module.exports = [
 	entry: './src/extension.ts',
 	output: {
 	    filename: 'index.js',
-            path: path.resolve(__dirname, '..', 'cell_widgets', 'nbextension', 'static'),
+            path: path.resolve(__dirname, '..', 'unit_widgets', 'nbextension', 'static'),
             libraryTarget: 'amd'
 	},
 	module: {

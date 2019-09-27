@@ -37,7 +37,7 @@ class SageTest(TestCommand):
 
 # The name of the project
 name = 'sage-combinat-widgets'
-pyname = 'cell_widgets' # basis for JS extension
+pyname = 'unit_widgets' # basis for JS extension
 
 js_path = pjoin(HERE, 'js')
 nb_path = pjoin(HERE, pyname, 'nbextension', 'static')
@@ -57,10 +57,10 @@ package_data_spec = {
 }
 
 data_files_spec = [
-    ('share/jupyter/nbextensions/cell-widgets',
+    ('share/jupyter/nbextensions/unit-widgets',
         nb_path, '*.js*'),
     ('share/jupyter/lab/extensions', lab_path, '*.tgz'),
-    ('etc/jupyter/nbconfig/notebook.d', HERE, 'cell-widgets.json')
+    ('etc/jupyter/nbconfig/notebook.d', HERE, 'unit-widgets.json')
 ]
 
 

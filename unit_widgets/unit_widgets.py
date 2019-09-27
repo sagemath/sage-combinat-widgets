@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 r"""
-IPywidgets with simple additional features to serve as elements for larger widgets.
+IPywidgets with simple additional features to serve as units to larger widgets.
 
 AUTHORS ::
 
@@ -11,22 +11,32 @@ from traitlets import Unicode
 from ipywidgets import Combobox, Text, Textarea, register
 
 @register
-class TextWithTooltip(Text):
+class TextUnit(Text):
     """Input text with a help title (tooltip)."""
-    _view_name = Unicode('TextWithTooltipView').tag(sync=True)
-    _view_module = Unicode('cell-widgets').tag(sync=True)
+    _model_name = Unicode('TextUnitModel').tag(sync=True)
+    _model_module = Unicode('unit-widgets').tag(sync=True)
+    _model_module_version = Unicode('^0.7.6').tag(sync=True)
+    _view_name = Unicode('TextUnitView').tag(sync=True)
+    _view_module = Unicode('unit-widgets').tag(sync=True)
     _view_module_version = Unicode('^0.7.6').tag(sync=True)
     description_tooltip = Unicode().tag(sync=True)
+    focuspos = Unicode().tag(sync=True)
 
     def set_tooltip(self, s=''):
         self.description_tooltip = s
 
+    def focus(self):
+        self.focuspos = 'on'
+
+    def blur(self):
+        self.focuspos = 'off'
+
 
 @register
-class ComboboxWithTooltip(Combobox):
+class ComboboxUnit(Combobox):
     """Combobox with a help title (tooltip)."""
-    _view_name = Unicode('ComboboxWithTooltipView').tag(sync=True)
-    _view_module = Unicode('cell-widgets').tag(sync=True)
+    _view_name = Unicode('ComboboxUnitView').tag(sync=True)
+    _view_module = Unicode('unit-widgets').tag(sync=True)
     _view_module_version = Unicode('^0.7.6').tag(sync=True)
     description_tooltip = Unicode().tag(sync=True)
 
@@ -35,10 +45,10 @@ class ComboboxWithTooltip(Combobox):
 
 
 @register
-class TextareaWithTooltip(Textarea):
+class TextareaUnit(Textarea):
     """Text area with a help title (tooltip)."""
-    _view_name = Unicode('TextareaWithTooltipView').tag(sync=True)
-    _view_module = Unicode('cell-widgets').tag(sync=True)
+    _view_name = Unicode('TextareaUnitView').tag(sync=True)
+    _view_module = Unicode('unit-widgets').tag(sync=True)
     _view_module_version = Unicode('^0.7.6').tag(sync=True)
     description_tooltip = Unicode().tag(sync=True)
 
