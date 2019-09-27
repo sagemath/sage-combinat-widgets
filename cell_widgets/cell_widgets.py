@@ -23,7 +23,7 @@ class TextWithTooltip(Text):
 
 
 @register
-class CombobxWithTooltip(Combobox):
+class ComboboxWithTooltip(Combobox):
     """Combobox with a help title (tooltip)."""
     _view_name = Unicode('ComboboxWithTooltipView').tag(sync=True)
     _view_module = Unicode('cell-widgets').tag(sync=True)
