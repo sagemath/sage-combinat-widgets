@@ -7,17 +7,18 @@ AUTHORS ::
     Odile Bénassy, Nicolas Thiéry
 
 """
-from traitlets import Unicode, HasTraits
+from traitlets import HasTraits, Integer, Unicode
 from ipywidgets import Combobox, Dropdown, Text, Textarea, ToggleButton, register
 
 
 class Unit(HasTraits):
     """Additional features to an ipywidgets widget."""
-    description_tooltip = Unicode().tag(sync=True) # set '' as default value
     _focus = Unicode().tag(sync=True)
+    _tooltip = Unicode('').tag(sync=True) # set '' as default value
+    tabindex = Integer().tag(sync=True)
 
     def set_tooltip(self, s=''):
-        self.description_tooltip = s
+        self._tooltip = s
 
     def focus(self):
         self._focus = ''
@@ -26,6 +27,15 @@ class Unit(HasTraits):
     def blur(self):
         self._focus = ''
         self._focus = 'off'
+
+    def set_tabindex(self, i=0):
+        self.tabindex = i
+
+    def allow_focus(self):
+        self.set_tabindex(0)
+
+    def disallow_focus(self):
+        self.set_tabindex(-1)
 
 
 @register

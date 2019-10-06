@@ -9,13 +9,15 @@ export
 class ComboboxUnitModel extends ComboboxModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'TextUnitModel',
+	_model_name: 'ComboboxUnitModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'TextUnitView',
+	_view_name: 'ComboboxUnitView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
+	_tooltip: null,
+	tabindex: null,
         };
     }
 }
@@ -31,6 +33,8 @@ class DropdownUnitModel extends DropdownModel {
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
+	_tooltip: null,
+	tabindex: null,
         };
     }
 }
@@ -46,6 +50,8 @@ class TextUnitModel extends TextModel {
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
+	_tooltip: null,
+	tabindex: null,
         };
     }
 }
@@ -61,6 +67,8 @@ class TextareaUnitModel extends TextareaModel {
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
+	_tooltip: null,
+	tabindex: null,
         };
     }
 }
@@ -76,6 +84,8 @@ class ToggleButtonUnitModel extends ToggleButtonModel {
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
+	_tooltip: null,
+	tabindex: null,
         };
     }
 }
@@ -84,16 +94,30 @@ export
 class ComboboxUnitView extends ComboboxView {
     render() {
         super.render();
+        this.update_tabindex();
+        this.update_tooltip();
         this.update_title();
-        this.model.on('change:description_tooltip', this.update_title, this);
+        this.update_focus();
+        this.model.on('change:tabindex', this.update_tabindex, this);
+        this.model.on('change:_tooltip', this.update_title, this);
+        this.model.on('change:description_tooltip', this.update_tooltip, this);
         this.model.on('change:_focus', this.update_focus, this);
     }
 
+    update_tabindex() {
+        let tabindex = this.model.get('tabindex')
+        if (tabindex) this.textbox.setAttribute('tabindex', tabindex);
+	else this.textbox.removeAttribute('tabindex');
+    }
+
+    update_tooltip() {
+	this.model.set('tooltip', this.model.get('description_tooltip'));
+    }
+
     update_title() {
-        if (this.model.get('description_tooltip')) {
-	    this.textbox.title = this.model.get('description_tooltip');
-	}
-	else this.textbox.title = '';
+        let title = this.model.get('_tooltip');
+        if (title) this.textbox.setAttribute('title', title);
+	else this.textbox.removeAttribute('title');
     }
 
     update_focus() {
@@ -114,10 +138,9 @@ class DropdownUnitView extends DropdownView {
     }
 
     update_title() {
-        if (this.model.get('description_tooltip')) {
-	    this.listbox.title = this.model.get('description_tooltip');
-	}
-	else this.listbox.title = '';
+        var title = this.model.get('description_tooltip');
+        if (!title) this.listbox.removeAttribute('title');
+	else this.listbox.setAttribute('title', title);
     }
 
     update_focus() {
@@ -137,12 +160,12 @@ class TextUnitView extends TextView {
         this.model.on('change:_focus', this.update_focus, this);
     }
 
-    update_title() {
+/*    update_title() {
         if (this.model.get('description_tooltip')) {
 	    this.textbox.title = this.model.get('description_tooltip');
 	}
 	else this.textbox.title = '';
-    }
+    }*/ // already in ipywidgets TextView
 
     update_focus() {
         let focus = this.model.get('_focus');
