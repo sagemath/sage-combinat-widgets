@@ -6,7 +6,7 @@ define(function() {
     window['requirejs'].config({
         map: {
             '*': {
-                'unit-widgets': 'nbextensions/unit_widgets/index',
+                'unit-widgets': 'nbextensions/unit-widgets/index',
             },
         }
     });
