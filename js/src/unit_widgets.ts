@@ -111,7 +111,7 @@ class ComboboxUnitView extends ComboboxView {
     }
 
     update_tooltip() {
-	this.model.set('tooltip', this.model.get('description_tooltip'));
+	this.model.set('_tooltip', this.model.get('description_tooltip'));
     }
 
     update_title() {
@@ -132,9 +132,24 @@ export
 class DropdownUnitView extends DropdownView {
     render() {
         super.render();
+        this.update_tabindex();
+        this.update_tooltip();
         this.update_title();
-        this.model.on('change:description_tooltip', this.update_title, this);
+        this.update_focus();
+        this.model.on('change:tabindex', this.update_tabindex, this);
+        this.model.on('change:_tooltip', this.update_title, this);
+        this.model.on('change:description_tooltip', this.update_tooltip, this);
         this.model.on('change:_focus', this.update_focus, this);
+    }
+
+    update_tabindex() {
+        let tabindex = this.model.get('tabindex')
+        if (tabindex) this.listbox.setAttribute('tabindex', tabindex);
+	else this.listbox.removeAttribute('tabindex');
+    }
+
+    update_tooltip() {
+	this.model.set('_tooltip', this.model.get('description_tooltip'));
     }
 
     update_title() {
@@ -155,17 +170,31 @@ export
 class TextUnitView extends TextView {
     render() {
         super.render();
+        this.update_tabindex();
+        this.update_tooltip();
         this.update_title();
-        this.model.on('change:description_tooltip', this.update_title, this);
+        this.update_focus();
+        this.model.on('change:tabindex', this.update_tabindex, this);
+        this.model.on('change:_tooltip', this.update_title, this);
+        this.model.on('change:description_tooltip', this.update_tooltip, this);
         this.model.on('change:_focus', this.update_focus, this);
     }
 
-/*    update_title() {
-        if (this.model.get('description_tooltip')) {
-	    this.textbox.title = this.model.get('description_tooltip');
-	}
-	else this.textbox.title = '';
-    }*/ // already in ipywidgets TextView
+    update_tabindex() {
+        let tabindex = this.model.get('tabindex')
+        if (tabindex) this.textbox.setAttribute('tabindex', tabindex);
+	else this.textbox.removeAttribute('tabindex');
+    }
+
+    update_tooltip() {
+	this.model.set('_tooltip', this.model.get('description_tooltip'));
+    }
+
+    update_title() {
+        let title = this.model.get('_tooltip');
+        if (title) this.textbox.setAttribute('title', title);
+	else this.textbox.removeAttribute('title');
+    }
 
     update_focus() {
         let focus = this.model.get('_focus');
@@ -179,16 +208,30 @@ export
 class TextareaUnitView extends TextareaView {
     render() {
         super.render();
+        this.update_tabindex();
+        this.update_tooltip();
         this.update_title();
-        this.model.on('change:description_tooltip', this.update_title, this);
+        this.update_focus();
+        this.model.on('change:tabindex', this.update_tabindex, this);
+        this.model.on('change:_tooltip', this.update_title, this);
+        this.model.on('change:description_tooltip', this.update_tooltip, this);
         this.model.on('change:_focus', this.update_focus, this);
     }
 
+    update_tabindex() {
+        let tabindex = this.model.get('tabindex')
+        if (tabindex) this.textbox.setAttribute('tabindex', tabindex);
+	else this.textbox.removeAttribute('tabindex');
+    }
+
+    update_tooltip() {
+	this.model.set('_tooltip', this.model.get('description_tooltip'));
+    }
+
     update_title() {
-        if (this.model.get('description_tooltip')) {
-	    this.textbox.title = this.model.get('description_tooltip');
-	}
-	else this.textbox.title = '';
+        let title = this.model.get('_tooltip');
+        if (title) this.textbox.setAttribute('title', title);
+	else this.textbox.removeAttribute('title');
     }
 
     update_focus() {
@@ -203,16 +246,32 @@ export
 class ToggleButtonUnitView extends ToggleButtonView {
     render() {
         super.render();
+        this.update_tabindex();
+        this.update_tooltip();
         this.update_title();
-        this.model.on('change:description_tooltip', this.update_title, this);
+        this.update_focus();
+        this.model.on('change:tabindex', this.update_tabindex, this);
+        this.model.on('change:_tooltip', this.update_title, this);
+        this.model.on('change:tooltip', this.update_tooltip, this);
+        this.model.on('change:description_tooltip', this.update_tooltip, this);
         this.model.on('change:_focus', this.update_focus, this);
     }
 
+    update_tabindex() {
+        let tabindex = this.model.get('tabindex')
+        if (tabindex) this.el.setAttribute('tabindex', tabindex);
+	else this.el.removeAttribute('tabindex');
+    }
+
+    update_tooltip() {
+        if (this.model.get('tooltip')) this.model.set('_tooltip', this.model.get('description_tooltip'));
+	else this.model.set('_tooltip', this.model.get('description_tooltip'));
+    }
+
     update_title() {
-        if (this.model.get('description_tooltip')) {
-	    this.el.title = this.model.get('description_tooltip');
-	}
-	else this.el.title = '';
+        let title = this.model.get('_tooltip');
+        if (title) this.el.setAttribute('title', title);
+	else this.el.removeAttribute('title');
     }
 
     update_focus() {
