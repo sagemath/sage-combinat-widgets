@@ -7,7 +7,7 @@ AUTHORS ::
     Odile Bénassy, Nicolas Thiéry
 
 """
-from traitlets import HasTraits, Integer, Unicode
+from traitlets import HasTraits, Int, Unicode
 from ipywidgets import Combobox, Dropdown, Text, Textarea, ToggleButton, register
 
 
@@ -15,7 +15,7 @@ class Unit(HasTraits):
     """Additional features to an ipywidgets widget."""
     _focus = Unicode().tag(sync=True)
     _tooltip = Unicode('').tag(sync=True) # set '' as default value
-    tabindex = Integer().tag(sync=True)
+    tabindex = Int().tag(sync=True)
 
     def set_tooltip(self, s=''):
         self._tooltip = s
