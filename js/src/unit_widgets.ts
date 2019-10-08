@@ -26,10 +26,10 @@ export
 class DropdownUnitModel extends DropdownModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'TextUnitModel',
+	_model_name: 'DropdownUnitModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'TextUnitView',
+	_view_name: 'DropdownUnitView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -60,10 +60,10 @@ export
 class TextareaUnitModel extends TextareaModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'TextUnitModel',
+	_model_name: 'TextareaUnitModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'TextUnitView',
+	_view_name: 'TextareaUnitView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -77,10 +77,10 @@ export
 class ToggleButtonUnitModel extends ToggleButtonModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'TextUnitModel',
+	_model_name: 'ToggleButtonUnitModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'TextUnitView',
+	_view_name: 'ToggleButtonUnitView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
