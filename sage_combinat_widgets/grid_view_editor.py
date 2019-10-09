@@ -493,7 +493,7 @@ class GridViewEditor(BindableEditorClass):
             sage: e.dirty
             {(0, 2): 7}
             sage: e.dirty_errors[(0,2)]
-            ValueError('the entries in each row of a semistandard tableau must be weakly increasing',)
+            ValueError('the entries in each row of a semistandard tableau must be weakly increasing')
         """
         self.dirty[pos] = val
         if err:

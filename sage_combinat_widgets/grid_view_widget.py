@@ -53,6 +53,7 @@ class BaseTextCell(TextUnit):
         self.layout = layout
         self.continuous_update = False
         self.position = position
+        self.description_tooltip = '' # avoid None
         self.add_class('gridcell')
 
 class TextCell(BaseTextCell):
@@ -565,20 +566,98 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             return self.children[self.total_height - pos[0] - 1].children[pos[1]]
         return self.children[pos[0]].children[pos[1]]
 
-    def set_dirty(self, pos, val, e=None):
-        super(GridViewWidget, self).set_dirty(pos, val, e)
+    def set_dirty(self, pos, val, err=None):
+        r"""
+        Set cell #pos as dirty
+
+        INPUT:
+
+            - ``pos`` -- a tuple
+            - ``val`` -- a(n incorrect) value for `pos`
+            - ``err`` -- an exception
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets import GridViewWidget
+            sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+            sage: w = GridViewWidget(t)
+            sage: from traitlets import Bunch
+            sage: err = w.set_cell(Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': w, 'type': 'change'}))
+            sage: w.set_dirty((0,2), 7, err)
+            sage: w.dirty
+            {(0, 2): 7}
+            sage: w.dirty_errors[(0,2)]
+            ValueError('the entries in each row of a semistandard tableau must be weakly increasing')
+            sage: w.children[0].children[2]._dom_classes
+            ('gridcell', 'dirty')
+            sage: w.children[0].children[2]._tooltip
+            'the entries in each row of a semistandard tableau must be weakly increasing'
+        """
+        super(GridViewWidget, self).set_dirty(pos, val, err)
         child = self.get_child(pos)
         child.add_class('dirty')
-        if e:
+        if err:
             child.set_tooltip(self.dirty_info(pos))
 
     def unset_dirty(self, pos):
+        r"""
+        Set a cell no more 'dirty'.
+
+        INPUT:
+
+            - ``pos`` -- a tuple
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets import GridViewWidget
+            sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+            sage: w = GridViewWidget(t)
+            sage: from traitlets import Bunch
+            sage: err = w.set_cell(Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'}))
+            sage: w.set_dirty((0,2), 7, err)
+            sage: err = w.set_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 9, 'owner': e, 'type': 'change'}))
+            sage: w.set_dirty((2,0), 9, err)
+            sage: w.dirty
+            {(0, 2): 7, (2, 0): 9}
+            sage: w.unset_dirty((0,2))
+            sage: w.dirty
+            {(2, 0): 9}
+            sage: w.children[0].children[2]._dom_classes
+            ('gridcell',)
+            sage: w.children[0].children[2]._tooltip
+            ''
+        """
         super(GridViewWidget, self).unset_dirty(pos)
         child = self.get_child(pos)
         child.remove_class('dirty')
         child.set_tooltip()
 
     def reset_dirty(self):
+        r"""
+        Reset all previously 'dirty' cells.
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets import GridViewWidget
+            sage: t = StandardTableau([[1, 2, 5, 6], [3], [4]])
+            sage: w = GridViewWidget(t)
+            sage: from traitlets import Bunch
+            sage: err = w.set_cell(Bunch({'name': 'cell_0_2', 'old': 5, 'new': 7, 'owner': e, 'type': 'change'}))
+            sage: w.set_dirty((0,2), 7, err)
+            sage: err = w.set_cell(Bunch({'name': 'cell_2_0', 'old': 4, 'new': 9, 'owner': e, 'type': 'change'}))
+            sage: w.set_dirty((2,0), 9, err)
+            sage: w.dirty
+            {(0, 2): 7, (2, 0): 9}
+            sage: w.children[2].children[0]._dom_classes
+            ('gridcell', 'removablecell', 'dirty')
+            sage: w.reset_dirty()
+            sage: w.dirty
+            {}
+            sage: w.children[2].children[0]._dom_classes
+            ('gridcell', 'removablecell')
+            sage: w.children[2].children[0]._tooltip
+            ''
+        """
         for pos in self.dirty:
             child = self.get_child(pos)
             child.remove_class('dirty')
