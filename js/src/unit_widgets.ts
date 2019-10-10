@@ -1,5 +1,6 @@
 import { ComboboxModel, ComboboxView,
        DropdownModel, DropdownView,
+       HTMLMathModel, HTMLMathView,
        TextModel, TextView,
        TextareaModel, TextareaView,
        ToggleButtonModel, ToggleButtonView } from '@jupyter-widgets/controls';
@@ -30,6 +31,23 @@ class DropdownUnitModel extends DropdownModel {
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
 	_view_name: 'DropdownUnitView',
+	_view_module: MODULE_NAME,
+	_view_module_version: MODULE_VERSION,
+        _focus: null,
+	_tooltip: null,
+	tabindex: null,
+        };
+    }
+}
+
+export
+class HTMLMathUnitModel extends HTMLMathModel {
+    defaults() {
+        return {...super.defaults(),
+	_model_name: 'HTMLMathUnitModel',
+	_model_module: MODULE_NAME,
+	_model_module_version: MODULE_VERSION,
+	_view_name: 'HTMLMathUnitView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -163,6 +181,44 @@ class DropdownUnitView extends DropdownView {
 	if (!focus) return;
 	if (focus == 'on') { this.listbox.focus(); }
 	else if (focus == 'off') { this.listbox.blur(); }
+    }
+};
+
+export
+class HTMLMathUnitView extends HTMLMathView {
+    render() {
+        super.render();
+        this.update_tabindex();
+        this.update_tooltip();
+        this.update_title();
+        this.update_focus();
+        this.model.on('change:tabindex', this.update_tabindex, this);
+        this.model.on('change:_tooltip', this.update_title, this);
+        this.model.on('change:description_tooltip', this.update_tooltip, this);
+        this.model.on('change:_focus', this.update_focus, this);
+    }
+
+    update_tabindex() {
+        let tabindex = this.model.get('tabindex')
+        if (tabindex) this.content.setAttribute('tabindex', tabindex);
+	else this.content.removeAttribute('tabindex');
+    }
+
+    update_tooltip() {
+	this.model.set('_tooltip', this.model.get('description_tooltip'));
+    }
+
+    update_title() {
+        let title = this.model.get('_tooltip');
+        if (title) this.content.setAttribute('title', title);
+	else this.content.removeAttribute('title');
+    }
+
+    update_focus() {
+        let focus = this.model.get('_focus');
+	if (!focus) return;
+	if (focus == 'on') { this.content.focus(); }
+	else if (focus == 'off') { this.content.blur(); }
     }
 };
 

@@ -8,7 +8,7 @@ AUTHORS ::
 
 """
 from traitlets import HasTraits, Int, Unicode
-from ipywidgets import Combobox, Dropdown, Text, Textarea, ToggleButton, register
+from ipywidgets import Combobox, Dropdown, HTMLMath, Text, Textarea, ToggleButton, register
 
 
 class Unit(HasTraits):
@@ -56,6 +56,17 @@ class DropdownUnit(Dropdown, Unit):
     _model_module = Unicode('unit-widgets').tag(sync=True)
     _model_module_version = Unicode('^0.7.6').tag(sync=True)
     _view_name = Unicode('DropdownUnitView').tag(sync=True)
+    _view_module = Unicode('unit-widgets').tag(sync=True)
+    _view_module_version = Unicode('^0.7.6').tag(sync=True)
+
+
+@register
+class HTMLMathUnit(HTMLMath, Unit):
+    """HTML Math widget with tooltip and focus."""
+    _model_name = Unicode('HTMLMathUnitModel').tag(sync=True)
+    _model_module = Unicode('unit-widgets').tag(sync=True)
+    _model_module_version = Unicode('^0.7.6').tag(sync=True)
+    _view_name = Unicode('HTMLMathUnitView').tag(sync=True)
     _view_module = Unicode('unit-widgets').tag(sync=True)
     _view_module_version = Unicode('^0.7.6').tag(sync=True)
 
