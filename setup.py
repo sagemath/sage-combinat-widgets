@@ -13,8 +13,7 @@ from setuptools.command.test import test as TestCommand # for tests
 
 from setupbase import (
     create_cmdclass, install_npm, ensure_targets,
-    find_packages, combine_commands,# ensure_python,
-    #get_version,
+    find_packages, combine_commands,
     HERE
 )
 
