@@ -8,7 +8,7 @@ AUTHORS ::
 
 """
 from traitlets import HasTraits, Int, Unicode
-from ipywidgets import Combobox, Dropdown, HTMLMath, Text, Textarea, ToggleButton, register
+from ipywidgets import Button, Combobox, Dropdown, HTMLMath, Text, Textarea, ToggleButton, register
 
 
 class Unit(HasTraits):
@@ -36,6 +36,17 @@ class Unit(HasTraits):
 
     def disallow_focus(self):
         self.set_tabindex(-1)
+
+
+@register
+class ButtonUnit(Button, Unit):
+    """Button with tooltip and focus."""
+    _model_name = Unicode('ButtonUnitModel').tag(sync=True)
+    _model_module = Unicode('unit-widgets').tag(sync=True)
+    _model_module_version = Unicode('^0.7.6').tag(sync=True)
+    _view_name = Unicode('ButtonUnitView').tag(sync=True)
+    _view_module = Unicode('unit-widgets').tag(sync=True)
+    _view_module_version = Unicode('^0.7.6').tag(sync=True)
 
 
 @register

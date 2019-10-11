@@ -1,10 +1,28 @@
-import { ComboboxModel, ComboboxView,
+import { ButtonModel,  ButtonView,
+       ComboboxModel, ComboboxView,
        DropdownModel, DropdownView,
        HTMLMathModel, HTMLMathView,
        TextModel, TextView,
        TextareaModel, TextareaView,
        ToggleButtonModel, ToggleButtonView } from '@jupyter-widgets/controls';
 import { MODULE_NAME, MODULE_VERSION } from './version';
+
+export
+class ButtonUnitModel extends ButtonModel {
+    defaults() {
+        return {...super.defaults(),
+	_model_name: 'ButtonUnitModel',
+	_model_module: MODULE_NAME,
+	_model_module_version: MODULE_VERSION,
+	_view_name: 'ButtonUnitView',
+	_view_module: MODULE_NAME,
+	_view_module_version: MODULE_VERSION,
+        _focus: null,
+	_tooltip: null,
+	tabindex: null,
+        };
+    }
+}
 
 export
 class ComboboxUnitModel extends ComboboxModel {
@@ -109,6 +127,44 @@ class ToggleButtonUnitModel extends ToggleButtonModel {
 }
 
 export
+class ButtonUnitView extends ButtonView {
+    render() {
+        super.render();
+        this.update_tabindex();
+        this.update_tooltip();
+        this.update_title();
+        this.update_focus();
+        this.model.on('change:tabindex', this.update_tabindex, this);
+        this.model.on('change:_tooltip', this.update_title, this);
+        this.model.on('change:tooltip', this.update_tooltip, this);
+        this.model.on('change:_focus', this.update_focus, this);
+    }
+
+    update_tabindex() {
+        let tabindex = this.model.get('tabindex')
+        if (tabindex) this.el.setAttribute('tabindex', tabindex);
+	else this.el.removeAttribute('tabindex');
+    }
+
+    update_tooltip() {
+        if (this.model.get('tooltip')) this.model.set('_tooltip', this.model.get('tooltip'));
+    }
+
+    update_title() {
+        let title = this.model.get('_tooltip');
+        if (title) this.el.setAttribute('title', title);
+	else this.el.removeAttribute('title');
+    }
+
+    update_focus() {
+        let focus = this.model.get('_focus');
+	if (!focus) return;
+	if (focus == 'on') { this.el.focus(); }
+	else if (focus == 'off') { this.el.blur(); }
+    }
+};
+
+export
 class ComboboxUnitView extends ComboboxView {
     render() {
         super.render();
@@ -129,7 +185,9 @@ class ComboboxUnitView extends ComboboxView {
     }
 
     update_tooltip() {
-	this.model.set('_tooltip', this.model.get('description_tooltip'));
+	if (this.model.get('description_tooltip')) {
+	    this.model.set('_tooltip', this.model.get('description_tooltip'));
+	}
     }
 
     update_title() {
@@ -167,7 +225,9 @@ class DropdownUnitView extends DropdownView {
     }
 
     update_tooltip() {
-	this.model.set('_tooltip', this.model.get('description_tooltip'));
+	if (this.model.get('description_tooltip')) {
+	    this.model.set('_tooltip', this.model.get('description_tooltip'));
+	}
     }
 
     update_title() {
@@ -205,7 +265,9 @@ class HTMLMathUnitView extends HTMLMathView {
     }
 
     update_tooltip() {
-	this.model.set('_tooltip', this.model.get('description_tooltip'));
+	if (this.model.get('description_tooltip')) {
+            this.model.set('_tooltip', this.model.get('description_tooltip'));
+	}
     }
 
     update_title() {
@@ -243,7 +305,9 @@ class TextUnitView extends TextView {
     }
 
     update_tooltip() {
-	this.model.set('_tooltip', this.model.get('description_tooltip'));
+	if (this.model.get('description_tooltip')) {
+	   this.model.set('_tooltip', this.model.get('description_tooltip'));
+	}
     }
 
     update_title() {
@@ -281,7 +345,9 @@ class TextareaUnitView extends TextareaView {
     }
 
     update_tooltip() {
-	this.model.set('_tooltip', this.model.get('description_tooltip'));
+        if (this.model.get('description_tooltip')) {
+	    this.model.set('_tooltip', this.model.get('description_tooltip'));
+	}
     }
 
     update_title() {
@@ -314,14 +380,18 @@ class ToggleButtonUnitView extends ToggleButtonView {
     }
 
     update_tabindex() {
-        let tabindex = this.model.get('tabindex')
+        let tabindex = this.model.get('tabindex');
         if (tabindex) this.el.setAttribute('tabindex', tabindex);
 	else this.el.removeAttribute('tabindex');
     }
 
     update_tooltip() {
-        if (this.model.get('tooltip')) this.model.set('_tooltip', this.model.get('description_tooltip'));
-	else this.model.set('_tooltip', this.model.get('description_tooltip'));
+        if (this.model.get('tooltip')) {
+	    this.model.set('_tooltip', this.model.get('tooltip'));
+	}
+	else if (this.model.get('description_tooltip')) {
+	    this.model.set('_tooltip', this.model.get('description_tooltip'));
+	}
     }
 
     update_title() {
