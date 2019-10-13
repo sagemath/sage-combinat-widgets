@@ -17,6 +17,7 @@ textcell_layout = Layout(width='3em', height='2em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em', height='3em', margin='0', padding='0')
 buttoncell_layout = Layout(width='5em', height='4em', margin='0', padding='0')
 buttoncell_smaller_layout = Layout(width='2em', height='2em', margin='0', padding='0')
+
 css_lines = []
 css_lines.append(".widget-text INPUT {border-collapse: collapse !important}")
 css_lines.append(".gridbutton {margin:0; padding:0; width:2em; height:2em; border:1px solid #999; color:#666}")
@@ -546,6 +547,15 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         self.children = vbox_children
         self.add_links()
         self.donottrack = False
+
+    def disallow_inside_focus(self):
+        r"""
+        Disallow focus for all cells except the first.
+        """
+        for r in self.children:
+            for c in r.children:
+                c.disallow_focus()
+        self.children[0].children[0].allow_focus()
 
     def get_child(self, pos):
         r"""
