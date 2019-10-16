@@ -554,8 +554,10 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         """
         for r in self.children:
             for c in r.children:
-                c.disallow_focus()
-        self.children[0].children[0].allow_focus()
+                if hasattr(c, 'disallow_focus'):
+                    c.disallow_focus()
+        if hasattr(self.children[0].children[0], 'allow_focus'):
+            self.children[0].children[0].allow_focus()
 
     def get_child(self, pos):
         r"""
