@@ -6,7 +6,7 @@ define(function() {
     window['requirejs'].config({
         map: {
             '*': {
-                'unit-widgets': 'nbextensions/unit-widgets/index',
+                'singleton-widgets': 'nbextensions/singleton-widgets/index',
             },
         }
     });

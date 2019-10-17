@@ -1,8 +1,8 @@
 {
-  "name": "unit-widgets",
+  "name": "singleton-widgets",
   "version": "0.7.6",
   "license": "GPL-2.0+",
-  "description": "Unit widgets to be combined.",
+  "description": "Singleton widgets to be combined.",
   "author": "Odile Bénassy, Nicolas Thiéry",
   "main": "lib/index.js",
   "repository": {
@@ -23,14 +23,14 @@
   ],
   "scripts": {
     "build": "npm run build:lib && npm run build:nbextension",
-    "build:labextension": "npm run clean:labextension && mkdirp ../unit_widgets/labextension && cd ../unit_widgets/labextension && npm pack ../../js",
+    "build:labextension": "npm run clean:labextension && mkdirp ../singleton_widgets/labextension && cd ../singleton_widgets/labextension && npm pack ../../js",
     "build:lib": "tsc",
     "build:nbextension": "webpack -p",
     "build:all": "npm run build:labextension && npm run build:nbextension",
     "clean": "rimraf dist/",
     "clean:lib": "rimraf lib",
-    "clean:labextension": "rimraf ../unit_widgets/labextension",
-    "clean:nbextension": "rimraf ../unit_widgets/nbextension/static/index.js",
+    "clean:labextension": "rimraf ../singleton_widgets/labextension",
+    "clean:nbextension": "rimraf ../singleton_widgets/nbextension/static/index.js",
     "prepack": "npm run build:lib",
     "prepare": "webpack",
     "test": "npm run test:firefox",
@@ -53,8 +53,11 @@
     "@jupyter-widgets/controls": "^1.5.2",
     "@types/node": "^12.6.9",
     "ajv": "^6.10.2",
+    "css-loader": "^3.2.0",
     "lodash": "^4.17.15",
     "npm": "^6.10.2",
+    "source-map-loader": "^0.2.4",
+    "style-loader": "^1.0.0",
     "webpack": "^4.39.1"
   },
   "jupyterlab": {

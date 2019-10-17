@@ -8,13 +8,13 @@ import { ButtonModel,  ButtonView,
 import { MODULE_NAME, MODULE_VERSION } from './version';
 
 export
-class ButtonUnitModel extends ButtonModel {
+class ButtonSingletonModel extends ButtonModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'ButtonUnitModel',
+	_model_name: 'ButtonSingletonModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'ButtonUnitView',
+	_view_name: 'ButtonSingletonView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -25,13 +25,13 @@ class ButtonUnitModel extends ButtonModel {
 }
 
 export
-class ComboboxUnitModel extends ComboboxModel {
+class ComboboxSingletonModel extends ComboboxModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'ComboboxUnitModel',
+	_model_name: 'ComboboxSingletonModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'ComboboxUnitView',
+	_view_name: 'ComboboxSingletonView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -42,13 +42,13 @@ class ComboboxUnitModel extends ComboboxModel {
 }
 
 export
-class DropdownUnitModel extends DropdownModel {
+class DropdownSingletonModel extends DropdownModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'DropdownUnitModel',
+	_model_name: 'DropdownSingletonModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'DropdownUnitView',
+	_view_name: 'DropdownSingletonView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -59,13 +59,13 @@ class DropdownUnitModel extends DropdownModel {
 }
 
 export
-class HTMLMathUnitModel extends HTMLMathModel {
+class HTMLMathSingletonModel extends HTMLMathModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'HTMLMathUnitModel',
+	_model_name: 'HTMLMathSingletonModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'HTMLMathUnitView',
+	_view_name: 'HTMLMathSingletonView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -76,13 +76,13 @@ class HTMLMathUnitModel extends HTMLMathModel {
 }
 
 export
-class TextUnitModel extends TextModel {
+class TextSingletonModel extends TextModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'TextUnitModel',
+	_model_name: 'TextSingletonModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'TextUnitView',
+	_view_name: 'TextSingletonView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -93,13 +93,13 @@ class TextUnitModel extends TextModel {
 }
 
 export
-class TextareaUnitModel extends TextareaModel {
+class TextareaSingletonModel extends TextareaModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'TextareaUnitModel',
+	_model_name: 'TextareaSingletonModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'TextareaUnitView',
+	_view_name: 'TextareaSingletonView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -110,13 +110,13 @@ class TextareaUnitModel extends TextareaModel {
 }
 
 export
-class ToggleButtonUnitModel extends ToggleButtonModel {
+class ToggleButtonSingletonModel extends ToggleButtonModel {
     defaults() {
         return {...super.defaults(),
-	_model_name: 'ToggleButtonUnitModel',
+	_model_name: 'ToggleButtonSingletonModel',
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
-	_view_name: 'ToggleButtonUnitView',
+	_view_name: 'ToggleButtonSingletonView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -127,7 +127,7 @@ class ToggleButtonUnitModel extends ToggleButtonModel {
 }
 
 export
-class ButtonUnitView extends ButtonView {
+class ButtonSingletonView extends ButtonView {
     render() {
         super.render();
         this.update_tabindex();
@@ -165,7 +165,7 @@ class ButtonUnitView extends ButtonView {
 };
 
 export
-class ComboboxUnitView extends ComboboxView {
+class ComboboxSingletonView extends ComboboxView {
     render() {
         super.render();
         this.update_tabindex();
@@ -205,7 +205,7 @@ class ComboboxUnitView extends ComboboxView {
 };
 
 export
-class DropdownUnitView extends DropdownView {
+class DropdownSingletonView extends DropdownView {
     render() {
         super.render();
         this.update_tabindex();
@@ -245,7 +245,7 @@ class DropdownUnitView extends DropdownView {
 };
 
 export
-class HTMLMathUnitView extends HTMLMathView {
+class HTMLMathSingletonView extends HTMLMathView {
     render() {
         super.render();
         this.update_tabindex();
@@ -285,7 +285,7 @@ class HTMLMathUnitView extends HTMLMathView {
 };
 
 export
-class TextUnitView extends TextView {
+class TextSingletonView extends TextView {
     render() {
         super.render();
         this.update_tabindex();
@@ -325,7 +325,7 @@ class TextUnitView extends TextView {
 };
 
 export
-class TextareaUnitView extends TextareaView {
+class TextareaSingletonView extends TextareaView {
     render() {
         super.render();
         this.update_tabindex();
@@ -365,7 +365,7 @@ class TextareaUnitView extends TextareaView {
 };
 
 export
-class ToggleButtonUnitView extends ToggleButtonView {
+class ToggleButtonSingletonView extends ToggleButtonView {
     render() {
         super.render();
         this.update_tabindex();

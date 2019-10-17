@@ -2,4 +2,4 @@
 // Distributed under the terms of the Modified BSD License.
 
 export * from './version';
-export * from './unit_widgets';
+export * from './singleton_widgets';
