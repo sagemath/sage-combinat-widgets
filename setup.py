@@ -36,7 +36,7 @@ class SageTest(TestCommand):
 
 # The name of the project
 name = 'sage-combinat-widgets'
-pyname = 'singleton_widgets' # basis for JS extension
+pyname = 'sage_combinat_widgets' # basis for JS extension
 
 js_path = pjoin(HERE, 'js')
 nb_path = pjoin(HERE, pyname, 'nbextension', 'static')
@@ -51,15 +51,18 @@ jstargets = [
 package_data_spec = {
     name: [
         'nbextension/static/*.*js*',
+        'nbextension/static/*.*css',
         'labextension/*.tgz'
     ]
 }
 
 data_files_spec = [
-    ('share/jupyter/nbextensions/singleton-widgets',
+    ('share/jupyter/nbextensions/sage-combinat-widgets',
         nb_path, '*.js*'),
+    ('share/jupyter/nbextensions/sage-combinat-widgets',
+        nb_path, '*.css'),
     ('share/jupyter/lab/extensions', lab_path, '*.tgz'),
-    ('etc/jupyter/nbconfig/notebook.d', HERE, 'singleton-widgets.json')
+    ('etc/jupyter/nbconfig/notebook.d', HERE, 'sage-combinat-widgets.json')
 ]
 
 

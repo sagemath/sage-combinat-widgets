@@ -1,5 +1,6 @@
 0.7.6:
 	* Isolate `singleton_widgets` sub-package
+	* Distribute CSS style along with the javascript
 0.7.5:
 	* Parallelogram polyomino adapter
 0.7.4:

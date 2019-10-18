@@ -1,8 +1,8 @@
 {
-  "name": "singleton-widgets",
+  "name": "sage-combinat-widgets",
   "version": "0.7.6",
   "license": "GPL-2.0+",
-  "description": "Singleton widgets to be combined.",
+  "description": "Sage Combinat widgets.",
   "author": "Odile Bénassy, Nicolas Thiéry",
   "main": "lib/index.js",
   "repository": {
@@ -23,14 +23,14 @@
   ],
   "scripts": {
     "build": "npm run build:lib && npm run build:nbextension",
-    "build:labextension": "npm run clean:labextension && mkdirp ../singleton_widgets/labextension && cd ../singleton_widgets/labextension && npm pack ../../js",
+    "build:labextension": "npm run clean:labextension && mkdirp ../sage_combinat_widgets/labextension && cd ../sage_combinat_widgets/labextension && npm pack ../../js",
     "build:lib": "tsc",
     "build:nbextension": "webpack -p",
     "build:all": "npm run build:labextension && npm run build:nbextension",
     "clean": "rimraf dist/",
     "clean:lib": "rimraf lib",
-    "clean:labextension": "rimraf ../singleton_widgets/labextension",
-    "clean:nbextension": "rimraf ../singleton_widgets/nbextension/static/index.js",
+    "clean:labextension": "rimraf ../sage_combinat_widgets/labextension",
+    "clean:nbextension": "rimraf ../sage_combinat_widgets/nbextension/static/index.js",
     "prepack": "npm run build:lib",
     "prepare": "webpack",
     "test": "npm run test:firefox",
