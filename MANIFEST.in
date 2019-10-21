@@ -1,0 +1,38 @@
+include LICENSE
+include README.rst
+
+include setupbase.py
+
+include js/tsconfig.json
+include js/package.json
+include js/webpack.config.js
+include sage_combinat_widgets/labextension/*.tgz
+
+# Documentation
+graft docs
+exclude docs/\#*
+prune docs/build
+prune docs/dist
+prune docs/presentation
+prune docs/video
+
+# Examples
+recursive-include examples *.ipynb *.py
+
+# Tests
+prune tests
+
+# Javascript files
+graft sage_combinat_widgets/nbextension
+graft js/src
+prune **/node_modules
+prune coverage
+prune js/lib
+
+# Patterns to exclude from any directory
+global-exclude *~
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .git
+global-exclude *checkpoint*
+global-exclude *Untitled*
