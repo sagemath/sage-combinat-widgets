@@ -91,10 +91,13 @@ def get_adapter(obj):
     if issubclass(obj.__class__, SkewTableau):
         from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
         return SkewTableauGridViewAdapter()
-    from sage.combinat.parallelogram_polyomino import ParallelogramPolyomino
-    if issubclass(obj.__class__, ParallelogramPolyomino):
-        from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import ParallelogramPolyominoGridViewAdapter
-        return ParallelogramPolyominoGridViewAdapter()
+    try:
+        from sage.combinat.parallelogram_polyomino import ParallelogramPolyomino
+        if issubclass(obj.__class__, ParallelogramPolyomino):
+            from sage_widget_adapters.combinat.parallelogram_polyomino_grid_view_adapter import ParallelogramPolyominoGridViewAdapter
+            return ParallelogramPolyominoGridViewAdapter()
+    except:
+        pass # support for parallelogram polyomino appears only in Sage 8.9
     from sage.matrix.matrix2 import Matrix
     if issubclass(obj.__class__, Matrix):
         from sage_widget_adapters.matrix.matrix_grid_view_adapter import MatrixGridViewAdapter
