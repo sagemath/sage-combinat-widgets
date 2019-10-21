@@ -79,3 +79,13 @@ The documentation of the package can be generated using Sage's
 Shorthand::
 
     $ make doc
+
+Acknowledgments
+---------------
+
+.. |EULogo| image:: http://opendreamkit.org/public/logos/Flag_of_Europe.svg
+    :width: 25
+    :alt: EU logo
+
+* |EULogo| This package was created under funding of the Horizon 2020 European Research Infrastructure project
+  `OpenDreamKit <https://opendreamkit.org/>`_ (grant agreement `#676541 <https://opendreamkit.org>`_).
