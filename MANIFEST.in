@@ -9,6 +9,7 @@ include js/webpack.config.js
 include sage_combinat_widgets/labextension/*.tgz
 
 # Documentation
+include demo_GridViewWidget.ipynb
 graft docs
 exclude docs/\#*
 prune docs/build
