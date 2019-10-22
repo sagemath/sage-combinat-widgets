@@ -49,6 +49,7 @@
     "webpack-cli": "^3.3.6"
   },
   "dependencies": {
+    "@phosphor/application": "^1.6.0",
     "@jupyter-widgets/base": "^2.0.1",
     "@jupyter-widgets/controls": "^1.5.2",
     "@types/node": "^12.6.9",
@@ -61,6 +62,6 @@
     "webpack": "^4.39.1"
   },
   "jupyterlab": {
-    "extension": "lib/labplugin"
+    "extension": "lib/plugin"
   }
 }
