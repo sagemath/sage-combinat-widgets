@@ -22,7 +22,7 @@ define(function() {
             .attr({
                 rel: 'stylesheet',
                 type: 'text/css',
-                href: requirejs.toUrl('./sage-combinat-widgets.css')
+                href: requirejs.toUrl('../style/sage-combinat-widgets.css')
             })
             .appendTo('head');
     };
