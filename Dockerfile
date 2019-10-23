@@ -1,4 +1,4 @@
-FROM sagemath/sagemath:8.3
+FROM sagemath/sagemath
 USER root
 ENV HOME /root
 RUN apt-get update && apt-get -qq install -y curl \
@@ -8,4 +8,5 @@ USER sage
 ENV HOME /home/sage
 COPY --chown=sage:sage . ${HOME}/sage-combinat-widgets
 WORKDIR ${HOME}/sage-combinat-widgets
+RUN sage -pip install jupyterlab
 RUN sage -pip install .
