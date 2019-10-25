@@ -9,4 +9,5 @@ ENV HOME /home/sage
 COPY --chown=sage:sage . ${HOME}/sage-combinat-widgets
 WORKDIR ${HOME}/sage-combinat-widgets
 RUN sage -pip install jupyterlab
+RUN cd ./js && npm run build:labextension && cd ..
 RUN sage -pip install .
