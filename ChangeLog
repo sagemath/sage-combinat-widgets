@@ -1,3 +1,5 @@
+0.7.7:
+	* Jupyterlab extension
 0.7.6:
 	* Isolate `singleton_widgets` sub-package
 	* Distribute CSS style along with the javascript
