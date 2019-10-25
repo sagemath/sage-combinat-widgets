@@ -8,6 +8,13 @@ USER sage
 ENV HOME /home/sage
 COPY --chown=sage:sage . ${HOME}/sage-combinat-widgets
 WORKDIR ${HOME}/sage-combinat-widgets
+RUN sage -pip install --upgrade ipywidgets
 RUN sage -pip install jupyterlab
-RUN cd ./js && npm run build:labextension && cd ..
+RUN cd ./js \
+ && npm install \
+ && npm run build:labextension \
+ && cd ..
 RUN sage -pip install .
+RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager \
+ && sage -n jupyterlab build \
+ && sage -n jupyterlab clean
