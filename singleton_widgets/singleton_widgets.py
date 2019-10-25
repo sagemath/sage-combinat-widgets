@@ -9,6 +9,7 @@ AUTHORS ::
 """
 from traitlets import HasTraits, Int, Unicode
 from ipywidgets import Button, Combobox, Dropdown, HTMLMath, Text, Textarea, ToggleButton, register
+JS_VERSION = '0.7.7'
 
 
 class Singleton(HasTraits):
@@ -43,10 +44,10 @@ class ButtonSingleton(Button, Singleton):
     """Button with tooltip and focus."""
     _model_name = Unicode('ButtonSingletonModel').tag(sync=True)
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _model_module_version = Unicode('^0.7.6').tag(sync=True)
+    _model_module_version = Unicode(JS_VERSION).tag(sync=True)
     _view_name = Unicode('ButtonSingletonView').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _view_module_version = Unicode('^0.7.6').tag(sync=True)
+    _view_module_version = Unicode(JS_VERSION).tag(sync=True)
 
 
 @register
@@ -54,10 +55,10 @@ class ComboboxSingleton(Combobox, Singleton):
     """Combobox with tooltip and focus."""
     _model_name = Unicode('ComboboxSingletonModel').tag(sync=True)
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _model_module_version = Unicode('^0.7.6').tag(sync=True)
+    _model_module_version = Unicode(JS_VERSION).tag(sync=True)
     _view_name = Unicode('ComboboxSingletonView').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _view_module_version = Unicode('^0.7.6').tag(sync=True)
+    _view_module_version = Unicode(JS_VERSION).tag(sync=True)
 
 
 @register
@@ -65,10 +66,10 @@ class DropdownSingleton(Dropdown, Singleton):
     """Dropdown with tooltip and focus."""
     _model_name = Unicode('DropdownSingletonModel').tag(sync=True)
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _model_module_version = Unicode('^0.7.6').tag(sync=True)
+    _model_module_version = Unicode(JS_VERSION).tag(sync=True)
     _view_name = Unicode('DropdownSingletonView').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _view_module_version = Unicode('^0.7.6').tag(sync=True)
+    _view_module_version = Unicode(JS_VERSION).tag(sync=True)
 
 
 @register
@@ -76,10 +77,10 @@ class HTMLMathSingleton(HTMLMath, Singleton):
     """HTML Math widget with tooltip and focus."""
     _model_name = Unicode('HTMLMathSingletonModel').tag(sync=True)
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _model_module_version = Unicode('^0.7.6').tag(sync=True)
+    _model_module_version = Unicode(JS_VERSION).tag(sync=True)
     _view_name = Unicode('HTMLMathSingletonView').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _view_module_version = Unicode('^0.7.6').tag(sync=True)
+    _view_module_version = Unicode(JS_VERSION).tag(sync=True)
 
 
 @register
@@ -87,10 +88,10 @@ class TextSingleton(Text, Singleton):
     """Input text with tooltip and focus."""
     _model_name = Unicode('TextSingletonModel').tag(sync=True)
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _model_module_version = Unicode('^0.7.6').tag(sync=True)
+    _model_module_version = Unicode(JS_VERSION).tag(sync=True)
     _view_name = Unicode('TextSingletonView').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _view_module_version = Unicode('^0.7.6').tag(sync=True)
+    _view_module_version = Unicode(JS_VERSION).tag(sync=True)
 
 
 @register
@@ -98,10 +99,10 @@ class TextareaSingleton(Textarea, Singleton):
     """Text area with tooltip and focus."""
     _model_name = Unicode('TextareaSingletonModel').tag(sync=True)
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _model_module_version = Unicode('^0.7.6').tag(sync=True)
+    _model_module_version = Unicode(JS_VERSION).tag(sync=True)
     _view_name = Unicode('TextareaSingletonView').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _view_module_version = Unicode('^0.7.6').tag(sync=True)
+    _view_module_version = Unicode(JS_VERSION).tag(sync=True)
 
 
 @register
@@ -109,7 +110,7 @@ class ToggleButtonSingleton(ToggleButton, Singleton):
     """Toggle button with tooltip and focus."""
     _model_name = Unicode('ToggleButtonSingletonModel').tag(sync=True)
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _model_module_version = Unicode('^0.7.6').tag(sync=True)
+    _model_module_version = Unicode(JS_VERSION).tag(sync=True)
     _view_name = Unicode('ToggleButtonSingletonView').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
-    _view_module_version = Unicode('^0.7.6').tag(sync=True)
+    _view_module_version = Unicode(JS_VERSION).tag(sync=True)
