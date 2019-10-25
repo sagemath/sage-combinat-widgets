@@ -15,6 +15,6 @@ RUN cd ./js \
  && npm run build:labextension \
  && cd ..
 RUN sage -pip install .
-RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager \
+RUN jupyter-labextension install --no-build @jupyter-widgets/jupyterlab-manager \
  && sage -n jupyterlab build \
  && sage -n jupyterlab clean
