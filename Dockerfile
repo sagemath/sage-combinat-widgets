@@ -12,9 +12,9 @@ RUN sage -pip install --upgrade ipywidgets
 RUN sage -pip install jupyterlab
 RUN cd ./js \
  && npm install \
- && npm run build:labextension \
+ && jupyter-labextension install . \
  && cd ..
 RUN sage -pip install .
-RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager \
+RUN jupyter-labextension install --no-build @jupyter-widgets/jupyterlab-manager \
  && sage -n jupyterlab build \
  && sage -n jupyterlab clean
