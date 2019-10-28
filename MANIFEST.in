@@ -1,5 +1,7 @@
+include ChangeLog
 include LICENSE
 include README.rst
+include VERSION
 
 include setupbase.py
 
