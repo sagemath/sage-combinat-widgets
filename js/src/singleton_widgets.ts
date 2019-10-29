@@ -1,6 +1,7 @@
 import { ButtonModel,  ButtonView,
        ComboboxModel, ComboboxView,
        DropdownModel, DropdownView,
+       HTMLModel, HTMLView,
        HTMLMathModel, HTMLMathView,
        TextModel, TextView,
        TextareaModel, TextareaView,
@@ -49,6 +50,23 @@ class DropdownSingletonModel extends DropdownModel {
 	_model_module: MODULE_NAME,
 	_model_module_version: MODULE_VERSION,
 	_view_name: 'DropdownSingletonView',
+	_view_module: MODULE_NAME,
+	_view_module_version: MODULE_VERSION,
+        _focus: null,
+	_tooltip: null,
+	tabindex: null,
+        };
+    }
+}
+
+export
+class HTMLSingletonModel extends HTMLModel {
+    defaults() {
+        return {...super.defaults(),
+	_model_name: 'HTMLSingletonModel',
+	_model_module: MODULE_NAME,
+	_model_module_version: MODULE_VERSION,
+	_view_name: 'HTMLSingletonView',
 	_view_module: MODULE_NAME,
 	_view_module_version: MODULE_VERSION,
         _focus: null,
@@ -245,7 +263,7 @@ class DropdownSingletonView extends DropdownView {
 };
 
 export
-class HTMLMathSingletonView extends HTMLMathView {
+class HTMLSingletonView extends HTMLView {
     render() {
         super.render();
         this.update_tabindex();
@@ -281,6 +299,13 @@ class HTMLMathSingletonView extends HTMLMathView {
 	if (!focus) return;
 	if (focus == 'on') { this.content.focus(); }
 	else if (focus == 'off') { this.content.blur(); }
+    }
+};
+
+export
+class HTMLMathSingletonView extends HTMLSingletonView {
+    render() {
+        super.render();
     }
 };
 
