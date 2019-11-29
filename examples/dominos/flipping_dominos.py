@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from flipping_aztecdiamond import DominoGeometry, DominosAdapter
+from .flipping_aztecdiamond import *
 from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, styled_button_cell
 from ipywidgets import Layout
 from traitlets import dlink, HasTraits, Bool
