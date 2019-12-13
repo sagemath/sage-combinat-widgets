@@ -22,7 +22,7 @@ import {
 const EXTENSION_ID = 'sage-combinat-widgets:plugin';
 
 /**
- * The example plugin.
+ * The plugin.
  */
 const sageCombinatWidgetsPlugin: IPlugin<Application<Widget>, void> = {
   id: EXTENSION_ID,

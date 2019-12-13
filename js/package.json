@@ -21,6 +21,7 @@
     "lib/*.js",
     "style/*.css"
   ],
+  "style": "style/sage-combinat-widgets.css",
   "scripts": {
     "build": "npm run build:lib && npm run build:nbextension",
     "build:labextension": "npm run clean:labextension && mkdirp ../sage_combinat_widgets/labextension && cd ../sage_combinat_widgets/labextension && npm pack ../../js",
@@ -61,7 +62,10 @@
     "style-loader": "^1.0.0",
     "webpack": "^4.39.1"
   },
+  "sideEffects": [
+    "style/*.css"
+  ],
   "jupyterlab": {
-    "extension": true
+    "extension": "lib/plugin"
   }
 }

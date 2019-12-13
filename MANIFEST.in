@@ -8,7 +8,7 @@ include setupbase.py
 include js/tsconfig.json
 include js/package.json
 include js/webpack.config.js
-include style/sage-combinat-widgets.css
+include js/style/sage-combinat-widgets.css
 include sage_combinat_widgets/labextension/*.tgz
 
 # Documentation

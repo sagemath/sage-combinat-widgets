@@ -8,7 +8,7 @@ AUTHORS ::
 
 """
 from traitlets import HasTraits, Int, Unicode
-from ipywidgets import Button, Combobox, Dropdown, HTMLMath, Text, Textarea, ToggleButton, register
+from ipywidgets import Button, Combobox, Dropdown, HTML, HTMLMath, Text, Textarea, ToggleButton, register
 JS_VERSION = '0.7.7'
 
 
@@ -68,6 +68,17 @@ class DropdownSingleton(Dropdown, Singleton):
     _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
     _model_module_version = Unicode(JS_VERSION).tag(sync=True)
     _view_name = Unicode('DropdownSingletonView').tag(sync=True)
+    _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
+    _view_module_version = Unicode(JS_VERSION).tag(sync=True)
+
+
+@register
+class HTMLSingleton(HTML, Singleton):
+    """HTML Math widget with tooltip and focus."""
+    _model_name = Unicode('HTMLSingletonModel').tag(sync=True)
+    _model_module = Unicode('sage-combinat-widgets').tag(sync=True)
+    _model_module_version = Unicode(JS_VERSION).tag(sync=True)
+    _view_name = Unicode('HTMLSingletonView').tag(sync=True)
     _view_module = Unicode('sage-combinat-widgets').tag(sync=True)
     _view_module_version = Unicode(JS_VERSION).tag(sync=True)
 
