@@ -66,6 +66,6 @@
     "style/*.css"
   ],
   "jupyterlab": {
-    "extension": true
+    "extension": "lib/plugin"
   }
 }
