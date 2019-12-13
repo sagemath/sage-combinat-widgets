@@ -57,7 +57,7 @@
     "ajv": "^6.10.2",
     "css-loader": "^3.2.0",
     "lodash": "^4.17.15",
-    "npm": "^6.10.2",
+    "npm": "^6.13.4",
     "source-map-loader": "^0.2.4",
     "style-loader": "^1.0.0",
     "webpack": "^4.39.1"
