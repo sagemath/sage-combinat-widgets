@@ -1,5 +1,6 @@
 0.7.7:
-	* Jupyterlab extension
+	* Moved to Python3
+	* Works on Jupyterlab
 0.7.6:
 	* Isolate `singleton_widgets` sub-package
 	* Distribute CSS style along with the javascript

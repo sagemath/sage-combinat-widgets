@@ -64,8 +64,8 @@ class SkewTableauGridViewAdapter(GridViewAdapter):
 
             sage: from sage.combinat.skew_tableau import SkewTableau
             sage: from sage_widget_adapters.combinat.skew_tableau_grid_view_adapter import SkewTableauGridViewAdapter
-            sage: SkewTableauGridViewAdapter.from_cells({(0, 1): 2, (0, 3): 6, (1, 0): 3, (2, 0): 4})
-            [[None, 2, None, 6], [3], [4]]
+            sage: SkewTableauGridViewAdapter.from_cells({(0, 1): 2, (1, 0): 3, (2, 0): 4})
+            [[None, 2], [3], [4]]
         """
         rows = []
         for i in range(max(pos[0] for pos in cells) + 1):

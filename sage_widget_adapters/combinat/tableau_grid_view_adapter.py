@@ -179,7 +179,7 @@ class TableauGridViewAdapter(GridViewAdapter):
             sage: sta.remove_cell(st, (1, 1))
             [[1, 2, 5, 6], [3], [4]]
             sage: sta.remove_cell(st, (2, 0))
-            ValueError('the entries in a standard tableau must be in bijection with 1,2,...,n',)
+            ValueError('the entries in a standard tableau must be in bijection with 1,2,...,n')
         """
         if not pos in self.removable_cells(obj):
             raise ValueError("Cell position '%s' is not removable." % str(pos))
