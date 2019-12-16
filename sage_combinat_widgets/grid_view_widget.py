@@ -343,7 +343,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
 
             sage: def f(x = w): return az.average_distance()
             sage: f = interact(f)
-            <html>...</html>
+            Interactive function <function f at ...> with 1 widget
+              x: GridViewWidget(value=Aztec Diamond graph of order 4, ...)
         """
         GridViewEditor.__init__(self, obj, adapter)
         VBox.__init__(self)
