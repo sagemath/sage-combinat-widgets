@@ -1,6 +1,6 @@
 {
   "name": "sage-combinat-widgets",
-  "version": "0.7.7",
+  "version": "0.7.8",
   "license": "GPL-2.0+",
   "description": "Jupyter widgets for SAGE Combinat",
   "author": "Odile Bénassy, Nicolas Thiéry",

@@ -9,7 +9,7 @@ AUTHORS ::
 """
 from traitlets import HasTraits, Int, Unicode
 from ipywidgets import Button, Combobox, Dropdown, HTML, HTMLMath, Text, Textarea, ToggleButton, register
-JS_VERSION = '0.7.7'
+JS_VERSION = '0.7.8'
 
 
 class Singleton(HasTraits):

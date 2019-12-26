@@ -1,3 +1,5 @@
+0.7.8:
+	* Flipping dominos example
 0.7.7:
 	* Moved to Python3
 	* Works on Jupyterlab
