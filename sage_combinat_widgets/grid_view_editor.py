@@ -739,8 +739,8 @@ class GridViewEditor(BindableEditorClass):
             return
         # Don't remove non empty cells
         # Don't remove addable cells ; this test will do something only if adapter addablecellzero is specified (therefore not eq to cellzero)
-        if not change.name.startswith('cell_') or self.to_cell(val) != self.adapter.cellzero \
-           or self.to_cell(val) == self.adapter.addablecellzero or change.old == traitlets.Undefined:
+        if not change.name.startswith('cell_') or val != self.adapter.cellzero \
+           or val == self.adapter.addablecellzero or change.old == traitlets.Undefined:
             return
         if not hasattr(self.adapter, 'remove_cell'):
             raise TypeError("Cannot remove cell from this object.")
