@@ -1,7 +1,7 @@
 /* Default stylesheet for Sage Combinat Widgets package */
 
 .widget-text INPUT {border-collapse: collapse !important}
-.gridbutton {margin:0; padding:0; width:2em; height:2em; border:1px solid #999; color:#666}
+.gridbutton {margin:0; padding:0; width:2em; height:2em; border:1px solid #999 !important; color:#666}
 .blankbutton, .addablebutton {background-color:white; color:#666}
 .blankbutton {border:0px !important}
 .blankcell INPUT {border:0px !important}

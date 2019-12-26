@@ -9,7 +9,7 @@ AUTHORS ::
 """
 from .grid_view_editor import GridViewEditor, cdlink
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, HTML, Text, ToggleButton, Button, ValueWidget
+from ipywidgets import Layout, VBox, HBox, HTML, ValueWidget
 from singleton_widgets import *
 from six import text_type
 
@@ -147,7 +147,7 @@ class DisabledTextCell(BaseTextCell):
         super(DisabledTextCell, self).__init__(content, position, layout=layout, **kws)
         self.disabled = True
 
-class ButtonCell(ToggleButton):
+class ButtonCell(ToggleButtonSingleton):
     r"""A base class for button grid cells.
 
     TESTS ::
@@ -200,13 +200,16 @@ class StyledButtonCell(ButtonCell):
     """
     disable = None
     css_class = None
+    addable = None
     def __init__(self, content, position, layout=buttoncell_smaller_layout, **kws):
         super(StyledButtonCell, self).__init__(content, position, layout, **kws)
         self.add_class(self.css_class)
         if self.disable:
             self.disabled = True
+        if self.addable:
+            self.add_class('addablebutton')
 
-def styled_button_cell(disabled=False, style_name=''):
+def styled_button_cell(disabled=False, style_name='', addable=False):
     r"""A function to create CSS-styled buttons.
     A regular button has a value and a position.
 
@@ -220,7 +223,9 @@ def styled_button_cell(disabled=False, style_name=''):
     class_name = "{}Button".format(style_name.capitalize())
     if disabled:
         class_name = "Disabled" + class_name
-    return type(class_name, (StyledButtonCell,), {'disable': disabled, 'css_class': style_name})
+    elif addable:
+        class_name = "Addable" + class_name
+    return type(class_name, (StyledButtonCell,), {'disable': disabled, 'css_class': style_name, 'addable': addable})
 
 DisabledButtonCell = styled_button_cell(disabled=True)
 r"""A disabled button cell.
@@ -248,7 +253,7 @@ class AddableButtonCell(ButtonCell):
         self.description = '+'
         self.tooltip = "Click to add a cell here"
 
-class StyledPushButton(Button):
+class StyledPushButton(ButtonSingleton):
     r"""A class for CSS-styled push buttons.
     Not meant to be called directly.
 
