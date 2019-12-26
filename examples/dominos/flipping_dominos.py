@@ -238,3 +238,8 @@ class DominosWidget(GridViewWidget):
         for d in matching:
             self.match(self.children[d.first[0]].children[d.first[1]],
                        self.children[d.second[0]].children[d.second[1]])
+
+    def set_value(self, value):
+        """Need to call self.draw() manually, as the change is not obvious to the observer!"""
+        super(GridViewWidget, self).set_value(value)
+        self.draw()
