@@ -106,7 +106,7 @@ class WiderTextCell(BaseTextCell):
     def __init__(self, content, position, layout=textcell_wider_layout, **kws):
         super(WiderTextCell, self).__init__(content, position, layout, **kws)
 
-class BlankCell(Text):
+class BlankCell(TextSingleton):
     r"""A blank placeholder cell
 
     TESTS ::
@@ -500,7 +500,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                                              layout=self.cell_layout,
                                              placeholder=cell_display)
                     if (i,j) in removable_positions:
-                        if issubclass(cell_widget_class, ToggleButton):
+                        if issubclass(cell_widget_class, ToggleButtonSingleton):
                             cell.description = '-'
                             cell.disabled = False
                         else:
