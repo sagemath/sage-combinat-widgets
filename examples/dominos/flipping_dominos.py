@@ -2,12 +2,44 @@
 # coding: utf-8
 
 from .flipping_aztecdiamond import *
+from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
 from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, styled_button_cell
 from ipywidgets import Layout
 from traitlets import dlink, HasTraits, Bool
 from contextlib import contextmanager
 
 smallblyt = Layout(width='12px',height='12px', margin='0', padding='0')
+
+
+class DominosAdapter(GraphGridViewAdapter):
+
+    remove_cell = None
+
+    def set_cell(self, obj, pos, val=True, dirty={}):
+        r"""
+        When we click on a graph cell,
+        we prepare a possible flip
+        or we try to complete the flip if it has been prepared previously
+        """
+        # Find out the relevant matching for 'pos'
+        d1 = obj.domino_for_position(pos)
+        if dirty: # if i'm a neighbor, then flip and return a new obj ; else return an error
+            # Consider the relevant matching(s)
+            for p in dirty:
+                if not dirty[p]: # check this position is pressed
+                    continue
+                d2 = obj.domino_for_position(p)
+                if d2 == d1:
+                    continue
+                if d2 in d1.neighbors():
+                    # Do the flip
+                    obj.flip(d1, d2)
+                    #obj.matching[d1.first] = d1
+                    #obj.matching[d2.first] = d2
+                    return obj
+            return Exception("Please select a second domino!")
+        else:
+            return Exception("Please select a second domino!")
 
 
 class ddlink(dlink):
@@ -125,18 +157,23 @@ class Domino(HasTraits):
         self.link = None
         self.direction = None
         self.orientation = None
-        self.compute()
+        self.compute(None)
 
     def __repr__(self):
         if self.value:
             return repr(self.first) + ' -> ' + repr(self.second) + " PRESSED"
         return repr(self.first) + ' -> ' + repr(self.second)
 
-    def compute(self):
+    def compute(self, css_classes=None):
         """Compute buttons relative positions.
         Create double directional link from both buttons"""
         self.geometry.compute()
-        self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
+        if css_classes:
+            for cl in css_classes:
+                self.first.remove_class(cl)
+                self.second.remove_class(cl)
+            self.first.add_class(css_classes[self.geometry.index_for_display-1])
+            self.second.add_class(css_classes[self.geometry.index_for_display-1])
         if self.geometry.orientation == 1:
             self.key = self.first.position
         else:
@@ -158,6 +195,7 @@ class Domino(HasTraits):
             elif self.geometry.orientation == -1:
                 self.first.add_class('bottom')
                 self.second.add_class('top')
+        self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
 
     def is_pressed(self):
         """Is the domino pressed?"""
@@ -176,24 +214,15 @@ class Domino(HasTraits):
         self.compute()
         other.compute()
 
+
 def make_cell_widget_class_index(g):
     def cell_widget_class_index(pos):
-        def calc_index_for_domino(d):
-            if d.direction == 'horizontal':
-                if not d.parity:
-                    return 1
-                else:
-                    return 2
-            else:
-                if not d.parity:
-                    return 3
-                else:
-                    return 4
         d = g.domino_for_position(pos)
         if d:
-            return calc_index_for_domino(d)
+            return d.calc_index_for_display()
         return 0
     return cell_widget_class_index
+
 
 class DominosWidget(GridViewWidget):
     """A widget with dominos"""
@@ -213,11 +242,17 @@ class DominosWidget(GridViewWidget):
                                             ],
                                             cell_widget_class_index=make_cell_widget_class_index(g),
                                             blank_widget_class = BlankButton)
+        self.css_classes = ['b1', 'b2', 'b3', 'b4']
 
     def draw(self):
         self.dominos = {}
         super(DominosWidget, self).draw()
         self.apply_matching(self.value.matching)
+
+    def update(self):
+        self.apply_matching(self.value.matching)
+        for k,d in self.dominos.items():
+            d.compute(self.css_classes)
 
     def match(self, b1, b2):
         """Match buttons b1 and b2, that is: create a domino"""
@@ -235,11 +270,12 @@ class DominosWidget(GridViewWidget):
 
     def apply_matching(self, matching):
         """Apply a matching"""
+        self.dominos = {}
         for d in matching:
             self.match(self.children[d.first[0]].children[d.first[1]],
                        self.children[d.second[0]].children[d.second[1]])
 
     def set_value(self, value):
-        """Need to call self.draw() manually, as the change is not obvious to the observer!"""
-        super(GridViewWidget, self).set_value(value)
-        self.draw()
+        """Need to call self.update() manually, as the change is not obvious to the observer!"""
+        self.reset_dirty()
+        self.update()

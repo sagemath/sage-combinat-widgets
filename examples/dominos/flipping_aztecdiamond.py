@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from sage.graphs.graph import Graph
-from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
+
 
 class DominoGeometry:
     r"""
@@ -13,6 +13,7 @@ class DominoGeometry:
         self.second = second
         self.direction = None
         self.orientation = None
+        self.index_for_display = None
         self.compute()
 
     def __repr__(self):
@@ -47,6 +48,19 @@ class DominoGeometry:
             self.parity = (self.first[0]%2 + self.first[1]%2)%2
         elif self.orientation == -1:
             self.parity = (self.second[0]%2 + self.second[1]%2)%2
+        self.index_for_display = self.calc_index_for_display()
+
+    def calc_index_for_display(self):
+        if self.direction == 'horizontal':
+            if not self.parity:
+                return 1
+            else:
+                return 2
+        else:
+            if not self.parity:
+                return 3
+            else:
+                return 4
 
     def reverse(self):
         return DominoGeometry(self.second, self.first)
@@ -68,8 +82,7 @@ class DominoGeometry:
             self.second, other.first = other.first, self.second
         else:
             self.second, other.second = other.second, self.second
-        self.compute()
-        other.compute()
+
 
 class FlippingAztecDiamond(Graph):
     def __init__(self, n, matching=()):
@@ -108,6 +121,9 @@ class FlippingAztecDiamond(Graph):
             if d.first == pos or d.second == pos:
                 return d
 
+    def position_for_domino(d):
+        return d.first
+
     @staticmethod
     def flip(d1, d2):
         """d1 and d2 are dominos"""
@@ -115,31 +131,3 @@ class FlippingAztecDiamond(Graph):
             d1.flip(d2)
         else:
             d2.flip(d1)
-
-class DominosAdapter(GraphGridViewAdapter):
-
-    remove_cell = None
-
-    def set_cell(self, obj, pos, val=True, dirty={}):
-        r"""
-        When we click on a graph cell,
-        we prepare a possible flip
-        or we try to complete the flip if it has been prepared previously
-        """
-        # Find out the relevant matching for 'pos'
-        d1 = obj.domino_for_position(pos)
-        if dirty: # if i'm a neighbor, then flip and return a new obj ; else return an error
-            # Consider the relevant matching(s)
-            for p in dirty:
-                if not dirty[p]: # check this position is pressed
-                    continue
-                d2 = obj.domino_for_position(p)
-                if d2 == d1:
-                    continue
-                if d2 in d1.neighbors():
-                    # Do the flip
-                    obj.flip(d1, d2)
-                    return obj
-            return Exception("Please select a second domino!")
-        else:
-            return Exception("Please select a second domino!")
