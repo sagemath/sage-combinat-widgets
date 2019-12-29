@@ -23,6 +23,7 @@ AUTHORS ::
 """
 import re, traitlets
 from six import add_metaclass
+from abc import abstractmethod
 from copy import copy
 from sage.misc.bindable_class import BindableClass
 from sage.all import SageObject
@@ -316,12 +317,20 @@ class GridViewEditor(BindableEditorClass):
             lnk.unlink()
         self.links = []
 
+    @abstractmethod
+    def update_style(self):
+        """
+        Update look and feel.
+        """
+        return
+
+    @abstractmethod
     def draw(self, cast=None):
         r"""
         Build the visual representation
         and cdlink objects -- with cast function `cast`.
         """
-        pass
+        return
 
     def get_value(self):
         r"""

@@ -116,9 +116,10 @@ class BlankCell(TextSingleton):
     """
     displaytype = text_type
 
-    def __init__(self, layout=textcell_layout, **kws):
+    def __init__(self, position=None, layout=textcell_layout, **kws):
         super(BlankCell, self).__init__()
         self.value = ''
+        self.position = position
         self.layout = layout
         self.disabled = True
         self.add_class('blankcell')
@@ -265,9 +266,9 @@ class StyledPushButton(ButtonSingleton):
     disable = None
     css_class = None
     def __init__(self, content=None, position=None, layout=buttoncell_smaller_layout, description='', placeholder=None):
-        super(StyledPushButton, self).__init__()
-        self.layout=layout
-        self.description=description
+        super(StyledPushButton, self).__init__(layout=layout, description=description, placeholder=placeholder)
+        self.content = content
+        self.position = position
         if self.disable:
             self.disabled = True
         self.add_class('gridbutton')
@@ -318,6 +319,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
 
     def __init__(self, obj, adapter=None, display_convention='en', cell_layout=None,
                  cell_widget_classes=[TextCell], cell_widget_class_index=lambda x:0,
+                 css_classes = [], css_class_index=None,
                  blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
         r"""
         Grid View Widget initialization.
@@ -365,6 +367,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         self.cell_layout = cell_layout
         self.cell_widget_classes = cell_widget_classes
         self.cell_widget_class_index = cell_widget_class_index
+        self.css_classes = css_classes
+        self.css_class_index = css_class_index or cell_widget_class_index or (lambda x:0)
         try:
             self.displaytype = cell_widget_classes[0].displaytype
         except:
@@ -448,6 +452,35 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             child = self.get_child(pos)
             if child and hasattr(child, 'value') and traitname in self.traits():
                 self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
+
+    def update_style(self, css_classes=None, css_class_index=None):
+        r"""
+        Update look and fell -- ie CSS classes.
+        Therefore avoid redrawing if overall shape is unchanged.
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets.grid_view_widget import *
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: az = AztecDiamondGraph(4)
+            sage: w = GridViewWidget(az, cell_widget_classes=[ButtonCell], blank_widget_class=BlankButton)
+            sage: w.children[1].children[3]._dom_classes
+            ('gridbutton',)
+            sage: w.update_style(css_classes=['cl0', 'cl1', 'cl2', 'cl3'], css_class_index=lambda x:x[0]%4)
+            sage: w.children[1].children[3]._dom_classes
+            ('gridbutton', 'cl1')
+        """
+        if not css_classes:
+            css_classes = self.css_classes
+        if not css_class_index:
+            css_class_index = self.cell_widget_class_index
+        for row in self.children:
+            for cell in row.children:
+                if not hasattr(cell, 'position'):
+                    continue # Do we want to change blank cells' style?
+                for cl in css_classes:
+                    cell.remove_class(cl)
+                cell.add_class(css_classes[css_class_index(cell.position)])
 
     def draw(self, cell_widget_classes=None, cell_widget_class_index=None,
              addable_widget_class=None, blank_widget_class=None):
