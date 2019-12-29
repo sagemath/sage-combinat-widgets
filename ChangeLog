@@ -1,5 +1,6 @@
 0.7.8:
-	* Flipping dominos example
+	* Modifying styles on the fly
+	* Better examples: dominos ..
 0.7.7:
 	* Moved to Python3
 	* Works on Jupyterlab
