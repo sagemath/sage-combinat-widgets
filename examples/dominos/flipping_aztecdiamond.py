@@ -82,6 +82,8 @@ class DominoGeometry:
             self.second, other.first = other.first, self.second
         else:
             self.second, other.second = other.second, self.second
+        self.compute()
+        other.compute()
 
 
 class FlippingAztecDiamond(Graph):
@@ -127,6 +129,8 @@ class FlippingAztecDiamond(Graph):
     @staticmethod
     def flip(d1, d2):
         """d1 and d2 are dominos"""
+        if d1==d2 or not d2 in d1.neighbors():
+            return
         if d1 < d2:
             d1.flip(d2)
         else:

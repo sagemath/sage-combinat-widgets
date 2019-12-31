@@ -29,13 +29,11 @@ class DominosAdapter(GraphGridViewAdapter):
                 if not dirty[p]: # check this position is pressed
                     continue
                 d2 = obj.domino_for_position(p)
-                if d2 == d1:
+                if d2 == d1 or not d2 in d1.neighbors():
                     continue
                 if d2 in d1.neighbors():
                     # Do the flip
                     obj.flip(d1, d2)
-                    #obj.matching[d1.first] = d1
-                    #obj.matching[d2.first] = d2
                     return obj
             return Exception("Please select a second domino!")
         else:
@@ -201,13 +199,25 @@ class Domino(HasTraits):
         """Is the domino pressed?"""
         return self.value
 
+    def set_value(self, value):
+        """Set domino value
+        As we have a directional link,
+        the domino value will also be set.
+        """
+        self.link.unlink()
+        self.first.value = value
+        self.second.value = value
+        self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
+
     def reset(self):
         """Full domino reset"""
-        self.value = False
+        self.set_value(False)
         self.link.unlink()
 
     def flip(self, other):
         """Flip self with some neighboring domino"""
+        if other == self or other.geometry == self.geometry:
+            return
         self.reset()
         other.reset()
         self.geometry.flip(other.geometry)
@@ -253,6 +263,7 @@ class DominosWidget(GridViewWidget):
         self.apply_matching(self.value.matching)
         for k,d in self.dominos.items():
             d.compute(self.css_classes)
+            d.set_value(False) # unpress buttons
 
     def match(self, b1, b2):
         """Match buttons b1 and b2, that is: create a domino"""
