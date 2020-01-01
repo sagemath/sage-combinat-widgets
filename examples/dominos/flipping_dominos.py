@@ -11,11 +11,11 @@ from contextlib import contextmanager
 smallblyt = Layout(width='12px',height='12px', margin='0', padding='0')
 
 
-class DominosAdapter(GraphGridViewAdapter):
+class FlippingDominosAdapter(GraphGridViewAdapter):
 
     remove_cell = None
 
-    def set_cell(self, obj, pos, val=True, dirty={}):
+    def set_cell(self, obj, pos, val, dirty={}):
         r"""
         When we click on a graph cell,
         we prepare a possible flip
@@ -234,7 +234,7 @@ def make_cell_widget_class_index(g):
     return cell_widget_class_index
 
 
-class DominosWidget(GridViewWidget):
+class FlippingDominosWidget(GridViewWidget):
     """A widget with dominos"""
 
     def __init__(self, g):
@@ -242,7 +242,7 @@ class DominosWidget(GridViewWidget):
         Init a flipping dominos widget
         with flipping aztec diamond graph `g`
         """
-        super(DominosWidget, self).__init__(g, adapter = DominosAdapter(),
+        super(FlippingDominosWidget, self).__init__(g, adapter = FlippingDominosAdapter(),
                                             cell_layout = smallblyt,
                                             cell_widget_classes=[styled_button_cell(),
                                                                  styled_button_cell(style_name='b1'),
@@ -256,7 +256,7 @@ class DominosWidget(GridViewWidget):
 
     def draw(self):
         self.dominos = {}
-        super(DominosWidget, self).draw()
+        super(FlippingDominosWidget, self).draw()
         self.apply_matching(self.value.matching)
 
     def update(self):
