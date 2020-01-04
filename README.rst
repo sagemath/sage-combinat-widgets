@@ -67,6 +67,10 @@ Shorthand::
 
     $ make test
 
+If you have ``tox`` installed, you can also test the package like this::
+
+    $ tox
+
 Documentation
 -------------
 
