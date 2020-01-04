@@ -14,3 +14,4 @@ js/node_modules/
 package-lock.json
 *.[1-9]
 *.print
+/.tox
