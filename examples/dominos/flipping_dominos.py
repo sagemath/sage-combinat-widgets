@@ -3,7 +3,7 @@
 
 from .flipping_aztecdiamond import *
 from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, styled_button_cell
+from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, StyledButtonCell
 from ipywidgets import Layout
 from traitlets import dlink, HasTraits, Bool, observe, All
 from contextlib import contextmanager
@@ -22,6 +22,7 @@ class FlippingDominosAdapter(GraphGridViewAdapter):
         we prepare a possible flip
         or we try to complete the flip if it has been prepared previously
         """
+        #print("in the adapter for pos =", pos, "val =", val, "dirty =", dirty)
         # Find out the relevant matching for 'pos'
         d1 = obj.domino_for_position(pos)
         if dirty: # if i'm a neighbor, then flip and return a new obj ; else return an error
@@ -34,7 +35,9 @@ class FlippingDominosAdapter(GraphGridViewAdapter):
                     continue
                 if d2 in d1.neighbors():
                     # Do the flip
+                    print("before flipping :", d1, d2)
                     obj.flip(d1, d2)
+                    print("after flipping :", d1, d2)
                     return obj
             return Exception("Please select a second domino!")
         else:
@@ -43,7 +46,7 @@ class FlippingDominosAdapter(GraphGridViewAdapter):
 
 class ddlink(dlink):
     """Double directional link with logic = or/and/none.
-    Double_source is a tuple of (source, target) tuples
+    `double_source` is a tuple of (source, traitname) tuples
     Usage: b1 = Button(description = 'B1')
            b2 = Button(description = 'B2')
            b3 = Button(description = 'B3')
@@ -101,6 +104,9 @@ class ddlink(dlink):
     def _update(self, change):
         #if self.updating or self.target[0].donottrack:
         #    return
+        #if self.target[0].donottrack:
+        #    print("on sort ici !!!")
+        #    return
         with self._busy_updating():
             if self.logic == 'and':
                 if self.intermediate_value == False: # aucun bouton pressé avant
@@ -137,27 +143,57 @@ class ddlink(dlink):
             source[0].unobserve(self._update, names=source[1])
         self.double_source, self.target = None, None
 
+
+class MyStyledButtonCell(StyledButtonCell):
+    def _handle_msg(self, msg):
+        r"""
+        Override needed to prevent propagation
+        when a domino is pressed, in some cases.
+        """
+        data = msg['content']['data']
+        if data['method'] != 'update' or not 'state' in data or ('buffer_paths' in data and data['buffer_paths']):
+            super(FlippinDominosWidget)._handle_msg(msg)
+        state = data['state']
+        try:
+            self.set_state(state)
+        except:
+            pass
+
+
+def my_styled_button_cell(disabled=False, style_name='', addable=False):
+    class_name = "{}Button".format(style_name.capitalize())
+    if disabled:
+        class_name = "Disabled" + class_name
+    elif addable:
+        class_name = "Addable" + class_name
+    return type(class_name, (MyStyledButtonCell,), {'disable': disabled, 'css_class': style_name, 'addable': addable})
+
+
 class Domino(HasTraits):
     r"""Objet non représenté en lui-même, les 2
     boutons qu'il contient étant, eux, des widgets"""
     value = Bool()
 
-    def __init__(self, parent, b1, b2):
+    def __init__(self, parent, b1, b2, link=True):
         """A domino has a parent widget and is made of 2 buttons"""
+        b1.link = None
+        b2.link = None
+        b1.value = False
+        b2.value = False
         super(Domino, self).__init__()
+        self.value = False
         self.geometry = DominoGeometry(b1.position, b2.position)
         self.parent = parent
         self.key = None
         self.first = b1
         self.second = b2
         self.buttons = (b1,b2)
-        b1.link = dlink((b1, 'value'), (b2, 'value'))
-        b2.link = dlink((b2, 'value'), (b1, 'value'))
         self.link = None
         self.direction = None
         self.orientation = None
         self.compute()
-        self.donottrack = False
+        if link:
+            self.set_links()
 
     def __repr__(self):
         if self.value:
@@ -165,10 +201,8 @@ class Domino(HasTraits):
         return repr(self.first) + ' -> ' + repr(self.second)
 
     def compute(self, css_classes=['b0', 'b1', 'b2', 'b3', 'b4']):
-        """Compute buttons relative positions.
-        Create double directional link from both buttons"""
+        """Compute buttons relative positions."""
         self.geometry.compute()
-        #print(self.geometry.__dict__)
         if css_classes:
             for cl in css_classes:
                 self.first.remove_class(cl)
@@ -196,26 +230,26 @@ class Domino(HasTraits):
             elif self.geometry.orientation == -1:
                 self.first.add_class('bottom')
                 self.second.add_class('top')
+
+    def set_links(self):
+        """Create double directional link from both buttons
+        and for domino."""
+        self.first.link = dlink((self.first, 'value'), (self.second, 'value'))
+        self.second.link = dlink((self.second, 'value'), (self.first, 'value'))
         self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
 
     def is_pressed(self):
         """Is the domino pressed?"""
         return self.value
 
-#    def set_value(self, value):
-#        """Set domino value
-#        As we have a directional link,
-#        the domino value will also be set.
-#        """
-#        self.link.unlink()
-#        self.first.value = value
-#        self.second.value = value
-#        self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
-
     def reset(self):
-        """Full domino reset"""
-        #self.set_value(False)
+        """Full domino unlink"""
         self.link.unlink()
+        self.first.link.unlink()
+        self.second.link.unlink()
+        self.value = False
+        self.first.value = False
+        self.second.value = False
 
     def flip(self, other):
         """Flip self with some neighboring domino"""
@@ -248,14 +282,15 @@ class FlippingDominosWidget(GridViewWidget):
         self.css_classes = css_classes
         super(FlippingDominosWidget, self).__init__(g, adapter = FlippingDominosAdapter(),
                                             cell_layout = smallblyt,
-                                            cell_widget_classes=[styled_button_cell(),
-                                                                 styled_button_cell(style_name='b1'),
-                                                                 styled_button_cell(style_name='b2'),
-                                                                 styled_button_cell(style_name='b3'),
-                                                                 styled_button_cell(style_name='b4'),
+                                            cell_widget_classes=[my_styled_button_cell(),
+                                                                 my_styled_button_cell(style_name='b1'),
+                                                                 my_styled_button_cell(style_name='b2'),
+                                                                 my_styled_button_cell(style_name='b3'),
+                                                                 my_styled_button_cell(style_name='b4'),
                                             ],
                                             cell_widget_class_index=make_cell_widget_class_index(g),
                                             blank_widget_class = BlankButton)
+
     def draw(self):
         self.dominos = {}
         super(FlippingDominosWidget, self).draw()
@@ -279,8 +314,10 @@ class FlippingDominosWidget(GridViewWidget):
         """Apply a matching"""
         self.dominos = {}
         for d in matching:
-            self.match(self.children[d.first[0]].children[d.first[1]],
-                       self.children[d.second[0]].children[d.second[1]])
+            self.match(
+                self.children[d.first[0]].children[d.first[1]],
+                self.children[d.second[0]].children[d.second[1]]
+            )
 
     def update(self):
         self.apply_matching(self.value.matching)
@@ -292,13 +329,7 @@ class FlippingDominosWidget(GridViewWidget):
         geometry = self.value.domino_for_position(pos)
         for t in (geometry.first, geometry.second):
             if t in self.dominos:
-                print("domino for position", t, ":", self.dominos[t].geometry, self.dominos[t].value)
                 return self.dominos[t]
-
-    def not_tracking(self, value):
-        self.donottrack = value
-        for d in self.dominos.values():
-            d.donottrack = value
 
     @observe(All)
     def set_cell(self, change):
@@ -306,40 +337,92 @@ class FlippingDominosWidget(GridViewWidget):
             return
         if change.name.startswith('cell_'):
             print("set_cell()", change.name, change.old, change.new)
-        else:
-            print("set_cell()", change.name)
-        # Try to reset everything right now to avoid unwanted propagations
-        domino = self.domino_for_position(extract_coordinates(change.name))
-        # First, we want to make the pressed domino visible to the user
-        self.not_tracking(True)
-        domino.first.value = True
-        domino.second.value = True
-        # Any pressed neighbor?
+        click_pos = extract_coordinates(change.name)
+        domino = self.domino_for_position(click_pos)
+        if not domino: # or domino.donottrack:
+            return
+        # The domino must be entirely pressed
+        if not domino.first.value or not domino.second.value:
+            return
+        # The domino must have a pressed neighbor
         other = None
         if self.dirty:
             for pos in self.dirty:
+                if other and other.geometry!=self.domino_for_position(pos).geometry:
+                    raise Exception("on a un double dans les voisins pressés: %s et %s" % (
+                        other.geometry, self.domino_for_position(pos).geometry))
                 other = self.domino_for_position(pos)
                 if other and not other.geometry in domino.geometry.neighbors():
                     other = None
                     continue # we don't have to reset everything, I guess(hope)
         if not other:
+            # Feed the 'dirty' dict and return
             self.dirty[domino.geometry.first] = True
             self.dirty[domino.geometry.second] = True
-            self.not_tracking(False)
             return
-        if domino.link:
-            domino.link.unlink()
-        if other.link:
-            other.link.unlink()
-        self.not_tracking(False)
+        # Do the flip
         super(FlippingDominosWidget, self).set_cell(change)
-        self.not_tracking(True)
-        # And now, we want to reset everything before the flip
-        domino.first.value = False
-        domino.second.value = False
-        other.first.value = False
-        other.second.value = False
-        # Now, recreate the 2 dominos and compute style
+        # Unlink and reset values
+        self.donottrack = True
+        domino.reset()
+        other.reset()
+        # Build our new dominos
+        new_domino, new_other = None, None
+        for g1 in self.value.matching:
+            if g1.first == domino.geometry.first or g1.first == other.geometry.first:
+                d1, d2 = domino.geometry, other.geometry
+            if g1.first == domino.geometry.first:
+                new_domino = Domino(
+                    self,
+                    self.children[g1.first[0]].children[g1.first[1]],
+                    self.children[g1.second[0]].children[g1.second[1]],
+                    link = False
+                )
+                self.dominos[domino.key] = new_domino
+                for g2 in g1.neighbors():
+                    if not g2 in self.value.matching:
+                        continue
+                    if (other.key in (g2.first, g2.second)) or \
+                       (other.key == g1.second and domino.geometry.second in (g2.first, g2.second)):
+                        new_other = Domino(
+                            self,
+                            self.children[g2.first[0]].children[g2.first[1]],
+                            self.children[g2.second[0]].children[g2.second[1]],
+                            link = False
+                        )
+                        self.dominos[other.key] = new_other
+                        break
+            elif g1.first == other.geometry.first:
+                new_other = Domino(
+                    self,
+                    self.children[g1.first[0]].children[g1.first[1]],
+                    self.children[g1.second[0]].children[g1.second[1]],
+                    link = False
+                )
+                self.dominos[other.key] = new_other
+                for g2 in g1.neighbors():
+                    if not g2 in self.value.matching:
+                        continue
+                    if (domino.key in (g2.first, g2.second)) or \
+                       (domino.key == g1.second and other.geometry.second in (g2.first, g2.second)):
+                        new_domino = Domino(
+                            self,
+                            self.children[g2.first[0]].children[g2.first[1]],
+                            self.children[g2.second[0]].children[g2.second[1]],
+                            link = False
+                        )
+                        self.dominos[domino.key] = new_domino
+                        break
+            if new_domino and new_other:
+                break
+        # Check that new dominos are sound and the flip has actually been performed
+        assert(new_domino is not None and new_other is not None)
+        assert(new_domino.geometry != domino.geometry and new_other.geometry != other.geometry)
+        # Compute the dominos
+        new_domino.compute()
+        new_other.compute()
+        new_domino.set_links()
+        new_other.set_links()
+        # Reset
         self.reset_dirty()
-        self.update()
-        self.not_tracking(False)
+        self.donottrack = False
