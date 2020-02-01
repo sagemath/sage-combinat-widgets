@@ -44,6 +44,17 @@ class FlippingDominosAdapter(GraphGridViewAdapter):
             return Exception("Please select a second domino!")
 
 
+class mydlink(dlink):
+    def _update(self, change):
+        if self.updating:
+            return
+        if not self.target:
+            return
+        with self._busy_updating():
+            setattr(self.target[0], self.target[1],
+                    self._transform(change.new))
+
+
 class ddlink(dlink):
     """Double directional link with logic = or/and/none.
     `double_source` is a tuple of (source, traitname) tuples
@@ -166,7 +177,8 @@ def my_styled_button_cell(disabled=False, style_name='', addable=False):
         class_name = "Disabled" + class_name
     elif addable:
         class_name = "Addable" + class_name
-    return type(class_name, (MyStyledButtonCell,), {'disable': disabled, 'css_class': style_name, 'addable': addable})
+    #return type(class_name, (MyStyledButtonCell,), {'disable': disabled, 'css_class': style_name, 'addable': addable})
+    return type(class_name, (StyledButtonCell,), {'disable': disabled, 'css_class': style_name, 'addable': addable})
 
 
 class Domino(HasTraits):
@@ -188,7 +200,7 @@ class Domino(HasTraits):
         self.first = b1
         self.second = b2
         self.buttons = (b1,b2)
-        self.link = None
+        #self.link = None
         self.direction = None
         self.orientation = None
         self.compute()
@@ -234,9 +246,9 @@ class Domino(HasTraits):
     def set_links(self):
         """Create double directional link from both buttons
         and for domino."""
-        self.first.link = dlink((self.first, 'value'), (self.second, 'value'))
-        self.second.link = dlink((self.second, 'value'), (self.first, 'value'))
-        self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
+        self.first.link = mydlink((self.first, 'value'), (self.second, 'value'))
+        self.second.link = mydlink((self.second, 'value'), (self.first, 'value'))
+        #self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
 
     def is_pressed(self):
         """Is the domino pressed?"""
@@ -244,10 +256,12 @@ class Domino(HasTraits):
 
     def reset(self):
         """Full domino unlink"""
-        self.link.unlink()
+        #self.link.unlink()
         self.first.link.unlink()
+        #self.first.link = None
         self.second.link.unlink()
-        self.value = False
+        #self.second.link = None
+        #self.value = False
         self.first.value = False
         self.second.value = False
 
