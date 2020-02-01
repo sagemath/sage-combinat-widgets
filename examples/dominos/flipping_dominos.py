@@ -3,7 +3,7 @@
 
 from .flipping_aztecdiamond import *
 from sage_widget_adapters.graphs.graph_grid_view_adapter import GraphGridViewAdapter
-from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, StyledButtonCell
+from sage_combinat_widgets.grid_view_widget import GridViewWidget, ButtonCell, BlankButton, styled_button_cell
 from ipywidgets import Layout
 from traitlets import dlink, HasTraits, Bool, observe, All
 from contextlib import contextmanager
@@ -55,136 +55,9 @@ class mydlink(dlink):
                     self._transform(change.new))
 
 
-class ddlink(dlink):
-    """Double directional link with logic = or/and/none.
-    `double_source` is a tuple of (source, traitname) tuples
-    Usage: b1 = Button(description = 'B1')
-           b2 = Button(description = 'B2')
-           b3 = Button(description = 'B3')
-           dl = ddlink(((b1, 'value'), (b2, 'value')), (b3, 'value'))
-    """
-    updating = False
-
-    def __init__(self, double_source, target, logic=None, set_at_init=True):
-        self.validate_tuple(target)
-        self.logic = logic
-        for source in double_source:
-            self.validate_tuple(source)
-        try:
-            if set_at_init:
-                if self.logic == 'and':
-                    setattr(target[0], target[1],
-                            getattr(double_source[0][0], double_source[0][1]) \
-                            and getattr(double_source[1][0], double_source[1][1]))
-                else:
-                    setattr(target[0], target[1],
-                            getattr(double_source[0][0], double_source[0][1]) \
-                            or getattr(double_source[1][0], double_source[1][1]))
-            else:
-                pass
-        finally:
-            for source in double_source:
-                source[0].observe(self._update, names=source[1])
-                source[0].observe(self._update, names=source[1])
-        self.target = target
-        self.double_source = double_source
-        self.intermediate_value = False # False / True / source.tooltip
-
-    def __repr__(self):
-        if self.double_source or self.target:
-            return "A double directional link from sources=%s to target='%s'" % (self.double_source, self.target)
-        return "None"
-
-    def validate_tuple(self, t):
-        if not len(t) == 2:
-            raise TypeError("Each linked traitlet must be specified as (HasTraits, 'trait_name'), not %r" % t)
-        obj, trait_name = t
-        if not isinstance(obj, HasTraits):
-            raise TypeError("Each object must be HasTraits, not %r" % type(obj))
-        if not trait_name in obj.traits():
-            raise TypeError("%r has no trait %r" % (obj, trait_name))
-
-    @contextmanager
-    def _busy_updating(self):
-        self.updating = True
-        try:
-            yield
-        finally:
-            self.updating = False
-
-    def _update(self, change):
-        #if self.updating or self.target[0].donottrack:
-        #    return
-        #if self.target[0].donottrack:
-        #    print("on sort ici !!!")
-        #    return
-        with self._busy_updating():
-            if self.logic == 'and':
-                if self.intermediate_value == False: # aucun bouton pressé avant
-                    self.intermediate_value = change.new
-                elif self.intermediate_value == True: # 2 boutons pressés avant
-                    setattr(self.target[0], self.target[1], change.new)
-                    if change.new == False:
-                        # prendre le tooltip de l'autre bouton
-                        for s in self.double_source:
-                            if s[0].tooltip != change.owner.tooltip:
-                                self.intermediate_value = s[0].tooltip
-                elif self.intermediate_value != change.owner.tooltip: # l'autre bouton a été pressé avant
-                    setattr(self.target[0], self.target[1], change.new)
-                    self.intermediate_value = change.new
-            elif self.logic == 'or':
-                if change.new == True:
-                    setattr(self.target[0], self.target[1], True)
-                    if self.intermediate_value == False:
-                        self.intermediate_value = change.owner.tooltip
-                    elif self.intermediate_value == True:
-                        pass
-                    elif self.intermediate_value != change.owner.tooltip:
-                        self.intermediate_value = True
-                else:
-                    if self.intermediate_value != True:
-                        setattr(self.target[0], self.target[1], False)
-                    self.intermediate_value = False # FIXME
-
-            else:
-                setattr(self.target[0], self.target[1], change.new)
-
-    def unlink(self):
-        for source in self.double_source:
-            source[0].unobserve(self._update, names=source[1])
-        self.double_source, self.target = None, None
-
-
-class MyStyledButtonCell(StyledButtonCell):
-    def _handle_msg(self, msg):
-        r"""
-        Override needed to prevent propagation
-        when a domino is pressed, in some cases.
-        """
-        data = msg['content']['data']
-        if data['method'] != 'update' or not 'state' in data or ('buffer_paths' in data and data['buffer_paths']):
-            super(FlippinDominosWidget)._handle_msg(msg)
-        state = data['state']
-        try:
-            self.set_state(state)
-        except:
-            pass
-
-
-def my_styled_button_cell(disabled=False, style_name='', addable=False):
-    class_name = "{}Button".format(style_name.capitalize())
-    if disabled:
-        class_name = "Disabled" + class_name
-    elif addable:
-        class_name = "Addable" + class_name
-    #return type(class_name, (MyStyledButtonCell,), {'disable': disabled, 'css_class': style_name, 'addable': addable})
-    return type(class_name, (StyledButtonCell,), {'disable': disabled, 'css_class': style_name, 'addable': addable})
-
-
-class Domino(HasTraits):
+class Domino(object):
     r"""Objet non représenté en lui-même, les 2
     boutons qu'il contient étant, eux, des widgets"""
-    value = Bool()
 
     def __init__(self, parent, b1, b2, link=True):
         """A domino has a parent widget and is made of 2 buttons"""
@@ -200,7 +73,6 @@ class Domino(HasTraits):
         self.first = b1
         self.second = b2
         self.buttons = (b1,b2)
-        #self.link = None
         self.direction = None
         self.orientation = None
         self.compute()
@@ -248,7 +120,6 @@ class Domino(HasTraits):
         and for domino."""
         self.first.link = mydlink((self.first, 'value'), (self.second, 'value'))
         self.second.link = mydlink((self.second, 'value'), (self.first, 'value'))
-        #self.link = ddlink(((self.first, 'value'), (self.second, 'value')), (self, 'value'), logic='and', set_at_init=False) # Fresh ddlink
 
     def is_pressed(self):
         """Is the domino pressed?"""
@@ -256,12 +127,8 @@ class Domino(HasTraits):
 
     def reset(self):
         """Full domino unlink"""
-        #self.link.unlink()
         self.first.link.unlink()
-        #self.first.link = None
         self.second.link.unlink()
-        #self.second.link = None
-        #self.value = False
         self.first.value = False
         self.second.value = False
 
@@ -296,11 +163,11 @@ class FlippingDominosWidget(GridViewWidget):
         self.css_classes = css_classes
         super(FlippingDominosWidget, self).__init__(g, adapter = FlippingDominosAdapter(),
                                             cell_layout = smallblyt,
-                                            cell_widget_classes=[my_styled_button_cell(),
-                                                                 my_styled_button_cell(style_name='b1'),
-                                                                 my_styled_button_cell(style_name='b2'),
-                                                                 my_styled_button_cell(style_name='b3'),
-                                                                 my_styled_button_cell(style_name='b4'),
+                                            cell_widget_classes=[styled_button_cell(),
+                                                                 styled_button_cell(style_name='b1'),
+                                                                 styled_button_cell(style_name='b2'),
+                                                                 styled_button_cell(style_name='b3'),
+                                                                 styled_button_cell(style_name='b4'),
                                             ],
                                             cell_widget_class_index=make_cell_widget_class_index(g),
                                             blank_widget_class = BlankButton)
