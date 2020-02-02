@@ -22,7 +22,6 @@ class FlippingDominosAdapter(GraphGridViewAdapter):
         we prepare a possible flip
         or we try to complete the flip if it has been prepared previously
         """
-        #print("in the adapter for pos =", pos, "val =", val, "dirty =", dirty)
         # Find out the relevant matching for 'pos'
         d1 = obj.domino_for_position(pos)
         if dirty: # if i'm a neighbor, then flip and return a new obj ; else return an error
@@ -35,9 +34,7 @@ class FlippingDominosAdapter(GraphGridViewAdapter):
                     continue
                 if d2 in d1.neighbors():
                     # Do the flip
-                    print("before flipping :", d1, d2)
                     obj.flip(d1, d2)
-                    print("after flipping :", d1, d2)
                     return obj
             return Exception("Please select a second domino!")
         else:
@@ -48,7 +45,7 @@ class mydlink(dlink):
     def _update(self, change):
         if self.updating:
             return
-        if not self.target:
+        if not self.target: # unlinked link
             return
         with self._busy_updating():
             setattr(self.target[0], self.target[1],
@@ -128,8 +125,12 @@ class Domino(object):
     def reset(self):
         """Full domino unlink"""
         self.first.link.unlink()
-        self.second.link.unlink()
+        self.first.link = None
+        del self.first.link
         self.first.value = False
+        self.second.link.unlink()
+        self.second.link = None
+        del self.second.link
         self.second.value = False
 
     def flip(self, other):
@@ -216,15 +217,18 @@ class FlippingDominosWidget(GridViewWidget):
     def set_cell(self, change):
         if self.donottrack:
             return
-        if change.name.startswith('cell_'):
-            print("set_cell()", change.name, change.old, change.new)
         click_pos = extract_coordinates(change.name)
         domino = self.domino_for_position(click_pos)
         if not domino: # or domino.donottrack:
             return
         # The domino must be entirely pressed
         if not domino.first.value or not domino.second.value:
-            return
+            #print("domino not pressed (", change.name, ")")
+            #return # FIXME not clear what to do here
+            pass
+        else:
+            #print("domino pressed (", change.name, ") ; dirty =", self.dirty)
+            pass
         # The domino must have a pressed neighbor
         other = None
         if self.dirty:
@@ -243,10 +247,12 @@ class FlippingDominosWidget(GridViewWidget):
             return
         # Do the flip
         super(FlippingDominosWidget, self).set_cell(change)
-        # Unlink and reset values
+        # Unlink, reset values, delete dominos
         self.donottrack = True
         domino.reset()
         other.reset()
+        del self.dominos[domino.key]
+        del self.dominos[other.key]
         # Build our new dominos
         new_domino, new_other = None, None
         for g1 in self.value.matching:
@@ -259,7 +265,7 @@ class FlippingDominosWidget(GridViewWidget):
                     self.children[g1.second[0]].children[g1.second[1]],
                     link = False
                 )
-                self.dominos[domino.key] = new_domino
+                self.dominos[new_domino.key] = new_domino
                 for g2 in g1.neighbors():
                     if not g2 in self.value.matching:
                         continue
@@ -271,7 +277,7 @@ class FlippingDominosWidget(GridViewWidget):
                             self.children[g2.second[0]].children[g2.second[1]],
                             link = False
                         )
-                        self.dominos[other.key] = new_other
+                        self.dominos[new_other.key] = new_other
                         break
             elif g1.first == other.geometry.first:
                 new_other = Domino(
@@ -280,7 +286,7 @@ class FlippingDominosWidget(GridViewWidget):
                     self.children[g1.second[0]].children[g1.second[1]],
                     link = False
                 )
-                self.dominos[other.key] = new_other
+                self.dominos[new_other.key] = new_other
                 for g2 in g1.neighbors():
                     if not g2 in self.value.matching:
                         continue
@@ -292,7 +298,7 @@ class FlippingDominosWidget(GridViewWidget):
                             self.children[g2.second[0]].children[g2.second[1]],
                             link = False
                         )
-                        self.dominos[domino.key] = new_domino
+                        self.dominos[new_domino.key] = new_domino
                         break
             if new_domino and new_other:
                 break
