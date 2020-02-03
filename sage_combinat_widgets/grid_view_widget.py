@@ -502,8 +502,10 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         addable_positions = self.addable_cells()
         addable_rows = []
         removable_positions = self.removable_cells()
-        addable_rows = [(i,[pos for pos in addable_positions if pos[0]==i]) \
-                        for i in set([t[0] for t in addable_positions])]
+        addable_rows = {
+            i : [pos for pos in addable_positions if pos[0]==i] \
+            for i in range(max([1+t[0] for t in addable_positions]))
+        }
         if not cell_widget_classes:
             cell_widget_classes = self.cell_widget_classes
         if not cell_widget_class_index:
@@ -516,10 +518,18 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         for i in range(self.height):
             r = rows[i]
             if not r: # Empty row
-                if (i,0) in addable_positions:
-                    vbox_children.append(HBox((addable_widget_class((i,0), layout=self.cell_layout),)))
-                else:
-                    vbox_children.append(HBox((blank_widget_class(layout=self.cell_layout, disabled=True),)))
+                if not addable_rows[i]:
+                    vbox_children.append(HBox((
+                        blank_widget_class(layout=self.cell_layout, disabled=True),
+                    )))
+                    continue
+                hbox_children = []
+                for j in range(max([pos[1]+1 for pos in addable_rows[i]])):
+                    if (i,j) in addable_positions:
+                        hbox_children.append(addable_widget_class((i,j), layout=self.cell_layout))
+                    else:
+                        hbox_children.append(blank_widget_class(layout=self.cell_layout, disabled=True))
+                vbox_children.append(HBox((hbox_children)))
                 continue
             j = 0
             hbox_children = []
@@ -549,11 +559,12 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                     # Outside of the grid-represented object limits
                     hbox_children.append(self.addable_widget_class((i,j), layout=self.cell_layout))
             vbox_children.append(HBox(hbox_children))
-        for row in addable_rows:
-            if row[0] >= self.height:
+        for i in addable_rows:
+            if i >= self.height:
+                row = addable_rows[i]
                 hbox_children = []
-                for c in range(max(row[1])[1]+1):
-                    if (row[0],c) in row[1]:
+                for j in range(max([(pos[1]+1) for pos in row])):
+                    if (i,j) in row:
                         hbox_children.append(self.addable_widget_class((i,j), layout=self.cell_layout))
                     else:
                         hbox_children.append(blank_widget_class(layout=self.cell_layout))
