@@ -704,5 +704,15 @@ def PartitionGridViewWidget(obj, display_convention='en'):
         sage: len(w.links)
         17
     """
-    return GridViewWidget(obj, cell_widget_classes=[ButtonCell],
-                          addable_widget_class=AddableButtonCell, display_convention=display_convention)
+    w = GridViewWidget(
+        obj,
+        cell_widget_classes=[DisabledButtonCell, ButtonCell],
+        addable_widget_class=AddableButtonCell,
+        display_convention=display_convention
+    )
+    def cell_widget_class_index(x):
+        if x in w.removable_cells():
+            return 1
+        return 0
+    w.cell_widget_class_index = cell_widget_class_index
+    return w
