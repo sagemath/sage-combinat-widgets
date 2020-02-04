@@ -500,12 +500,13 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                 for i in range(self.height)]
         vbox_children = []
         addable_positions = self.addable_cells()
-        addable_rows = []
         removable_positions = self.removable_cells()
-        addable_rows = {
-            i : [pos for pos in addable_positions if pos[0]==i] \
-            for i in range(max([1+t[0] for t in addable_positions]))
-        }
+        addable_rows = {}
+        if addable_positions:
+            addable_rows = {
+                i : [pos for pos in addable_positions if pos[0]==i] \
+                for i in range(max([1+t[0] for t in addable_positions]))
+            }
         if not cell_widget_classes:
             cell_widget_classes = self.cell_widget_classes
         if not cell_widget_class_index:
@@ -555,7 +556,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                 else:
                     hbox_children.append(blank_widget_class(layout=self.cell_layout))
                 j+=1
-                if j > max([t[0][1] for t in rows[i]]) and (i,j) in addable_positions:
+                if addable_positions and \
+                   j > max([t[0][1] for t in rows[i]]) and (i,j) in addable_positions:
                     # Outside of the grid-represented object limits
                     hbox_children.append(self.addable_widget_class((i,j), layout=self.cell_layout))
             vbox_children.append(HBox(hbox_children))
