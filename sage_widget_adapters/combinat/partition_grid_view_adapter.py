@@ -149,7 +149,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
         r"""
         From a partition `obj`, a position (pair of coordinates) `pos` and a value `val`,
         return a new partition with a modified cell at position `pos`.
-        Actually remove the cell if it's removable, otherwise return the same partition.
+        Remove the cell if relevant, otherwise return the same partition.
 
         TESTS ::
 
@@ -162,7 +162,7 @@ class PartitionGridViewAdapter(GridViewAdapter):
             sage: pa.set_cell(p, (1,4), True)
             [6, 4, 2, 1]
         """
-        if pos in self.removable_cells(obj):
+        if pos in self.removable_cells(obj) and val:
             return self.remove_cell(obj, pos, dirty)
         return obj
 

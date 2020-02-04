@@ -106,7 +106,7 @@ class WiderTextCell(BaseTextCell):
     def __init__(self, content, position, layout=textcell_wider_layout, **kws):
         super(WiderTextCell, self).__init__(content, position, layout, **kws)
 
-class BlankCell(Text):
+class BlankCell(TextSingleton):
     r"""A blank placeholder cell
 
     TESTS ::
@@ -116,9 +116,10 @@ class BlankCell(Text):
     """
     displaytype = text_type
 
-    def __init__(self, layout=textcell_layout, **kws):
+    def __init__(self, position=None, layout=textcell_layout, **kws):
         super(BlankCell, self).__init__()
         self.value = ''
+        self.position = position
         self.layout = layout
         self.disabled = True
         self.add_class('blankcell')
@@ -265,9 +266,9 @@ class StyledPushButton(ButtonSingleton):
     disable = None
     css_class = None
     def __init__(self, content=None, position=None, layout=buttoncell_smaller_layout, description='', placeholder=None):
-        super(StyledPushButton, self).__init__()
-        self.layout=layout
-        self.description=description
+        super(StyledPushButton, self).__init__(layout=layout, description=description, placeholder=placeholder)
+        self.content = content
+        self.position = position
         if self.disable:
             self.disabled = True
         self.add_class('gridbutton')
@@ -318,6 +319,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
 
     def __init__(self, obj, adapter=None, display_convention='en', cell_layout=None,
                  cell_widget_classes=[TextCell], cell_widget_class_index=lambda x:0,
+                 css_classes = [], css_class_index=None,
                  blank_widget_class=BlankCell, addable_widget_class=AddableTextCell):
         r"""
         Grid View Widget initialization.
@@ -365,6 +367,8 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         self.cell_layout = cell_layout
         self.cell_widget_classes = cell_widget_classes
         self.cell_widget_class_index = cell_widget_class_index
+        self.css_classes = css_classes
+        self.css_class_index = css_class_index or cell_widget_class_index or (lambda x:0)
         try:
             self.displaytype = cell_widget_classes[0].displaytype
         except:
@@ -449,6 +453,35 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             if child and hasattr(child, 'value') and traitname in self.traits():
                 self.links.append(cdlink((child, 'value'), (self, traitname), self.cast))
 
+    def update_style(self, css_classes=None, css_class_index=None):
+        r"""
+        Update look and fell -- ie CSS classes.
+        Therefore avoid redrawing if overall shape is unchanged.
+
+        TESTS ::
+
+            sage: from sage_combinat_widgets.grid_view_widget import *
+            sage: from sage.graphs.generators.families import AztecDiamondGraph
+            sage: az = AztecDiamondGraph(4)
+            sage: w = GridViewWidget(az, cell_widget_classes=[ButtonCell], blank_widget_class=BlankButton)
+            sage: w.children[1].children[3]._dom_classes
+            ('gridbutton',)
+            sage: w.update_style(css_classes=['cl0', 'cl1', 'cl2', 'cl3'], css_class_index=lambda x:x[0]%4)
+            sage: w.children[1].children[3]._dom_classes
+            ('gridbutton', 'cl1')
+        """
+        if not css_classes:
+            css_classes = self.css_classes
+        if not css_class_index:
+            css_class_index = self.cell_widget_class_index
+        for row in self.children:
+            for cell in row.children:
+                if not hasattr(cell, 'position'):
+                    continue # Do we want to change blank cells' style?
+                for cl in css_classes:
+                    cell.remove_class(cl)
+                cell.add_class(css_classes[css_class_index(cell.position)])
+
     def draw(self, cell_widget_classes=None, cell_widget_class_index=None,
              addable_widget_class=None, blank_widget_class=None):
         r"""
@@ -467,10 +500,13 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                 for i in range(self.height)]
         vbox_children = []
         addable_positions = self.addable_cells()
-        addable_rows = []
         removable_positions = self.removable_cells()
-        addable_rows = [(i,[pos for pos in addable_positions if pos[0]==i]) \
-                        for i in set([t[0] for t in addable_positions])]
+        addable_rows = {}
+        if addable_positions:
+            addable_rows = {
+                i : [pos for pos in addable_positions if pos[0]==i] \
+                for i in range(max([1+t[0] for t in addable_positions]))
+            }
         if not cell_widget_classes:
             cell_widget_classes = self.cell_widget_classes
         if not cell_widget_class_index:
@@ -483,10 +519,18 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
         for i in range(self.height):
             r = rows[i]
             if not r: # Empty row
-                if (i,0) in addable_positions:
-                    vbox_children.append(HBox((addable_widget_class((i,0), layout=self.cell_layout),)))
-                else:
-                    vbox_children.append(HBox((blank_widget_class(layout=self.cell_layout, disabled=True),)))
+                if not addable_rows[i]:
+                    vbox_children.append(HBox((
+                        blank_widget_class(layout=self.cell_layout, disabled=True),
+                    )))
+                    continue
+                hbox_children = []
+                for j in range(max([pos[1]+1 for pos in addable_rows[i]])):
+                    if (i,j) in addable_positions:
+                        hbox_children.append(addable_widget_class((i,j), layout=self.cell_layout))
+                    else:
+                        hbox_children.append(blank_widget_class(layout=self.cell_layout, disabled=True))
+                vbox_children.append(HBox((hbox_children)))
                 continue
             j = 0
             hbox_children = []
@@ -500,7 +544,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                                              layout=self.cell_layout,
                                              placeholder=cell_display)
                     if (i,j) in removable_positions:
-                        if issubclass(cell_widget_class, ToggleButton):
+                        if issubclass(cell_widget_class, ToggleButtonSingleton):
                             cell.description = '-'
                             cell.disabled = False
                         else:
@@ -512,15 +556,17 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
                 else:
                     hbox_children.append(blank_widget_class(layout=self.cell_layout))
                 j+=1
-                if j > max([t[0][1] for t in rows[i]]) and (i,j) in addable_positions:
+                if addable_positions and \
+                   j > max([t[0][1] for t in rows[i]]) and (i,j) in addable_positions:
                     # Outside of the grid-represented object limits
                     hbox_children.append(self.addable_widget_class((i,j), layout=self.cell_layout))
             vbox_children.append(HBox(hbox_children))
-        for row in addable_rows:
-            if row[0] >= self.height:
+        for i in addable_rows:
+            if i >= self.height:
+                row = addable_rows[i]
                 hbox_children = []
-                for c in range(max(row[1])[1]+1):
-                    if (row[0],c) in row[1]:
+                for j in range(max([(pos[1]+1) for pos in row])):
+                    if (i,j) in row:
                         hbox_children.append(self.addable_widget_class((i,j), layout=self.cell_layout))
                     else:
                         hbox_children.append(blank_widget_class(layout=self.cell_layout))
@@ -671,5 +717,15 @@ def PartitionGridViewWidget(obj, display_convention='en'):
         sage: len(w.links)
         17
     """
-    return GridViewWidget(obj, cell_widget_classes=[ButtonCell],
-                          addable_widget_class=AddableButtonCell, display_convention=display_convention)
+    w = GridViewWidget(
+        obj,
+        cell_widget_classes=[DisabledButtonCell, ButtonCell],
+        addable_widget_class=AddableButtonCell,
+        display_convention=display_convention
+    )
+    def cell_widget_class_index(x):
+        if x in w.removable_cells():
+            return 1
+        return 0
+    w.cell_widget_class_index = cell_widget_class_index
+    return w

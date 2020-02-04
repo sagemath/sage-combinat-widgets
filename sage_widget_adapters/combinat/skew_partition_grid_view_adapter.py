@@ -145,7 +145,7 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
         r"""
         From a partition `obj`, a position (pair of coordinates) `pos` and a value `val`,
         return a new partition with a modified cell at position `pos`.
-        Actually remove the cell if it's removable, otherwise return the same partition.
+        Remove the cell if relevant, otherwise return the same partition.
 
         TESTS ::
 
@@ -158,7 +158,7 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             sage: spa.set_cell(sp, (1,3), True)
             [7, 3, 2, 1] / [2, 1, 1]
         """
-        if pos in self.removable_cells(obj):
+        if pos in self.removable_cells(obj) and not val:
             return self.remove_cell(obj, pos, dirty)
         return obj
 
