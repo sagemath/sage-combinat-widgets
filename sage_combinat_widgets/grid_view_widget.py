@@ -719,6 +719,7 @@ def PartitionGridViewWidget(obj, display_convention='en'):
     """
     w = GridViewWidget(
         obj,
+        cell_layout=buttoncell_smaller_layout,
         cell_widget_classes=[DisabledButtonCell, ButtonCell],
         addable_widget_class=AddableButtonCell,
         display_convention=display_convention
