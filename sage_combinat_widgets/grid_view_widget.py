@@ -215,7 +215,7 @@ def styled_button_cell(disabled=False, style_name='', addable=False):
 
         sage: from sage_combinat_widgets.grid_view_widget import styled_button_cell
         sage: styled_button_cell(disabled=True, style_name='mycssclass')
-        <class 'traitlets.traitlets.DisabledMycssclassButton'>
+        <class 'traitlets.traitlets.DisabledMycssclassButtonCell'>
     """
     # FIXME passer la couleur en paramètre ? une chaîne CSS ?
     class_name = "{}ButtonCell".format(style_name.capitalize())
@@ -473,7 +473,7 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             css_class_index = self.cell_widget_class_index
         for row in self.children:
             for cell in row.children:
-                if not hasattr(cell, 'position'):
+                if not hasattr(cell, 'position') or cell.position is None:
                     continue # Do we want to change blank cells' style?
                 for cl in css_classes:
                     cell.remove_class(cl)
