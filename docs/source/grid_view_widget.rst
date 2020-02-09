@@ -9,4 +9,4 @@ Grid View Widget
    :special-members:
    :undoc-members:
    :show-inheritance:
-   :exclude-members: compute_tooltip, get_model_id
+   :exclude-members: get_model_id
