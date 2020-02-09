@@ -159,8 +159,7 @@ class ButtonCell(ToggleButtonSingleton):
     displaytype = bool
 
     def __init__(self, content, position, layout=buttoncell_smaller_layout, **kws):
-        super(ButtonCell, self).__init__()
-        self.layout = layout
+        super(ButtonCell, self).__init__(layout=layout)
         self.value = content
         self.position = position
         self.add_class('gridbutton')
@@ -195,16 +194,14 @@ class StyledButtonCell(ButtonCell):
 
         sage: from sage_combinat_widgets.grid_view_widget import StyledButtonCell
         sage: b = StyledButtonCell(True, (1,2))
-        Traceback (most recent call last):
-        ...
-        TraitError: Element of the '_dom_classes' trait of a StyledButtonCell instance must be a unicode string, but a value of None <type 'NoneType'> was specified.
     """
     disable = None
     css_class = None
     addable = None
     def __init__(self, content, position, layout=buttoncell_smaller_layout, **kws):
         super(StyledButtonCell, self).__init__(content, position, layout, **kws)
-        self.add_class(self.css_class)
+        if self.css_class:
+            self.add_class(self.css_class)
         if self.disable:
             self.disabled = True
         if self.addable:
@@ -221,7 +218,7 @@ def styled_button_cell(disabled=False, style_name='', addable=False):
         <class 'traitlets.traitlets.DisabledMycssclassButton'>
     """
     # FIXME passer la couleur en paramètre ? une chaîne CSS ?
-    class_name = "{}Button".format(style_name.capitalize())
+    class_name = "{}ButtonCell".format(style_name.capitalize())
     if disabled:
         class_name = "Disabled" + class_name
     elif addable:
