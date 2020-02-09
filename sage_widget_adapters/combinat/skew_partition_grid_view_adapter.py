@@ -156,6 +156,8 @@ class SkewPartitionGridViewAdapter(GridViewAdapter):
             sage: spa.set_cell(sp, (1,6), True)
             [7, 4, 2, 1] / [2, 1, 1]
             sage: spa.set_cell(sp, (1,3), True)
+            [7, 4, 2, 1] / [2, 1, 1]
+            sage: spa.set_cell(sp, (1,3), False)
             [7, 3, 2, 1] / [2, 1, 1]
         """
         if pos in self.removable_cells(obj) and not val:
