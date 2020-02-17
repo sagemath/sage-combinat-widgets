@@ -19,6 +19,9 @@ Also :
 Installation
 ------------
 
+   $ pip3 install sage_combinat_widgets
+
+
 Local install from source
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -30,11 +33,7 @@ Change to the root directory and run::
 
     $ sage -pip install --upgrade --no-index -v .
 
-For convenience this package contains a [makefile](makefile) with this
-and other often used commands. Should you wish too, you can use the
-shorthand::
-
-    $ make install
+NB: For this to work, you need a recent `nodejs` installation.
 
 Usage
 -----

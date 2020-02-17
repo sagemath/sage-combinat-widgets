@@ -27,7 +27,7 @@
     "build:labextension": "npm run clean:labextension && mkdirp ../sage_combinat_widgets/labextension && cd ../sage_combinat_widgets/labextension && npm pack ../../js",
     "build:lib": "tsc",
     "build:nbextension": "webpack -p",
-    "build:all": "npm run build:labextension && npm run build:nbextension",
+    "build:all": "npm install && npm run build && npm run build:labextension",
     "clean": "rimraf dist/",
     "clean:lib": "rimraf lib",
     "clean:labextension": "rimraf ../sage_combinat_widgets/labextension",
