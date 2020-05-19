@@ -18,9 +18,9 @@ Also :
 
 Installation
 ------------
+Assuming your pip install on Python3:
 
-   $ pip3 install sage_combinat_widgets
-
+   $ pip install sage_combinat_widgets
 
 Local install from source
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -34,6 +34,10 @@ Change to the root directory and run::
     $ sage -pip install --upgrade --no-index -v .
 
 NB: For this to work, you need a recent `nodejs` installation.
+
+For use on Jupyterlab, you might also need to install `@jupyter-widgets/jupyterlab-manager`:
+
+    $ jupyter labextension @jupyter-widgets/jupyterlab-manager
 
 Usage
 -----
@@ -65,6 +69,10 @@ This is just calling ``sage -t`` with appropriate flags.
 Shorthand::
 
     $ make test
+
+If you have ``tox`` installed, you can also test the package like this::
+
+    $ tox
 
 Documentation
 -------------
