@@ -13,7 +13,7 @@ from ipywidgets import Layout, VBox, HBox, HTML, ValueWidget
 from singleton_widgets import *
 from six import text_type
 
-textcell_layout = Layout(width='3em', height='2em', margin='0', padding='0')
+textcell_layout = Layout(width='3em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em', height='3em', margin='0', padding='0')
 buttoncell_layout = Layout(width='5em', height='4em', margin='0', padding='0')
 buttoncell_smaller_layout = Layout(width='2em', height='2em', margin='0', padding='0')
