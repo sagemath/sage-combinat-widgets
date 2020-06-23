@@ -135,10 +135,15 @@ class Domino(object):
             pass
 
     def reset(self):
-        """Full domino reset"""
-        self.unlink()
+        """Domino value reset"""
+        #self.value = False
         self.first.value = False
         self.second.value = False
+
+    def full_reset(self):
+        """Domino full reset"""
+        self.unlink()
+        self.reset()
 
 
 def make_cell_widget_class_index(g):
@@ -193,7 +198,9 @@ class FlippingDominosWidget(GridViewWidget):
             b2 = self.children[g.second[0]].children[g.second[1]]
         except:
             return TypeError("Buttons do not exist for geometry %s" % g)
-        return Domino(self, b1, b2, link=link)
+        new_domino = Domino(self, b1, b2, link=link)
+        self.dominos[new_domino.key] = new_domino
+        return new_domino
 
     def reset(self):
         """Clear dominos and reset every button"""
@@ -230,8 +237,9 @@ class FlippingDominosWidget(GridViewWidget):
             return
         # Second domino, second button
         if self.flipping:
-            domino.first.value = False # one of the two is False already
-            domino.second.value = False # change the one that is not yet changed
+            domino.reset() #first.value = False # only one of the two is actually unchanged
+            #domino.second.value = False # change the one that is not yet changed
+            domino.set_links()
             self.flipping = False
             return
         # For the domino to be considered, it must be entirely pressed
@@ -271,14 +279,15 @@ class FlippingDominosWidget(GridViewWidget):
         del self.dominos[other.key]
         del self.dominos[domino.key]
         # Build our new dominos
-        new_domino, new_other = self.new_domino_with_geometry(d1), self.new_domino_with_geometry(d2)
-        self.dominos[new_domino.key] = new_domino
-        self.dominos[new_other.key] = new_other
+        new_domino, new_other = self.new_domino_with_geometry(d1, False), self.new_domino_with_geometry(d2, False)
         # Check that new dominos are sound and the flip has actually been performed
         assert(new_domino is not None and new_other is not None)
         assert(new_domino.geometry != domino.geometry and new_other.geometry != other.geometry)
         # Reset
         other.reset()
         domino.reset()
+        # Re-create broken links
+        #new_domino.set_links() -> postponed till the second button is pressed
+        new_other.set_links()
         self.reset_dirty()
         self.donottrack = False
