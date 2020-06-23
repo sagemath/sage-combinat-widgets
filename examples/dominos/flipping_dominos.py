@@ -119,16 +119,27 @@ class Domino(object):
         """Is the domino pressed?"""
         return self.value
 
+    def unlink(self):
+        """Domino unlink"""
+        try:
+            self.first.link.unlink()
+            self.first.link = None
+            del self.first.link
+        except:
+            pass
+        try:
+            self.second.link.unlink()
+            self.second.link = None
+            del self.second.link
+        except:
+            pass
+
     def reset(self):
-        """Full domino unlink"""
-        self.first.link.unlink()
-        self.first.link = None
-        del self.first.link
+        """Full domino reset"""
+        self.unlink()
         self.first.value = False
-        self.second.link.unlink()
-        self.second.link = None
-        del self.second.link
         self.second.value = False
+
 
 def make_cell_widget_class_index(g):
     def cell_widget_class_index(pos):
@@ -148,6 +159,7 @@ class FlippingDominosWidget(GridViewWidget):
         with flipping aztec diamond graph `g`
         """
         self.css_classes = css_classes
+        self.flipping = None # Helper for the flip
         super(FlippingDominosWidget, self).__init__(g, adapter = FlippingDominosAdapter(),
                                             cell_layout = smallblyt,
                                             cell_widget_classes=[styled_button_cell(),
@@ -174,14 +186,14 @@ class FlippingDominosWidget(GridViewWidget):
         d = Domino(self, b1, b2)
         self.dominos[d.key] = d
 
-    def new_domino_with_geometry(self, g):
+    def new_domino_with_geometry(self, g, link=True):
         """If possible, create a domino with geometry g for our object"""
         try:
             b1 = self.children[g.first[0]].children[g.first[1]]
             b2 = self.children[g.second[0]].children[g.second[1]]
         except:
             return TypeError("Buttons do not exist for geometry %s" % g)
-        return Domino(self, b1, b2, link=False)
+        return Domino(self, b1, b2, link=link)
 
     def reset(self):
         """Clear dominos and reset every button"""
@@ -214,9 +226,15 @@ class FlippingDominosWidget(GridViewWidget):
             return
         click_pos = extract_coordinates(change.name)
         domino = self.domino_for_position(click_pos)
-        if not domino: # or domino.donottrack:
+        if not domino:
             return
-        # The domino must be entirely pressed
+        # Second domino, second button
+        if self.flipping:
+            domino.first.value = False # one of the two is False already
+            domino.second.value = False # change the one that is not yet changed
+            self.flipping = False
+            return
+        # For the domino to be considered, it must be entirely pressed
         if not domino.first.value or not domino.second.value:
             #print("domino not pressed (", change.name, ")")
             #return # FIXME not clear what to do here
@@ -248,10 +266,10 @@ class FlippingDominosWidget(GridViewWidget):
         d1, d2 = self.value.flipped
         # Unlink, reset values, delete dominos
         self.donottrack = True
-        domino.reset()
-        other.reset()
-        del self.dominos[domino.key]
+        other.unlink()
+        domino.unlink()
         del self.dominos[other.key]
+        del self.dominos[domino.key]
         # Build our new dominos
         new_domino, new_other = self.new_domino_with_geometry(d1), self.new_domino_with_geometry(d2)
         self.dominos[new_domino.key] = new_domino
@@ -259,11 +277,8 @@ class FlippingDominosWidget(GridViewWidget):
         # Check that new dominos are sound and the flip has actually been performed
         assert(new_domino is not None and new_other is not None)
         assert(new_domino.geometry != domino.geometry and new_other.geometry != other.geometry)
-        # Compute the dominos
-        new_domino.compute()
-        new_other.compute()
-        new_domino.set_links()
-        new_other.set_links()
         # Reset
+        other.reset()
+        domino.reset()
         self.reset_dirty()
         self.donottrack = False
