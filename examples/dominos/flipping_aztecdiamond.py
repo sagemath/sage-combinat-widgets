@@ -65,16 +65,16 @@ class DominoGeometry:
     def reverse(self):
         return DominoGeometry(self.second, self.first)
 
-    def neighbors(self):
+    def is_neighbor(self, other):
         r"""
-        Return list of parallel neighbouring matches
+        Is `other` a neighbor for self?
         Note: we consider only horizontal or vertical matches"""
-        if self.direction == 'horizontal':
-            return [DominoGeometry((self.first[0] + 1, self.first[1]), (self.second[0] + 1, self.second[1])),
-                    DominoGeometry((self.first[0] - 1, self.first[1]), (self.second[0] - 1, self.second[1]))]
-        else:
-            return [DominoGeometry((self.first[0], self.first[1] + 1), (self.second[0], self.second[1] + 1)),
-                    DominoGeometry((self.first[0], self.first[1] - 1), (self.second[0], self.second[1] - 1))]
+        if self.direction == 'horizontal' and other.first[1] == self.first[1] and other.second[1] == self.second[1] \
+           and abs(other.first[0] - self.first[0]) == 1 and abs(other.second[0] - self.second[0]) == 1:
+            return True
+        if self.direction == 'vertical' and other.first[0] == self.first[0] and other.second[0] == self.second[0] \
+           and abs(other.first[1] - self.first[1]) == 1 and abs(other.second[1] - self.second[1]) == 1:
+            return True
 
     def flip(self, other):
         """Flip self with some neighboring domino"""
@@ -106,6 +106,7 @@ class FlippingAztecDiamond(Graph):
         except:
             raise TypeError("This matching is not suitable for a flipping aztec diamond (tuple {} is not valid)." . format(t))
         self.matching = self.apply_matching(matching) # dominos with only horizontal or vertical consecutive matches
+        self.flipped = None
 
     def __copy__(self):
         return FlippingAztecDiamond.__init__(self, self.aztec_order, ((m.first, m.second) for m in self.matching))
@@ -128,8 +129,8 @@ class FlippingAztecDiamond(Graph):
 
     @staticmethod
     def flip(d1, d2):
-        """d1 and d2 are dominos"""
-        if d1==d2 or not d2 in d1.neighbors():
+        """d1 and d2 are domino geometries"""
+        if d1==d2 or not d1.is_neighbor(d2):
             return
         if d1 < d2:
             d1.flip(d2)

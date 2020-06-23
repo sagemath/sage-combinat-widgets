@@ -23,18 +23,19 @@ class FlippingDominosAdapter(GraphGridViewAdapter):
         or we try to complete the flip if it has been prepared previously
         """
         # Find out the relevant matching for 'pos'
-        d1 = obj.domino_for_position(pos)
+        d1 = obj.domino_for_position(pos) # a DominoGeometry
         if dirty: # if i'm a neighbor, then flip and return a new obj ; else return an error
             # Consider the relevant matching(s)
             for p in dirty:
                 if not dirty[p]: # check this position was pressed
                     continue
                 d2 = obj.domino_for_position(p)
-                if d2 == d1 or not d2 in d1.neighbors():
+                if d2 == d1 or not d1.is_neighbor(d2):
                     continue
-                if d2 in d1.neighbors():
+                if d1.is_neighbor(d2):
                     # Do the flip
                     obj.flip(d1, d2)
+                    obj.flipped = (d1, d2)
                     return obj
             return Exception("Please select a second domino!")
         else:
@@ -62,7 +63,6 @@ class Domino(object):
         b2.link = None
         b1.value = False
         b2.value = False
-        super(Domino, self).__init__()
         self.value = False
         self.geometry = DominoGeometry(b1.position, b2.position)
         self.parent = parent
@@ -70,8 +70,6 @@ class Domino(object):
         self.first = b1
         self.second = b2
         self.buttons = (b1,b2)
-        self.direction = None
-        self.orientation = None
         self.compute()
         if link:
             self.set_links()
@@ -83,7 +81,6 @@ class Domino(object):
 
     def compute(self, css_classes=['b0', 'b1', 'b2', 'b3', 'b4']):
         """Compute buttons relative positions."""
-        self.geometry.compute()
         if css_classes:
             for cl in css_classes:
                 self.first.remove_class(cl)
@@ -133,17 +130,6 @@ class Domino(object):
         del self.second.link
         self.second.value = False
 
-    def flip(self, other):
-        """Flip self with some neighboring domino"""
-        if other == self or other.geometry == self.geometry:
-            return
-        self.reset()
-        other.reset()
-        self.geometry.flip(other.geometry)
-        self.compute()
-        other.compute()
-
-
 def make_cell_widget_class_index(g):
     def cell_widget_class_index(pos):
         d = g.domino_for_position(pos)
@@ -187,6 +173,15 @@ class FlippingDominosWidget(GridViewWidget):
         """Create a domino and let it do the work. NB: the key should always be top-left."""
         d = Domino(self, b1, b2)
         self.dominos[d.key] = d
+
+    def new_domino_with_geometry(self, g):
+        """If possible, create a domino with geometry g for our object"""
+        try:
+            b1 = self.children[g.first[0]].children[g.first[1]]
+            b2 = self.children[g.second[0]].children[g.second[1]]
+        except:
+            return TypeError("Buttons do not exist for geometry %s" % g)
+        return Domino(self, b1, b2, link=False)
 
     def reset(self):
         """Clear dominos and reset every button"""
@@ -237,7 +232,7 @@ class FlippingDominosWidget(GridViewWidget):
                     raise Exception("on a un double dans les voisins pressés: %s et %s" % (
                         other.geometry, self.domino_for_position(pos).geometry))
                 other = self.domino_for_position(pos)
-                if other and not other.geometry in domino.geometry.neighbors():
+                if other and not domino.geometry.is_neighbor(other.geometry):
                     other = None
                     continue # we don't have to reset everything, I guess(hope)
         if not other:
@@ -245,8 +240,12 @@ class FlippingDominosWidget(GridViewWidget):
             self.dirty[domino.geometry.first] = True
             self.dirty[domino.geometry.second] = True
             return
+        # Keep the current geometries
+        old_d1, old_d2 = domino.geometry, other.geometry
         # Do the flip
         super(FlippingDominosWidget, self).set_cell(change)
+        # Retrieve the new geometries
+        d1, d2 = self.value.flipped
         # Unlink, reset values, delete dominos
         self.donottrack = True
         domino.reset()
@@ -254,54 +253,9 @@ class FlippingDominosWidget(GridViewWidget):
         del self.dominos[domino.key]
         del self.dominos[other.key]
         # Build our new dominos
-        new_domino, new_other = None, None
-        for g1 in self.value.matching:
-            if g1.first == domino.geometry.first or g1.first == other.geometry.first:
-                d1, d2 = domino.geometry, other.geometry
-            if g1.first == domino.geometry.first:
-                new_domino = Domino(
-                    self,
-                    self.children[g1.first[0]].children[g1.first[1]],
-                    self.children[g1.second[0]].children[g1.second[1]],
-                    link = False
-                )
-                self.dominos[new_domino.key] = new_domino
-                for g2 in g1.neighbors():
-                    if not g2 in self.value.matching:
-                        continue
-                    if (other.key in (g2.first, g2.second)) or \
-                       (other.key == g1.second and domino.geometry.second in (g2.first, g2.second)):
-                        new_other = Domino(
-                            self,
-                            self.children[g2.first[0]].children[g2.first[1]],
-                            self.children[g2.second[0]].children[g2.second[1]],
-                            link = False
-                        )
-                        self.dominos[new_other.key] = new_other
-                        break
-            elif g1.first == other.geometry.first:
-                new_other = Domino(
-                    self,
-                    self.children[g1.first[0]].children[g1.first[1]],
-                    self.children[g1.second[0]].children[g1.second[1]],
-                    link = False
-                )
-                self.dominos[new_other.key] = new_other
-                for g2 in g1.neighbors():
-                    if not g2 in self.value.matching:
-                        continue
-                    if (domino.key in (g2.first, g2.second)) or \
-                       (domino.key == g1.second and other.geometry.second in (g2.first, g2.second)):
-                        new_domino = Domino(
-                            self,
-                            self.children[g2.first[0]].children[g2.first[1]],
-                            self.children[g2.second[0]].children[g2.second[1]],
-                            link = False
-                        )
-                        self.dominos[new_domino.key] = new_domino
-                        break
-            if new_domino and new_other:
-                break
+        new_domino, new_other = self.new_domino_with_geometry(d1), self.new_domino_with_geometry(d2)
+        self.dominos[new_domino.key] = new_domino
+        self.dominos[new_other.key] = new_other
         # Check that new dominos are sound and the flip has actually been performed
         assert(new_domino is not None and new_other is not None)
         assert(new_domino.geometry != domino.geometry and new_other.geometry != other.geometry)
