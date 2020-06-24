@@ -249,6 +249,10 @@ class FlippingDominosWidget(GridViewWidget):
                 if getattr(self, 'cell_%d_%d' % this_domino.geometry.second) == True:
                     setattr(self, 'cell_%d_%d' % this_domino.geometry.second, False)
                 this_domino.set_links()
+                assert(type(this_domino.first.link) == type(this_domino.second.link) == mydlink)
+                assert(this_domino.value == this_domino.first.value == this_domino.second.value == False)
+                self.reset_links() # Rebuild underlying
+                self.add_links()   # GridViewWidget links
                 self.flipping = False
                 return
             this_domino.reset()
