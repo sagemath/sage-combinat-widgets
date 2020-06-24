@@ -112,6 +112,11 @@ class Domino(object):
     def set_links(self):
         """Create double directional link from both buttons
         and for domino."""
+        for b in [self.first, self.second]:
+            if hasattr(b, 'link') and b.link:
+                b.link.unlink()
+                b.link = None
+                del b.link
         self.first.link = mydlink((self.first, 'value'), (self.second, 'value'))
         self.second.link = mydlink((self.second, 'value'), (self.first, 'value'))
 
@@ -136,7 +141,7 @@ class Domino(object):
 
     def reset(self):
         """Domino value reset"""
-        #self.value = False
+        self.value = False
         self.first.value = False
         self.second.value = False
 
@@ -236,11 +241,21 @@ class FlippingDominosWidget(GridViewWidget):
         if not domino:
             return
         # Second domino, second button
-        if self.flipping:
-            domino.reset() #first.value = False # only one of the two is actually unchanged
-            #domino.second.value = False # change the one that is not yet changed
-            domino.set_links()
-            self.flipping = False
+        if self.flipping: # ici il faut arriver à remettre ce qu'il faut à False, sans jamais aller plus loin dans la fonction
+            this_domino = self.domino_for_position(click_pos)
+            if this_domino.first.value == False and this_domino.second.value == False:
+                if getattr(self, 'cell_%d_%d' % this_domino.geometry.first) == True:
+                    setattr(self, 'cell_%d_%d' % this_domino.geometry.first, False)
+                if getattr(self, 'cell_%d_%d' % this_domino.geometry.second) == True:
+                    setattr(self, 'cell_%d_%d' % this_domino.geometry.second, False)
+                this_domino.set_links()
+                self.flipping = False
+                return
+            this_domino.reset()
+            if getattr(self, 'cell_%d_%d' % this_domino.geometry.first) == True:
+                setattr(self, 'cell_%d_%d' % this_domino.geometry.first, False)
+            if getattr(self, 'cell_%d_%d' % this_domino.geometry.second) == True:
+                setattr(self, 'cell_%d_%d' % this_domino.geometry.second, False)
             return
         # For the domino to be considered, it must be entirely pressed
         if not domino.first.value or not domino.second.value:
@@ -286,8 +301,12 @@ class FlippingDominosWidget(GridViewWidget):
         # Reset
         other.reset()
         domino.reset()
-        # Re-create broken links
-        #new_domino.set_links() -> postponed till the second button is pressed
-        new_other.set_links()
+        # Re-create broken links but only for current domino
+        # and let the second button of the old second domino finish the work
+        this_domino = self.domino_for_position(click_pos)
+        for d in [new_other, new_domino]:
+            if d == this_domino:
+                d.reset()
+                d.set_links()
         self.reset_dirty()
         self.donottrack = False
