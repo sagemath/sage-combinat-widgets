@@ -113,6 +113,29 @@ class cdlink(traitlets.dlink):
         return "A typecasting directional link from source=(%s, %s) to target='%s'" % (
             self.source[0].__class__, self.source[0].value, self.target[1])
 
+class BaseCell(traitlets.HasTraits):
+    r"""
+    Abstract class for all cells
+    """
+    def __init__(self, content, position, **kws):
+        super(BaseCell, self).__init__()
+        self.value = content
+        self.position = position
+
+
+class BaseClass(object):
+    # Define a cell type (aka `class`)
+    def __init__(self, name, cond=lambda x: x):
+        self.name = name
+        self.cond = cond
+
+    def has_property(self, name, value):
+        return name == self.basename and self.cond(value)
+
+    #def eval(self, value=True):
+    #    return (self.basename, value)
+
+
 import sage.misc.classcall_metaclass
 class MetaHasTraitsClasscallMetaclass(traitlets.MetaHasTraits, sage.misc.classcall_metaclass.ClasscallMetaclass):
     pass

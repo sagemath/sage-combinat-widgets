@@ -7,9 +7,9 @@ AUTHORS ::
     Odile Bénassy, Nicolas Thiéry
 
 """
-from .grid_view_editor import GridViewEditor, cdlink
+from .grid_view_editor import BaseCell, BaseClass, GridViewEditor, cdlink
 from sage.graphs.generic_graph import GenericGraph
-from ipywidgets import Layout, VBox, HBox, HTML, ValueWidget
+from ipywidgets import DOMWidget, Layout, VBox, HBox, HTML, ValueWidget
 from singleton_widgets import *
 from six import text_type
 
@@ -19,20 +19,27 @@ buttoncell_layout = Layout(width='5em', height='4em', margin='0', padding='0')
 buttoncell_smaller_layout = Layout(width='2em', height='2em', margin='0', padding='0')
 
 
-class BaseTextCell(TextSingleton):
+class Cell(BaseCell, DOMWidget):
+    r"""
+    Abstract class for all `ipywidgets` cells
+    """
+    def __init__(self, content, position, layout, **kws):
+        super(Cell, self).__init__(content, position, **kws)
+        self.layout = layout
+        self.continuous_update = False
+        self.description_tooltip = '' # avoid None
+
+
+class BaseTextCell(Cell, TextSingleton):
     r"""
     Abstract class for all text cells except blank.
     """
     displaytype = text_type
 
     def __init__(self, content, position, layout, **kws):
-        super(BaseTextCell, self).__init__()
-        self.value = content
-        self.layout = layout
-        self.continuous_update = False
-        self.position = position
-        self.description_tooltip = '' # avoid None
+        super(BaseTextCell, self).__init__(content, position, layout, **kws)
         self.add_class('gridcell')
+
 
 class TextCell(BaseTextCell):
     r"""A regular text grid cell
@@ -55,13 +62,17 @@ class StyledTextCell(TextCell):
         sage: b = StyledTextCell("ok", (1,2))
         Traceback (most recent call last):
         ...
-        TraitError: Element of the '_dom_classes' trait of a StyledTextCell instance must be a unicode string, but a value of None <type 'NoneType'> was specified.
+        TypeError: Constructor cannot be called without a `css_class` argument.
     """
     disable = None
     css_class = None
     style = None
     def __init__(self, content, position, layout=textcell_layout, **kws):
         super(StyledTextCell, self).__init__(content, position, layout, **kws)
+        try:
+            assert self.css_class is not None
+        except:
+            raise TypeError("Constructor cannot be called without a `css_class` argument.")
         self.add_class(self.css_class)
         if self.disable:
             self.disabled = True
@@ -148,8 +159,9 @@ class DisabledTextCell(BaseTextCell):
         super(DisabledTextCell, self).__init__(content, position, layout=layout, **kws)
         self.disabled = True
 
-class ButtonCell(ToggleButtonSingleton):
-    r"""A base class for button grid cells.
+
+class ButtonCell(Cell, ToggleButtonSingleton):
+    r"""A base class for toggle button grid cells.
 
     TESTS ::
 
@@ -159,9 +171,7 @@ class ButtonCell(ToggleButtonSingleton):
     displaytype = bool
 
     def __init__(self, content, position, layout=buttoncell_smaller_layout, **kws):
-        super(ButtonCell, self).__init__(layout=layout)
-        self.value = content
-        self.position = position
+        super(ButtonCell, self).__init__(content, position, layout=layout, **kws)
         self.add_class('gridbutton')
         self.set_tooltip()
 
@@ -309,6 +319,18 @@ def get_model_id(w):
     for u in w.widgets:
         if w.widgets[u] == w:
             return u
+
+class Class(BaseClass):
+    """Define a cell type (aka `class`)
+    related to some CSS display attributes.
+    """
+    def __init(self, name, cond=None):
+        super(Class, self).__init__(name, cond)
+        self.css_class = '%s_%X' % (name, id(cond))
+
+    def get_css_name(self):
+        return self.css_name
+
 
 class GridViewWidget(GridViewEditor, VBox, ValueWidget):
     r"""A widget for all grid-representable Sage objects
