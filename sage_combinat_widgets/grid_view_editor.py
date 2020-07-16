@@ -262,6 +262,8 @@ class GridViewEditor(BindableEditorClass):
         if obj is None:
             return
         self.cells = self.adapter.compute_cells(obj)
+        if hasattr(self.adapter, 'compute_cell_classes'):
+            self.cell_classes = self.adapter.compute_cell_classes(obj)
         celltype = self.adapter.celltype
         cellzero = self.adapter.cellzero
         addablecelltype = self.adapter.addablecelltype or celltype

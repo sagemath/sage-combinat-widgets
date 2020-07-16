@@ -12,6 +12,8 @@ from sage.graphs.generic_graph import GenericGraph
 from ipywidgets import DOMWidget, Layout, VBox, HBox, HTML, ValueWidget
 from singleton_widgets import *
 from six import text_type
+from _functools import reduce
+from operator import iadd
 
 textcell_layout = Layout(width='3em', margin='0', padding='0')
 textcell_wider_layout = Layout(width='7em', height='3em', margin='0', padding='0')
@@ -84,11 +86,15 @@ def apply_css(css_line):
         ip = get_ipython()
         for base in ip.__class__.__mro__:
             """If we are in a notebook, we will find 'notebook' in those names"""
-            if 'otebook' in base.__name__:
+            if 'otebook' in base.__name__ or base.__name__ == 'ZMQInteractiveShell':
                 ip.display_formatter.format(HTML("<style>%s</style>" % css_line))
                 break
     except:
         pass # We are in the test environment
+
+def set_cell_class_attr(cl, css_attr, css_val):
+    # Apply CSS attribute/value to CSS class corresponding to cell class `cl`
+    apply_css(".%s { %s:%s }" % (cl.get_css_name(), css_attr, css_val))
 
 def styled_text_cell(disabled=False, style_name='', style=None):
     r"""A function to create CSS-styled cells.
@@ -320,16 +326,19 @@ def get_model_id(w):
         if w.widgets[u] == w:
             return u
 
-class Class(BaseClass):
+class CellClass(BaseClass):
     """Define a cell type (aka `class`)
     related to some CSS display attributes.
     """
-    def __init(self, name, cond=None):
-        super(Class, self).__init__(name, cond)
-        self.css_class = '%s_%X' % (name, id(cond))
+    def __init__(self, name, cond=None):
+        super(CellClass, self).__init__(name, cond)
+        self.css_name = '%s_%X' % (name, id(cond))
 
     def get_css_name(self):
         return self.css_name
+
+    def eval(self, val=True):
+        return (self.name, value)
 
 
 class GridViewWidget(GridViewEditor, VBox, ValueWidget):
@@ -493,13 +502,23 @@ class GridViewWidget(GridViewEditor, VBox, ValueWidget):
             css_classes = self.css_classes
         if not css_class_index:
             css_class_index = self.cell_widget_class_index
-        for row in self.children:
-            for cell in row.children:
-                if not hasattr(cell, 'position') or cell.position is None:
-                    continue # Do we want to change blank cells' style?
-                for cl in css_classes:
-                    cell.remove_class(cl)
-                cell.add_class(css_classes[css_class_index(cell.position)])
+        # First, initially created CSS classes
+        if css_classes and css_class_index:
+            for row in self.children:
+                for cell in row.children:
+                    if not hasattr(cell, 'position') or cell.position is None:
+                        continue # Do we want to change blank cells' style?
+                    for cl in css_classes:
+                        cell.remove_class(cl)
+                    cell.add_class(css_classes[css_class_index(cell.position)])
+        # Then, CSS classes associated to cell classes
+        all_cell_classes = set([x[0] for x in reduce(iadd, self.cell_classes.values())])
+        for cl in all_cell_classes:
+            for pos in self.cells:
+                self.children[pos[0]].children[pos[1]].remove_class(cl.get_css_name())
+        for pos in self.cell_classes:
+            for cl in self.cell_classes[pos]:
+                self.children[pos[0]].children[pos[1]].add_class(cl[0].get_css_name())
 
     def draw(self, cell_widget_classes=None, cell_widget_class_index=None,
              addable_widget_class=None, blank_widget_class=None):
