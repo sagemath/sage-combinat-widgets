@@ -273,12 +273,8 @@ class FlippingDominosWidget(GridViewWidget):
         other = None
         if self.dirty:
             for pos in self.dirty:
-                if other and other.geometry!=self.domino_for_position(pos).geometry:
-                    raise Exception("on a un double dans les voisins pressés: %s et %s" % (
-                        other.geometry, self.domino_for_position(pos).geometry))
-                other = self.domino_for_position(pos)
-                if other and not domino.geometry.is_neighbor(other.geometry):
-                    other = None
+                if self.domino_for_position(pos).geometry.is_neighbor(domino.geometry):
+                    other = self.domino_for_position(pos)
                     continue # we don't have to reset everything, I guess(hope)
         if not other:
             # Feed the 'dirty' dict and return
@@ -288,7 +284,7 @@ class FlippingDominosWidget(GridViewWidget):
         # Keep the current geometries
         old_d1, old_d2 = domino.geometry, other.geometry
         # Do the flip
-        super(FlippingDominosWidget, self).set_cell(change)
+        super(FlippingDominosWidget, self).set_cell(change, keep_dirty=True)
         # Retrieve the new geometries
         d1, d2 = self.value.flipped
         # Unlink, reset values, delete dominos
@@ -297,12 +293,16 @@ class FlippingDominosWidget(GridViewWidget):
         domino.unlink()
         del self.dominos[other.key]
         del self.dominos[domino.key]
+        # Reset dirty positions
+        for pos in [other.geometry.first, other.geometry.second, domino.geometry.first, domino.geometry.second]:
+            if pos in self.dirty:
+                del self.dirty[pos]
         # Build our new dominos
         new_domino, new_other = self.new_domino_with_geometry(d1, False), self.new_domino_with_geometry(d2, False)
         # Check that new dominos are sound and the flip has actually been performed
         assert(new_domino is not None and new_other is not None)
         assert(new_domino.geometry != domino.geometry and new_other.geometry != other.geometry)
-        # Reset
+        # Reset the dominos
         other.reset()
         domino.reset()
         # Re-create broken links but only for current domino
@@ -312,5 +312,4 @@ class FlippingDominosWidget(GridViewWidget):
             if d == this_domino:
                 d.reset()
                 d.set_links()
-        self.reset_dirty()
         self.donottrack = False

@@ -346,7 +346,7 @@ class GridViewEditor(BindableEditorClass):
         """
         return self.value
 
-    def set_value(self, obj):
+    def set_value(self, obj, keep_dirty=False):
         r"""
         Check compatibility, then set editor value.
 
@@ -366,7 +366,8 @@ class GridViewEditor(BindableEditorClass):
             ...
             ValueError: Object 42 is not compatible. A tableau must be a list of iterables.
         """
-        self.reset_dirty()
+        if not keep_dirty:
+            self.reset_dirty()
         res = self.adapter._validate(obj)
         if issubclass(res.__class__, BaseException):
             raise ValueError("Object %s is not compatible. %s" % (obj, res))
@@ -592,7 +593,7 @@ class GridViewEditor(BindableEditorClass):
         return ''
 
     @traitlets.observe(traitlets.All)
-    def set_cell(self, change):
+    def set_cell(self, change, keep_dirty=False):
         r"""
         What to do when a cell value has been changed.
 
@@ -626,7 +627,7 @@ class GridViewEditor(BindableEditorClass):
                 self.set_dirty(pos, val, result)
             return
         # Success
-        self.set_value(result)
+        self.set_value(result, keep_dirty=keep_dirty)
 
     def addable_cells(self):
         r"""
