@@ -209,20 +209,22 @@ class GridViewAdapter(object):
             [[1, 2, 5, 6], [3, 7, 42], [4]]
             sage: ga.make_dirty(t.to_list(), {(2,0):0})
             [[1, 2, 5, 6], [3, 7]]
+            sage: ga.make_dirty(t.to_list(), {(0,2):0, (0,3):0})
+            [[1, 2], [3, 7], [4]]
         """
         for p in dirty:
             if p[0] < len(l):
                 if p[1] < len(l[p[0]]):
-                    if dirty[p] == self.cellzero:
-                        del l[p[0]][p[1]]
-                    else:
-                        l[p[0]][p[1]] = dirty[p]
-                elif len(l[p[0]]) == p[1] and dirty[p] != self.cellzero:
+                    l[p[0]][p[1]] = dirty[p]
+                elif len(l[p[0]]) <= p[1] and dirty[p] != self.cellzero:
+                    # padding with cellzero
+                    l[p[0]] += [self.cellzero] * (p[1] - len(l[p[0]]))
                     l[p[0]].append(dirty[p])
             else:
                 for i in range(p[0] - len(l)):
                     l.append([])
-                l.append([dirty[p]])
+                l.append([cellzero] * p[1] + [dirty[p]])
+        l = [[ val for val in row if val != self.cellzero ] for row in l]
         return [val for val in l if val]
 
     def set_cell(self, obj, pos, val, dirty={}, constructorname=''):
@@ -237,6 +239,7 @@ class GridViewAdapter(object):
             sage: from sage.combinat.tableau import Tableau
             sage: t = Tableau([[1, 2, 5, 6], [3, 7], [4]])
             sage: ga = GridViewAdapter()
+            sage: ga.cellzero = None
             sage: ga.set_cell(t, (1,1), 8, constructorname='Tableau')
             [[1, 2, 5, 6], [3, 8], [4]]
             sage: ga.cellzero = 0
